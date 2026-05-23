@@ -103,6 +103,35 @@ All skills produce a report with downloaded reference images:
 
 Open `report.html` in any browser to see the screenshots inline.
 
+## Repository structure
+
+- `browse/src` — CLI runtime, browser automation, and tool orchestration.
+- `browse/test` — unit and integration tests for command and browser behavior.
+- `scripts/validate-plugin.mjs` — quick plugin validation entrypoint.
+- `plugins/lazyweb` — packaged plugin payload consumed by Codex/Claude connectors.
+- `plugins/lazyweb/skills` — individual skill definitions and prompts.
+
+## Development
+
+### Install and test
+
+```bash
+npm install
+npm test
+```
+
+The test command runs plugin validation checks used by the plugin marketplace and local CI.
+
+### Verify MCP registration
+
+1. Install or load the plugin package in your host.
+2. Confirm each lazyweb skill shows under your MCP namespace.
+3. Run one smoke command such as `lazyweb_search` for a simple query:
+
+```json
+{"query":"pricing page","limit":3}
+```
+
 ## License
 
 MIT
