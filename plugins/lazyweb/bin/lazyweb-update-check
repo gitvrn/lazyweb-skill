@@ -14,7 +14,7 @@ TTL=86400
 
 # Resolve the local VERSION. Prefer the plugin root the router exports; fall back to
 # this script's own location so it also works when run directly from a checkout.
-SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" 2>/dev/null && pwd)
+SCRIPT_DIR=$(CDPATH= cd -- "$(dirname "$0")" 2>/dev/null && pwd)
 LOCAL_VERSION=""
 for f in "${LAZYWEB_SKILL_ROOT:-}/VERSION" "${SCRIPT_DIR%/}/../VERSION" "${SCRIPT_DIR%/}/../../VERSION"; do
   [ -n "$f" ] && [ -f "$f" ] || continue

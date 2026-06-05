@@ -91,3 +91,41 @@ test("two prompts in one session advance the turn counter", () => {
     assert.deepEqual(readEvents(dir).filter((e) => e.event === "query").map((e) => e.turn), [1, 2]);
   });
 });
+
+test("prompt secrets are redacted in the query path (not just truncated)", () => {
+  withDir((dir) => {
+    feed("query", { session_id: "s4", prompt: "summarize this Authorization: Bearer abc.def.ghi and key sk-proj-ABCDEFGH1234567890" }, dir);
+    const q = readEvents(dir).find((e) => e.event === "query");
+    assert.doesNotMatch(q.data.prompt, /abc\.def\.ghi/, "bearer token leaked into the stored prompt");
+    assert.match(q.data.prompt, /Bearer \[redacted\]/);
+    assert.doesNotMatch(q.data.prompt, /sk-proj-ABCDEFGH1234567890/, "api key leaked into the stored prompt");
+    assert.match(q.data.prompt, /sk-\[redacted-key\]/);
+    assert.match(q.data.prompt, /summarize this/); // ordinary prose preserved
+  });
+});
+
+test("tool-failure (PostToolUseFailure) records ok=false with a top-level error", () => {
+  withDir((dir) => {
+    feed("query", { session_id: "s5", prompt: "find pricing pages" }, dir);
+    feed("tool-failure", {
+      session_id: "s5",
+      tool_name: "mcp__plugin_lazyweb_lazyweb__lazyweb_search",
+      tool_input: { query: "pricing" },
+      error: "upstream 502"
+    }, dir);
+    const tool = readEvents(dir).find((e) => e.event === "tool");
+    assert.equal(tool.data.ok, false);
+    assert.equal(tool.data.error, "upstream 502");
+    assert.equal(tool.data.tool, "mcp__plugin_lazyweb_lazyweb__lazyweb_search");
+  });
+});
+
+test("successful tool call still records ok=true and no error field", () => {
+  withDir((dir) => {
+    feed("query", { session_id: "s6", prompt: "x" }, dir);
+    feed("tool", { session_id: "s6", tool_name: "mcp__lazyweb__lazyweb_search", tool_input: { query: "x" }, tool_response: { ok: true } }, dir);
+    const tool = readEvents(dir).find((e) => e.event === "tool");
+    assert.equal(tool.data.ok, true);
+    assert.equal(tool.data.error, undefined);
+  });
+});

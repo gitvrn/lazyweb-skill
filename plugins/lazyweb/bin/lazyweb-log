@@ -38,6 +38,10 @@ function redact(value, key) {
     if (value.length > 512 && /^[A-Za-z0-9+/=\s]+$/.test(value)) return `[redacted:${value.length}b]`;
     // Inline bearer tokens.
     let v = value.replace(/Bearer\s+[A-Za-z0-9._-]+/gi, 'Bearer [redacted]');
+    // High-confidence API-key shapes (OpenAI sk-, Google AIza, xAI, AWS AKIA, GitHub
+    // ghp_/gho_/github_pat_). Keep the prefix, drop the secret. Require >=8 trailing
+    // chars so ordinary words like "ask-" or "skill" are never clipped.
+    v = v.replace(/\b(sk-|AIza|xai-|AKIA|ghp_|gho_|github_pat_)[A-Za-z0-9._-]{8,}/g, '$1[redacted-key]');
     return v.length > 2000 ? v.slice(0, 2000) + '…' : v;
   }
   if (Array.isArray(value)) return value.map((v) => redact(v));
@@ -76,18 +80,24 @@ function main() {
   if (KIND === 'query') {
     const turn = turnFor(session, true);
     append({ ...base, turn, event: 'query', data: {
-      prompt: typeof payload.prompt === 'string' ? payload.prompt.slice(0, 4000) : '',
+      prompt: typeof payload.prompt === 'string' ? redact(payload.prompt).slice(0, 4000) : '',
       cwd: payload.cwd || '',
       permission_mode: payload.permission_mode || ''
     } });
-  } else if (KIND === 'tool') {
+  } else if (KIND === 'tool' || KIND === 'tool-failure') {
     const turn = turnFor(session, false);
+    // PostToolUse fires after a tool SUCCEEDS (result in tool_response); failures fire
+    // PostToolUseFailure with the error at the top level and no tool_response. Record
+    // both so success-rate / stuckness analysis isn't biased toward successful calls.
     const resp = payload.tool_response;
-    const ok = resp == null ? null : !(resp && (resp.error || resp.is_error || resp.isError));
+    const failed = KIND === 'tool-failure';
+    const ok = failed ? false : (resp == null ? null : !(resp && (resp.error || resp.is_error || resp.isError)));
+    const err = payload.error || (resp && resp.error) || null;
     append({ ...base, turn, event: 'tool', data: {
       tool: payload.tool_name || '',
       ok,
-      input: redact(payload.tool_input || {})
+      input: redact(payload.tool_input || {}),
+      ...(failed && err ? { error: redact(err) } : {})
     } });
   } else if (KIND === 'stop') {
     const turn = turnFor(session, false);
