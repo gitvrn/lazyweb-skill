@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -12,8 +12,8 @@ function read(relativePath) {
 
 test("packages and routes generic A/B test research skill", () => {
   assert.ok(
-    existsSync(path.join(root, "plugins/lazyweb/skills/lazyweb-ab-test-research/SKILL.md")),
-    "missing packaged lazyweb-ab-test-research skill",
+    existsSync(path.join(root, "plugins/lazyweb/internal-skills/lazyweb-ab-test-research/SKILL.md")),
+    "missing routed lazyweb-ab-test-research mode",
   );
   const router = read("plugins/lazyweb/skills/lazyweb/SKILL.md");
   assert.match(router, /lazyweb-ab-test-research/);
@@ -22,17 +22,29 @@ test("packages and routes generic A/B test research skill", () => {
 
 test("packages and routes welcome and feedback skills", () => {
   assert.ok(
-    existsSync(path.join(root, "plugins/lazyweb/skills/lazyweb-welcome/SKILL.md")),
-    "missing packaged lazyweb-welcome skill",
+    existsSync(path.join(root, "plugins/lazyweb/internal-skills/lazyweb-welcome/SKILL.md")),
+    "missing routed lazyweb-welcome mode",
   );
   assert.ok(
-    existsSync(path.join(root, "plugins/lazyweb/skills/lazyweb-feedback/SKILL.md")),
-    "missing packaged lazyweb-feedback skill",
+    existsSync(path.join(root, "plugins/lazyweb/internal-skills/lazyweb-feedback/SKILL.md")),
+    "missing routed lazyweb-feedback mode",
   );
   const router = read("plugins/lazyweb/skills/lazyweb/SKILL.md");
   assert.match(router, /lazyweb-welcome/);
   assert.match(router, /lazyweb-feedback/);
-  assert.match(router, /Bare `\/lazyweb` with no task.*lazyweb-welcome/s);
+  assert.match(router, /Bare `\/lazyweb` or `\/lazyweb:lazyweb` with no task.*lazyweb-welcome/s);
+  assert.match(router, /internal-skills/);
+});
+
+test("publishes exactly one Lazyweb slash skill", () => {
+  const publicSkillDirs = readdirSync(path.join(root, "plugins/lazyweb/skills"), { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name)
+    .sort();
+  assert.deepEqual(publicSkillDirs, ["lazyweb"]);
+  const router = read("plugins/lazyweb/skills/lazyweb/SKILL.md");
+  assert.match(router, /^name:\s*lazyweb\s*$/m);
+  assert.doesNotMatch(router, /directly invocable/);
 });
 
 const publicAbTestArgs = [
@@ -128,7 +140,9 @@ test("README documents the full A/B public and backend filter matrix", () => {
 
 test("README documents first-run welcome, free screenshots, paid A/B, and feedback", () => {
   const readme = read("README.md");
-  assert.match(readme, /\/lazyweb:lazyweb-welcome/);
+  assert.match(readme, /\/lazyweb:lazyweb/);
+  assert.match(readme, /welcome mode/i);
+  assert.match(readme, /Only the router above should appear in slash completion/);
   assert.match(readme, /Free access includes screenshot search/);
   assert.match(readme, /only paid feature/i);
   assert.match(readme, /20k\+.*A\/B tests/i);
@@ -138,14 +152,14 @@ test("README documents first-run welcome, free screenshots, paid A/B, and feedba
 });
 
 test("A/B research skill documents limited data and interesting learning default", () => {
-  const skill = read("plugins/lazyweb/skills/lazyweb-ab-test-research/SKILL.md");
+  const skill = read("plugins/lazyweb/internal-skills/lazyweb-ab-test-research/SKILL.md");
   assert.match(skill, /_experiments.*limited screenshot-diff evidence set/s);
   assert.match(skill, /interesting_learning.*false/s);
   assert.match(skill, /high_design_bar/);
 });
 
 test("A/B research skill documents the full public and backend filter matrix", () => {
-  const skill = read("plugins/lazyweb/skills/lazyweb-ab-test-research/SKILL.md");
+  const skill = read("plugins/lazyweb/internal-skills/lazyweb-ab-test-research/SKILL.md");
   assert.match(skill, /current public paid gateway/);
   assert.match(skill, /Backend\/Internal Experiment Tools/);
   assert.match(skill, /Do not pass `interesting_learning` or `high_design_bar` to the public\s+gateway unless the live tool schema includes those fields/);
@@ -156,11 +170,11 @@ test("A/B research skill documents the full public and backend filter matrix", (
 
 test("design skills all mention high design bar filtering", () => {
   const files = [
-    "plugins/lazyweb/skills/lazyweb-design-improve/SKILL.md",
-    "plugins/lazyweb/skills/lazyweb-design-research/SKILL.md",
-    "plugins/lazyweb/skills/lazyweb-quick-references/SKILL.md",
-    "plugins/lazyweb/skills/lazyweb-design-brainstorm/SKILL.md",
-    "plugins/lazyweb/skills/lazyweb-ab-test-research/SKILL.md",
+    "plugins/lazyweb/internal-skills/lazyweb-design-improve/SKILL.md",
+    "plugins/lazyweb/internal-skills/lazyweb-design-research/SKILL.md",
+    "plugins/lazyweb/internal-skills/lazyweb-quick-references/SKILL.md",
+    "plugins/lazyweb/internal-skills/lazyweb-design-brainstorm/SKILL.md",
+    "plugins/lazyweb/internal-skills/lazyweb-ab-test-research/SKILL.md",
   ];
   for (const file of files) {
     assert.match(read(file), /high_design_bar/, `${file} should mention high_design_bar`);

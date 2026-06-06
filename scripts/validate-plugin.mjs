@@ -7,12 +7,26 @@ import { spawnSync } from "node:child_process";
 const root = path.resolve(new URL("..", import.meta.url).pathname);
 const pluginDir = path.join(root, "plugins/lazyweb");
 
+const publicSkillNames = new Set(["lazyweb"]);
+
+const internalSkillNames = new Set([
+  "lazyweb-ab-test-research",
+  "lazyweb-add-inspo-source",
+  "lazyweb-design-brainstorm",
+  "lazyweb-design-improve",
+  "lazyweb-design-research",
+  "lazyweb-feedback",
+  "lazyweb-flows",
+  "lazyweb-quick-references",
+  "lazyweb-remove-inspo-source",
+  "lazyweb-welcome"
+]);
+
 const publicGatewayTools = new Set([
   "lazyweb_health",
   "lazyweb_search",
   "lazyweb_find_similar",
   "lazyweb_compare_image",
-  "lazyweb_get_flows",
   "lazyweb_list_categories",
   "lazyweb_list_collections",
   "lazyweb_ab_test_research"
@@ -20,6 +34,7 @@ const publicGatewayTools = new Set([
 
 const documentedLazywebTools = new Set([
   ...publicGatewayTools,
+  "lazyweb_get_flows",
   "lazyweb_find_experiments",
   "lazyweb_recent_experiments",
   "search_screenshots",
@@ -88,16 +103,31 @@ function assertMcpConfig() {
 
 function assertSkills() {
   const skillsDir = path.join(pluginDir, "skills");
-  const skillFiles = run("sh", ["-lc", `find ${JSON.stringify(skillsDir)} -path '*/SKILL.md' -type f | sort`]);
-  assert.equal(skillFiles.status, 0, skillFiles.stderr);
-  const files = skillFiles.stdout.trim().split("\n").filter(Boolean);
-  assert.ok(files.length >= 4, "expected bundled Lazyweb skills");
+  const internalSkillsDir = path.join(pluginDir, "internal-skills");
+  const publicSkillFiles = run("sh", ["-lc", `find ${JSON.stringify(skillsDir)} -path '*/SKILL.md' -type f | sort`]);
+  assert.equal(publicSkillFiles.status, 0, publicSkillFiles.stderr);
+  const publicFiles = publicSkillFiles.stdout.trim().split("\n").filter(Boolean);
+  assert.equal(publicFiles.length, publicSkillNames.size, "only the Lazyweb router should be published as a slash skill");
+  assert.equal(path.relative(pluginDir, publicFiles[0]), "skills/lazyweb/SKILL.md");
+
+  const internalSkillFiles = run("sh", ["-lc", `find ${JSON.stringify(internalSkillsDir)} -path '*/SKILL.md' -type f | sort`]);
+  assert.equal(internalSkillFiles.status, 0, internalSkillFiles.stderr);
+  const internalFiles = internalSkillFiles.stdout.trim().split("\n").filter(Boolean);
+  const internalNames = new Set(internalFiles.map((file) => path.basename(path.dirname(file))));
+  assert.deepEqual(internalNames, internalSkillNames, "internal routed Lazyweb skill set drifted");
 
   const mentionedTools = new Set();
+  const files = [...publicFiles, ...internalFiles];
   for (const file of files) {
     const text = readFileSync(file, "utf8");
     assert.match(text, /^---\n[\s\S]+?\n---\n/, `${file} missing YAML frontmatter`);
-    assert.match(text, /^name:\s*.+$/m, `${file} missing skill name`);
+    const name = text.match(/^name:\s*(.+)$/m)?.[1]?.trim();
+    assert.ok(name, `${file} missing skill name`);
+    if (publicFiles.includes(file)) {
+      assert.ok(publicSkillNames.has(name), `${file} exposes unexpected public Lazyweb skill ${name}`);
+    } else {
+      assert.ok(internalSkillNames.has(name), `${file} declares unexpected internal Lazyweb skill ${name}`);
+    }
     assert.match(text, /^description:\s*(\||>|.+)$/m, `${file} missing description`);
     for (const match of text.matchAll(/\b(?:lazyweb_[a-z_]+|search_screenshots|list_filters|list_all_filters|vision_screenshots|metadata_screenshots|get_company_details|list_companies_by_categories)\b/g)) {
       mentionedTools.add(match[0]);
@@ -123,15 +153,19 @@ function assertVersionConsistency() {
 }
 
 function assertSingleSkillSource() {
-  // Single source of truth for skills is plugins/lazyweb/skills/. Root-level
-  // lazyweb-*/ skill dirs drifted historically; fail the build if they return.
+  // Single public slash skill lives in plugins/lazyweb/skills/. Routed internal
+  // modes live in plugins/lazyweb/internal-skills/. Root-level lazyweb-*/ skill
+  // dirs drifted historically; fail the build if they return.
   const strays = run("sh", ["-lc", `ls -d ${JSON.stringify(root)}/lazyweb-*/ 2>/dev/null || true`])
     .stdout.trim().split("\n").filter(Boolean);
-  assert.equal(strays.length, 0, `root-level lazyweb-* skill dirs must not exist (use plugins/lazyweb/skills/). Found: ${strays.join(", ")}`);
+  assert.equal(strays.length, 0, `root-level lazyweb-* skill dirs must not exist. Found: ${strays.join(", ")}`);
 
   const router = path.join(pluginDir, "skills/lazyweb/SKILL.md");
   assert.ok(existsSync(router), "router skill missing: plugins/lazyweb/skills/lazyweb/SKILL.md");
   assert.match(readFileSync(router, "utf8"), /^name:\s*lazyweb\s*$/m, "router skill must declare name: lazyweb");
+  const routerText = readFileSync(router, "utf8");
+  assert.match(routerText, /internal-skills/, "router must load routed modes from internal-skills");
+  assert.doesNotMatch(routerText, /directly invocable/, "router must not advertise internal modes as public slash skills");
 }
 
 function assertBin() {
@@ -274,10 +308,8 @@ async function assertLiveMcpToolNamesWhenRequested() {
   for (const tool of publicGatewayTools) {
     assert.ok(liveTools.has(tool), `live MCP missing public gateway tool ${tool}`);
   }
-  for (const tool of documentedLazywebTools) {
-    if (tool.startsWith("lazyweb_")) continue;
-    assert.ok(liveTools.has(tool), `live MCP missing canonical tool ${tool}`);
-  }
+  // Backend/internal compatibility tools are documented for richer surfaces, but
+  // the hosted public gateway is intentionally narrower.
 }
 
 assertManifest();

@@ -18,7 +18,7 @@ allowed-tools:
 
 # Lazyweb Welcome
 
-Use this as the first call after installing Lazyweb.
+Use this as the routed welcome mode for `/lazyweb:lazyweb` after installing Lazyweb.
 
 ## Preamble
 
@@ -61,7 +61,8 @@ Reply in concise plain language. Include:
   `https://buy.stripe.com/4gM3cwbdE8Mc46df5fawo07`
 - Research taste link:
   `https://www.lazyweb.com/research.md`
-- For feedback, ask the agent to run `/lazyweb:lazyweb-feedback`.
+- For feedback, ask the agent to run `/lazyweb:lazyweb` and say they want to send
+  Lazyweb feedback.
 
 Do not run a research workflow from this skill. If the user gives a concrete
-task after the welcome, route to the matching Lazyweb sub-skill.
+task after the welcome, route to the matching internal Lazyweb mode.

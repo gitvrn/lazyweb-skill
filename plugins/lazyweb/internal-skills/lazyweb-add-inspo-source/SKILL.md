@@ -17,9 +17,9 @@ allowed-tools:
 
 # Add Inspiration Library
 
-Connect an external design inspiration library so all Lazyweb design skills
-(`/lazyweb-design-research`, `/lazyweb-design-improve`, `/lazyweb-design-brainstorm`,
-`/lazyweb-quick-references`) search it alongside Lazyweb's database.
+Connect an external design inspiration library so all routed Lazyweb design modes
+(`lazyweb-design-research`, `lazyweb-design-improve`, `lazyweb-design-brainstorm`,
+`lazyweb-quick-references`) search it alongside Lazyweb's database.
 
 No adapters or scrapers needed — Claude uses the browse tool to navigate the library
 UI at search time, the same way it browses any website.
@@ -152,8 +152,8 @@ Write to `~/.lazyweb/libraries.json`.
 Tell the user:
 - "{Name} is now connected as an inspiration source."
 - "All Lazyweb design skills will now search {Name} alongside Lazyweb's database."
-- "If your session expires, run `/lazyweb-add-inspo-source` again to reconnect."
-- "To disconnect, run `/lazyweb-remove-inspo-source`."
+- "If your session expires, ask `/lazyweb:lazyweb` to reconnect this inspiration source."
+- "To disconnect, ask `/lazyweb:lazyweb` to remove this inspiration source."
 
 ## Important Notes
 

@@ -19,7 +19,7 @@ allowed-tools:
 
 # Lazyweb Flows
 
-Real, ordered multi-screen flows from production apps. Where `/lazyweb-quick-references`
+Real, ordered multi-screen flows from production apps. Where `lazyweb-quick-references`
 shows individual screens, this shows the *sequence* — step 1 → step 2 → step 3 — so the
 user can see how a flow actually moves.
 
@@ -58,7 +58,7 @@ an image and a short label. Read step order carefully — the sequence is the po
 
 **If `lazyweb_get_flows` is not available** (older install, or the flows gateway is not
 deployed yet): tell the user "Flows aren't available on this install yet — they ship with
-a Lazyweb update." Then fall back to `/lazyweb-quick-references` for the individual screens
+a Lazyweb update." Then fall back to `lazyweb-quick-references` for the individual screens
 of that flow, and continue. Do not fail the skill.
 
 ## Download and report

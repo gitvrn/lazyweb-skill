@@ -11,34 +11,67 @@ Your agent searches before it designs. It finds real examples, downloads them lo
 After installing Lazyweb, make the first call:
 
 ```text
-/lazyweb:lazyweb-welcome
+/lazyweb:lazyweb
 ```
 
-The welcome skill explains everything Lazyweb can do, what free screenshot and
-design-reference access includes, the paid A/B Test Agent upgrade for 20k+ A/B
-tests, the Lazyweb Research taste link, and how to send feedback.
+With no extra task, the router loads the welcome mode. It explains everything
+Lazyweb can do, what free screenshot and design-reference access includes, the
+paid A/B Test Agent upgrade for 20k+ A/B tests, the Lazyweb Research taste link,
+and how to send feedback.
 
-## Skills included
+## Public command
 
-**`/lazyweb`** — The entry point. One command that routes you to the right Lazyweb skill. Say what you want ("research onboarding", "improve this screen", "show me pricing references") and it hands off to the matching skill below, or asks which one you meant when it's ambiguous. It also runs a non-blocking update check so you know when a newer plugin is available. Installed as a plugin, it is namespaced `/lazyweb:lazyweb`; you can also just describe your goal and the agent will route through it.
+**`/lazyweb`** - The entry point. One command that routes you to the right
+Lazyweb mode. Say what you want ("research onboarding", "improve this screen",
+"show me pricing references") and it hands off internally, or asks which path you
+meant when it is ambiguous. It also runs a non-blocking update check so you know
+when a newer plugin is available. Installed as a plugin, it is namespaced
+`/lazyweb:lazyweb`; you can also just describe your goal and the agent will route
+through it.
 
-**`/lazyweb-welcome`** — First-run welcome. Explains what Lazyweb can do, what is free, what the paid A/B Test Agent unlocks, and where to send feedback. After installing the plugin, make this your first command: `/lazyweb:lazyweb-welcome`.
+## Internal modes
 
-**`/lazyweb-design-research`** — Deep design research. Identifies competitors, searches Lazyweb + web, downloads reference screenshots, and produces a structured report with: TL;DR, Examples, Findings, Patterns, Anti-Patterns, Unique Angles, and Recommendations. Use for competitive analysis and best practices research.
+Only the router above should appear in slash completion. These routed modes live
+under `plugins/lazyweb/internal-skills/` so the router can load them without
+publishing a long menu of subcommands.
 
-**`/lazyweb-quick-references`** — Find screenshots fast. Searches Lazyweb, downloads results, groups by pattern. Lighter than design-research — just find, group, show. Use when you need visual references, not a full report.
+**Welcome** - First-run welcome. Explains what Lazyweb can do, what is free, what
+the paid A/B Test Agent unlocks, and where to send feedback. After installing the
+plugin, make this your first command: `/lazyweb:lazyweb`.
 
-**`/lazyweb-design-improve`** — Improve an existing design. Captures a screenshot of your current app, finds similar screens from the best apps, and generates 1-5 concrete improvement ideas — each tied to a real reference. Adapted from Lazyweb's production design critique system.
+**Design research** - Deep design research. Identifies competitors, searches
+Lazyweb + web, downloads reference screenshots, and produces a structured report
+with: TL;DR, Examples, Findings, Patterns, Anti-Patterns, Unique Angles, and
+Recommendations. Use for competitive analysis and best practices research.
 
-**`/lazyweb-design-brainstorm`** — Cross-pollination brainstorm. Deliberately searches OUTSIDE your category to find novel patterns. If everyone in fintech copies each other, this skill looks at gaming, entertainment, and social apps for transferable ideas. The "zig when everyone zags" skill.
+**Quick references** - Find screenshots fast. Searches Lazyweb, downloads
+results, groups by pattern. Lighter than design-research: just find, group, show.
+Use when you need visual references, not a full report.
 
-**`/lazyweb-ab-test-research`** — Growth and monetization A/B research. Uses the current public paid gateway when available, and can use richer backend/internal experiment retrieval tools only when the live MCP surface exposes them.
+**Design improvement** - Improve an existing design. Captures a screenshot of
+your current app, finds similar screens from the best apps, and generates 1-5
+concrete improvement ideas, each tied to a real reference. Adapted from Lazyweb's
+production design critique system.
 
-**`/lazyweb-feedback`** — Send Lazyweb feedback. Uses the `lazyweb feedback` CLI command to log product feedback, bug reports, feature requests, or install friction to Lazyweb.
+**Design brainstorm** - Cross-pollination brainstorm. Deliberately searches
+outside your category to find novel patterns. If everyone in fintech copies each
+other, this mode looks at gaming, entertainment, and social apps for transferable
+ideas.
 
-**`/lazyweb-add-inspo-source`** — Connect external inspiration libraries so Lazyweb design skills can include them in research.
+**A/B test research** - Growth and monetization A/B research. Uses the current
+public paid gateway when available, and can use richer backend/internal experiment
+retrieval tools only when the live MCP surface exposes them.
 
-**`/lazyweb-remove-inspo-source`** — Disconnect an external inspiration library.
+**Flows** - Real multi-screen flows such as onboarding, checkout, paywalls, and
+sign-up sequences when the live MCP surface exposes `lazyweb_get_flows`;
+otherwise the router falls back to quick references for the same flow.
+
+**Feedback** - Send Lazyweb feedback. Uses the `lazyweb feedback` CLI command to
+log product feedback, bug reports, feature requests, or install friction to
+Lazyweb.
+
+**Inspiration sources** - Connect or disconnect external inspiration libraries so
+Lazyweb design modes can include them in research.
 
 ## Setup
 
@@ -47,7 +80,8 @@ tests, the Lazyweb Research taste link, and how to send feedback.
 This repo is packaged as a Codex plugin with:
 
 - Plugin source in `plugins/lazyweb/`
-- Skills in `~/plugins/lazyweb/skills/`
+- One public skill in `~/plugins/lazyweb/skills/lazyweb/SKILL.md`
+- Routed internal modes in `~/plugins/lazyweb/internal-skills/`
 - MCP config in `~/plugins/lazyweb/.mcp.json`
 - Marketplace entry in `~/.agents/plugins/marketplace.json`
 
@@ -64,14 +98,13 @@ claude plugin marketplace add https://github.com/aboul3ata/lazyweb-skill
 claude plugin install lazyweb@lazyweb
 ```
 
-Claude Code skills are namespaced as `/lazyweb:<skill-name>`, for example
-`/lazyweb:lazyweb-welcome`.
+Claude Code exposes one namespaced Lazyweb skill: `/lazyweb:lazyweb`.
 
 After installing, restart Claude Code if it was already running, then make the
 first Lazyweb call:
 
 ```text
-/lazyweb:lazyweb-welcome
+/lazyweb:lazyweb
 ```
 
 ### Generate a free token
@@ -100,10 +133,10 @@ https://www.lazyweb.com/research.md
 
 ### Verify
 
-First run the welcome skill:
+First run the router in welcome mode:
 
 ```text
-/lazyweb:lazyweb-welcome
+/lazyweb:lazyweb
 ```
 
 Then list MCP tools, run `lazyweb_health`, and run `lazyweb_search` with:

@@ -37,7 +37,7 @@ or not, ALWAYS:
 6. Ask the user if the research looks good
 7. If in plan mode, exit plan mode after the user confirms — the research is done
 8. Suggest next steps: "You can now use this research to inform your implementation,
-   run `/lazyweb-design-improve` on your current design, or start building."
+   ask `/lazyweb:lazyweb` to improve your current design, or start building."
 
 ## When to Use This
 
@@ -48,9 +48,9 @@ or not, ALWAYS:
 
 ## When NOT to Use This
 
-- User just wants to see a few screenshots quickly → use `/lazyweb-quick-references`
-- User has an existing design and wants improvement ideas → use `/lazyweb-design-improve`
-- User wants creative/unconventional ideas → use `/lazyweb-design-brainstorm`
+- User just wants to see a few screenshots quickly -> route to `lazyweb-quick-references`
+- User has an existing design and wants improvement ideas -> route to `lazyweb-design-improve`
+- User wants creative/unconventional ideas -> route to `lazyweb-design-brainstorm`
 
 ## Lazyweb MCP Setup
 
@@ -217,7 +217,7 @@ in the report. A mismatched reference from Mobbin is just as bad as a mismatched
 from Lazyweb.
 
 **If the library session has expired** (login wall, redirect to sign-in):
-- Tell the user: "Your {library} session has expired. Run `/lazyweb-add-inspo-source` to reconnect."
+- Tell the user: "Your {library} session has expired. Ask `/lazyweb:lazyweb` to reconnect that inspiration source."
 - Skip this library and continue with the rest — don't block the research.
 
 Label all library-sourced references in the report with the library name: `[Mobbin]`, `[Savee]`, etc.

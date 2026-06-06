@@ -25,7 +25,7 @@ cat ~/.lazyweb/libraries.json 2>/dev/null || echo '{"libraries":[]}'
 ```
 
 If no libraries are connected, tell the user: "No inspiration libraries are connected.
-Use `/lazyweb-add-inspo-source` to connect one."
+Ask `/lazyweb:lazyweb` to connect one."
 
 ### 2. Ask Which to Remove
 

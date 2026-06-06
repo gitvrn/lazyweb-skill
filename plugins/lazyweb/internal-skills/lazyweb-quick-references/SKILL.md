@@ -36,7 +36,7 @@ or not, ALWAYS:
 6. Ask the user if the references look good
 7. If in plan mode, exit plan mode after the user confirms
 8. Suggest next steps: "You can now use these references to inform your design,
-   run `/lazyweb-design-research` for deeper analysis, or start building."
+   ask `/lazyweb:lazyweb` for deeper design research, or start building."
 
 ## Ground the search (run first)
 
@@ -54,9 +54,9 @@ Before searching, ground the work in what the user is building, and avoid guessi
 
 ## When NOT to Use This
 
-- User wants deep analysis, competitive research, or best practices → use `/lazyweb-design-research`
-- User has an existing design and wants feedback → use `/lazyweb-design-improve`
-- User wants creative/unconventional ideas → use `/lazyweb-design-brainstorm`
+- User wants deep analysis, competitive research, or best practices -> route to `lazyweb-design-research`
+- User has an existing design and wants feedback -> route to `lazyweb-design-improve`
+- User wants creative/unconventional ideas -> route to `lazyweb-design-brainstorm`
 
 ## Lazyweb MCP Setup
 
@@ -199,7 +199,7 @@ If libraries are configured, search each one using the browse tool. For each lib
 Grab the best 3-5 screenshots per library and move on.
 
 **If the library session has expired** (login wall, redirect to sign-in):
-- Tell the user: "Your {library} session has expired. Run `/lazyweb-add-inspo-source` to reconnect."
+- Tell the user: "Your {library} session has expired. Ask `/lazyweb:lazyweb` to reconnect that inspiration source."
 - Skip this library and continue with other sources.
 
 Label all library-sourced references: `[Mobbin]`, `[Savee]`, etc.

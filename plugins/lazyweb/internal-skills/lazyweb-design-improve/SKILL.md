@@ -32,8 +32,8 @@ or not, ALWAYS:
 5. After saving, show the user a summary of improvement ideas and tell them where the files are
 6. Ask the user if the improvements look good
 7. If in plan mode, exit plan mode after the user confirms
-8. Suggest next steps: "You can now implement these improvements, run
-   `/lazyweb-design-brainstorm` for more creative ideas, or start building."
+8. Suggest next steps: "You can now implement these improvements, ask
+   `/lazyweb:lazyweb` for more creative ideas, or start building."
 
 ---
 
@@ -56,9 +56,9 @@ Before searching, ground the work in what the user is building, and avoid guessi
 
 ## When NOT to Use This
 
-- User hasn't built anything yet and wants research → use `/lazyweb-design-research`
-- User wants to see examples of a specific screen type → use `/lazyweb-quick-references`
-- User wants creative/unconventional ideas → use `/lazyweb-design-brainstorm`
+- User hasn't built anything yet and wants research -> route to `lazyweb-design-research`
+- User wants to see examples of a specific screen type -> route to `lazyweb-quick-references`
+- User wants creative/unconventional ideas -> route to `lazyweb-design-brainstorm`
 
 ## Lazyweb MCP Setup
 
@@ -214,7 +214,7 @@ A reference from Mobbin that doesn't clearly show a better approach than the cur
 design is useless — skip it.
 
 **If the library session has expired** (login wall, redirect to sign-in):
-- Tell the user: "Your {library} session has expired. Run `/lazyweb-add-inspo-source` to reconnect."
+- Tell the user: "Your {library} session has expired. Ask `/lazyweb:lazyweb` to reconnect that inspiration source."
 - Skip this library and continue with other sources.
 
 Label all library-sourced references: `[Mobbin]`, `[Savee]`, etc.
