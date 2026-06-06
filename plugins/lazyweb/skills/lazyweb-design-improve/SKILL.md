@@ -46,7 +46,7 @@ Before searching, ground the work in what the user is building, and avoid guessi
 
 1. **Detect context.** Run `lazyweb-context-detect` (on `PATH` when installed as a plugin; otherwise `<plugin-root>/bin/lazyweb-context-detect`). It prints the project, platform (mobile/desktop), and stack. Use it to bias the `platform` filter and to caption references accurately. (You will also capture the current screen below; context-detect grounds the surrounding product.)
 2. **Clarify only what's missing.** If it reports `platform=unknown`, or you can't tell the product/screen from the request, ask ONE AskUserQuestion to pin down product/screen, mobile vs desktop, and the specific outcome. Skip anything the context already answered; don't interrogate when the request is already clear.
-3. **Search from multiple angles.** Cast 3-5 `lazyweb_search` queries with different wordings and filters (by screen, by competitor `company`, by `category`, by `platform`) instead of one, and read each result's `visionDescription` before using it.
+3. **Search from multiple angles.** Cast 3-5 `lazyweb_search` queries with different wordings and filters (by screen, by competitor `company`, by `category`, by `platform`, by `high_design_bar`) instead of one, and read each result's `visionDescription` before using it.
 
 ## When to Use This
 
@@ -68,11 +68,18 @@ Required MCP tools:
 - `lazyweb_search` — text search over mobile and desktop screenshots
 - `lazyweb_find_similar` — more results like a known Lazyweb screenshot ID
 - `lazyweb_compare_image` — visual search from `image_base64` + `mime_type` or `image_url`
+- `lazyweb_find_experiments` — generic A/B experiment evidence for the screen or category
+- `lazyweb_recent_experiments` — latest 10, 25, or 50 generic experiment rows
+- `lazyweb_ab_test_research` — PM-facing synthesis wrapper over experiment evidence
 - `lazyweb_health` — connectivity check
 
 These are stable public compatibility aliases. The server may also expose canonical
 tools such as `search_screenshots`, `list_filters`, `vision_screenshots`, and
 `metadata_screenshots`; prefer the `lazyweb_*` names in this skill.
+Use `high_design_bar: true` in `lazyweb_search`, `lazyweb_find_similar`,
+`lazyweb_compare_image`, and experiment tools when the user asks for high-design,
+premium, best-designed, or stronger visual-quality examples. This filters to
+companies where `companies.high_design_bar = true`.
 
 Before searching, verify MCP is available by listing tools and running
 `lazyweb_health`.
@@ -172,7 +179,19 @@ a text description of what's actually in the screenshot. Read it.
 
 Mismatched references destroy user trust faster than anything else.
 
-### 3. Search Connected Inspiration Libraries
+### 3. Pull Experiment Evidence
+
+When the user is optimizing a growth, monetization, onboarding, checkout, paywall,
+activation, or cancellation screen, call `lazyweb_find_experiments` with the same
+screen/category filters. Use `lazyweb_recent_experiments` for latest/recent tests.
+If the user asks for high-design-bar or premium examples, include
+`"high_design_bar": true` on both the design search and experiment calls.
+
+Treat `_experiments` as limited screenshot-diff evidence: use it to strengthen or
+weaken each recommendation, but do not claim measured lift unless the evidence says
+so directly.
+
+### 4. Search Connected Inspiration Libraries
 
 Check if `~/.lazyweb/libraries.json` exists and has connected libraries:
 
@@ -200,7 +219,7 @@ design is useless — skip it.
 
 Label all library-sourced references: `[Mobbin]`, `[Savee]`, etc.
 
-### 4. Web Research + Live Screenshot Capture (REQUIRED)
+### 5. Web Research + Live Screenshot Capture (REQUIRED)
 
 **Always supplement** with live competitor screenshots and recent examples.
 
@@ -222,7 +241,7 @@ If no browse tool is available, describe web examples in the report without imag
 
 **Platform balance:** Aim for at least 50% same-platform references.
 
-### 5. Download References
+### 6. Download References
 
 ```bash
 REPORT_DIR="$(pwd)/.lazyweb/design-improve/{screen-slug}-{YYYY-MM-DD}"
@@ -247,7 +266,7 @@ if [ -x "$LB" ]; then
 fi
 ```
 
-### 6. Analyze and Generate Ideas
+### 7. Analyze and Generate Ideas
 
 Look at the current design alongside the references. Consider:
 - What's the user's product context? (audience, platform, goals)
@@ -267,7 +286,7 @@ Generate 1-5 concrete improvement ideas. Each must be:
 - Tied to a reference (which screenshot inspired this idea?)
 - Actionable (the user should be able to implement it)
 
-### 7. Write HTML Improvement Report
+### 8. Write HTML Improvement Report
 
 Write directly to `.lazyweb/design-improve/{screen-slug}-{YYYY-MM-DD}/report.html`.
 Do not create a Markdown version.
@@ -338,7 +357,7 @@ just enough to communicate the layout idea. Example:
 These sketches help the user visualize the improvement without needing to open a
 design tool. They don't need to be pixel-perfect — just communicative.
 
-### 8. HTML Requirements
+### 9. HTML Requirements
 
 The `report.html` file should:
 - Be a self-contained single HTML file with inline CSS (no external dependencies)

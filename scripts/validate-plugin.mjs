@@ -12,6 +12,9 @@ const publicTools = new Set([
   "lazyweb_search",
   "lazyweb_find_similar",
   "lazyweb_compare_image",
+  "lazyweb_find_experiments",
+  "lazyweb_recent_experiments",
+  "lazyweb_ab_test_research",
   "search_screenshots",
   "list_filters",
   "list_all_filters",
@@ -258,7 +261,15 @@ async function assertLiveMcpToolNamesWhenRequested() {
   }
 
   const liveTools = await listLiveMcpTools();
-  for (const tool of ["lazyweb_health", "lazyweb_search", "lazyweb_find_similar", "lazyweb_compare_image"]) {
+  for (const tool of [
+    "lazyweb_health",
+    "lazyweb_search",
+    "lazyweb_find_similar",
+    "lazyweb_compare_image",
+    "lazyweb_find_experiments",
+    "lazyweb_recent_experiments",
+    "lazyweb_ab_test_research"
+  ]) {
     assert.ok(liveTools.has(tool), `live MCP missing compatibility tool ${tool}`);
   }
   for (const tool of publicTools) {

@@ -18,6 +18,8 @@ Your agent searches before it designs. It finds real examples, downloads them lo
 
 **`/lazyweb-design-brainstorm`** — Cross-pollination brainstorm. Deliberately searches OUTSIDE your category to find novel patterns. If everyone in fintech copies each other, this skill looks at gaming, entertainment, and social apps for transferable ideas. The "zig when everyone zags" skill.
 
+**`/lazyweb-ab-test-research`** — Growth and monetization A/B research. Pulls generic experiment evidence from Lazyweb's `_experiments` table, pairs it with visual references, and turns it into PM-facing hypotheses and test strategy. It is not paywall-only.
+
 **`/lazyweb-add-inspo-source`** — Connect external inspiration libraries so Lazyweb design skills can include them in research.
 
 **`/lazyweb-remove-inspo-source`** — Disconnect an external inspiration library.
@@ -81,14 +83,30 @@ List MCP tools, run `lazyweb_health`, then run `lazyweb_search` with:
 | `lazyweb_search` with `company` | Filter by company |
 | `lazyweb_search` with `platform: "desktop"` | Search desktop/web screenshots only |
 | `lazyweb_search` with `platform: "mobile"` | Search mobile app screenshots only |
+| `lazyweb_search` with `high_design_bar: true` | Filter to companies marked `companies.high_design_bar = true` |
 | `lazyweb_compare_image` | Find screenshots visually similar to an image URL or base64 image |
 | `lazyweb_find_similar` | Find screenshots similar to one you already found |
+| `list_companies_by_categories` with `high_design_bar: true` | Return only high-design-bar company IDs for composition |
+| `lazyweb_find_experiments` | Find generic A/B experiment evidence from Lazyweb's experiments table |
+| `lazyweb_recent_experiments` | Pull the latest 10, 25, or 50 generic experiment rows |
+| `lazyweb_ab_test_research` | Turn experiment evidence into PM-facing A/B test research and strategy |
 
 These public `lazyweb_*` tool names are compatibility aliases on `https://www.lazyweb.com/mcp`.
 They map to the current canonical MCP tools such as `search_screenshots`,
 `list_filters`, `vision_screenshots`, and `metadata_screenshots`.
 
 Use MCP tools for all Lazyweb database access.
+
+Use `high_design_bar: true` when the user asks for high-design-bar companies,
+premium examples, best-designed apps, or stronger visual-quality filtering. This
+applies to design tools such as `lazyweb_search`, `lazyweb_find_similar`, and
+`lazyweb_compare_image`, and to A/B tools such as `lazyweb_find_experiments`,
+`lazyweb_recent_experiments`, and `lazyweb_ab_test_research`.
+
+For category-scoped A/B work, call `list_companies_by_categories` first and
+then pass the returned `company_ids` into `lazyweb_find_experiments`.
+`lazyweb_find_experiments` reads generic experiment evidence and must not be
+treated as paywall-only.
 
 ## Output format
 

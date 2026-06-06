@@ -3,10 +3,11 @@ name: lazyweb
 description: |
   Lazyweb entry point — one command for every Lazyweb design tool. Routes the user to
   the right skill: deep design research, quick screenshot references, improving an
-  existing design, cross-category brainstorming, or connecting/disconnecting external
-  inspiration libraries. Use when the user types /lazyweb, says "lazyweb", asks what
-  Lazyweb can do, or makes a design-evidence request and the specific sub-skill is
-  unclear. Design with evidence, not vibes.
+  existing design, A/B test research, cross-category brainstorming, or
+  connecting/disconnecting external inspiration libraries. Use when the user types
+  /lazyweb, says "lazyweb", asks what Lazyweb can do, or makes a design-evidence or
+  experiment-evidence request and the specific sub-skill is unclear. Design with
+  evidence, not vibes.
   Trigger on: "lazyweb", "use lazyweb", "what can lazyweb do", "ask lazyweb", and any
   design research / reference / inspiration request where the right sub-skill is unclear.
 allowed-tools:
@@ -93,6 +94,7 @@ Pick the one sub-skill that matches the user's request and hand off to it.
 | Deep competitive analysis / best-practices research, a full report with references | `lazyweb-design-research` |
 | Just a few screenshots / references, fast — no full report | `lazyweb-quick-references` |
 | Improvement ideas for a design they already have | `lazyweb-design-improve` |
+| A/B tests, experiments, growth hypotheses, monetization strategy | `lazyweb-ab-test-research` |
 | Creative, cross-category ideas ("zig when everyone zags") | `lazyweb-design-brainstorm` |
 | Connect an external inspiration library (Mobbin, Savee, Dribbble…) | `lazyweb-add-inspo-source` |
 | Disconnect an inspiration library | `lazyweb-remove-inspo-source` |
@@ -122,5 +124,10 @@ one source of truth.
 
 - Every sub-skill stays directly invocable (e.g. `/lazyweb:lazyweb-design-research`).
 - All skills are backed by the hosted Lazyweb MCP tools (`lazyweb_search`,
-  `lazyweb_find_similar`, `lazyweb_compare_image`, `lazyweb_health`). If MCP is not
-  installed, the skills degrade to web research and tell the user how to install it.
+  `lazyweb_find_similar`, `lazyweb_compare_image`, `lazyweb_find_experiments`,
+  `lazyweb_recent_experiments`, `lazyweb_ab_test_research`,
+  `list_companies_by_categories`, `lazyweb_health`). If MCP is not installed, the
+  skills degrade to web research and tell the user how to install it.
+- Pass `high_design_bar: true` when the user asks for high-design-bar, premium,
+  best-designed, or stronger visual-quality examples. The filter is backed by
+  `companies.high_design_bar = true` and works for design and A/B evidence tools.
