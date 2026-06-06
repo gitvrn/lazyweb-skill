@@ -30,7 +30,7 @@ available tools and run `lazyweb_health`.
 - `lazyweb_health` — verify Lazyweb MCP connectivity.
 - `lazyweb_ab_test_research` — current public paid gateway for A/B Test Agent research.
 - `lazyweb_search` — pull visual design references to pair with experiment evidence.
-- `lazyweb_compare_image` / `lazyweb_find_similar` — optional visual reference retrieval.
+- `lazyweb_compare_image` / `lazyweb_find_similar` — visual reference retrieval when the target screen or adjacent examples would clarify the recommendation.
 - `lazyweb_list_categories` / `lazyweb_list_collections` — public browsing helpers.
 
 If Lazyweb MCP is not installed or auth fails, tell the user: "Lazyweb MCP is
@@ -49,7 +49,7 @@ Current public `lazyweb_ab_test_research` arguments:
   "constraints": "keep annual plan visible",
   "operation": "research",
   "experiment_ids": ["exp_123"],
-  "include_images": false,
+  "include_images": true,
   "target_image_url": "https://example.com/screen.png",
   "limit": 25,
   "analysis_experiment_limit": 10,
@@ -201,7 +201,8 @@ For ranked App Store slices, add rank filters:
 
 3. **Supplement with design references.** Call `lazyweb_search` for the same
    screen or flow when visual examples would make the recommendation clearer.
-   Read `visionDescription` before relying on any screenshot.
+   Read `visionDescription` before relying on any screenshot, and embed returned
+   `imageUrl` values directly instead of downloading Lazyweb images locally.
 
 4. **Synthesize like a growth PM.** Answer with:
    - Relevant observed experiments and what changed.
@@ -220,4 +221,7 @@ For ranked App Store slices, add rank filters:
 
 For strategy or best-practice questions, answer in chat. For larger audits,
 create `.lazyweb/ab-test-research/{topic}-{date}/report.html` only if the user
-asks for a durable report.
+asks for a durable report. HTML reports should include experiment and reference
+images by default using the `imageUrl`, `control.image_url`, or
+`variant.image_url` fields returned by Lazyweb. Set `include_images: false` only
+when the user explicitly wants metadata-only output.

@@ -1,8 +1,8 @@
 ---
 name: lazyweb-quick-references
 description: |
-  Find app screenshots and UI references quickly. Downloads results locally and
-  groups them by pattern. Use when the user wants to see examples of a specific
+  Find app screenshots and UI references quickly. Embeds Lazyweb results by
+  storage-backed URL and groups them by pattern. Use when the user wants to see examples of a specific
   screen, UI element, or flow without a full research report.
   Trigger on: "show me examples of", "how do other apps do", "design inspiration for",
   "UI reference for", "what does X's app look like", "find screenshots of",
@@ -20,7 +20,7 @@ allowed-tools:
 
 # Lazyweb Quick References
 
-Find real app screenshots fast, download them locally, and group by pattern.
+Find real app screenshots fast, embed Lazyweb images by URL, and group by pattern.
 Lighter than design-research — no competitive analysis, no anti-patterns. Just find → group → show.
 
 ## CRITICAL: Output Behavior
@@ -29,7 +29,7 @@ Lighter than design-research — no competitive analysis, no anti-patterns. Just
 or not, ALWAYS:
 
 1. Write the HTML report to `.lazyweb/quick-references/{topic}-{date}/report.html`
-2. Download references to `.lazyweb/quick-references/{topic}-{date}/references/`
+2. Embed Lazyweb references directly with their `imageUrl`; save only current-state and web-captured screenshots under `.lazyweb/quick-references/{topic}-{date}/references/`
 3. Do NOT create `report.md` or any other Markdown report artifact
 4. Do NOT write research content into a plan file
 5. After saving, show the user a summary and tell them where the files are
@@ -230,10 +230,10 @@ REPORT_DIR="$(pwd)/.lazyweb/quick-references/{topic-slug}-{YYYY-MM-DD}"
 mkdir -p "$REPORT_DIR/references"
 ```
 
-Download Lazyweb results, cap at 30 images:
-```bash
-curl -sL "{imageUrl}" -o "$REPORT_DIR/references/{company}-{screen}.png"
-```
+Do not download Lazyweb database images. Use the `imageUrl` returned by Lazyweb
+directly in the HTML report. Lazyweb image URLs are storage-backed and intended
+for report embedding; if a selected Lazyweb result has no `imageUrl`, omit the
+image and rely on `visionDescription` plus text.
 
 For web-captured examples:
 ```bash
@@ -270,10 +270,10 @@ Put this FIRST so the user gets the answer immediately.}
 ## References
 
 ### Pattern A: {Name}
-![Company Screen](references/company-screen.png)
+![Company Screen]({Lazyweb imageUrl or local web-capture path})
 *{Company} — {What this screen shows, 1 line} [{Lazyweb|Web}]*
 
-![Company2 Screen](references/company2-screen.png)
+![Company2 Screen]({Lazyweb imageUrl or local web-capture path})
 *{Company2} — {What this screen shows} [{Lazyweb|Web}]*
 
 {What these have in common — 1-2 sentences}
@@ -309,9 +309,10 @@ without needing to open a design tool. They don't need to be pixel-perfect — j
 ### 7. HTML Requirements
 
 The `report.html` file should:
-- Be a self-contained single HTML file with inline CSS (no external dependencies)
+- Be a single HTML file with inline CSS (no external CSS/JS dependencies)
 - Use clean, readable styling: system fonts, max-width 900px, comfortable line-height
-- Reference images using RELATIVE paths (`references/filename.png`)
+- Use absolute Lazyweb `imageUrl` values for Lazyweb references
+- Use relative paths (`references/filename.png`) only for current-state and web-captured screenshots saved locally
 - Style images with rounded corners, subtle shadow, max-width that fits the layout
 - Use a light blue callout box for the TL;DR section
 - Open the HTML file in the user's browser: `open "$REPORT_DIR/report.html"`

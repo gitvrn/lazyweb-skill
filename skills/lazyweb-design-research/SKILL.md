@@ -22,7 +22,7 @@ allowed-tools:
 # Lazyweb Design Research
 
 Structured design research that identifies competitors, gathers real app screenshots,
-and produces a report with downloaded visual references.
+and produces a report with embedded visual references.
 
 ## CRITICAL: Output Behavior
 
@@ -30,7 +30,7 @@ and produces a report with downloaded visual references.
 or not, ALWAYS:
 
 1. Write the HTML report to `.lazyweb/design-research/{topic}-{date}/report.html`
-2. Download references to `.lazyweb/design-research/{topic}-{date}/references/`
+2. Embed Lazyweb references directly with their `imageUrl`; save only current-state and web-captured screenshots under `.lazyweb/design-research/{topic}-{date}/references/`
 3. Do NOT create `report.md` or any other Markdown report artifact
 4. Do NOT write research content into a plan file
 5. After saving, show the user a summary of findings and tell them where the files are
@@ -263,10 +263,10 @@ REPORT_DIR="$(pwd)/.lazyweb/design-research/{topic-slug}-{YYYY-MM-DD}"
 mkdir -p "$REPORT_DIR/references"
 ```
 
-For each strong Lazyweb result, download the image:
-```bash
-curl -sL "{imageUrl}" -o "$REPORT_DIR/references/{company}-{screen-slug}.png"
-```
+Do not download Lazyweb database images. Use the `imageUrl` returned by Lazyweb
+directly in the HTML report. Lazyweb image URLs are storage-backed and intended
+for report embedding; if a selected Lazyweb result has no `imageUrl`, omit the
+image and rely on `visionDescription` plus text.
 
 For web-captured examples (from step 5B):
 ```bash
@@ -276,7 +276,8 @@ if [ -x "$LB" ]; then
 fi
 ```
 
-Cap at 30 images total. Name files descriptively: `stripe-pricing-page.png`, `linear-onboarding-step1.png`.
+Cap at 30 visual references total. Name locally captured files descriptively:
+`stripe-pricing-page.png`, `linear-onboarding-step1.png`.
 
 Label each reference with its source in the report: `[Lazyweb]` or `[Web]` so the
 user knows the provenance.
@@ -340,7 +341,7 @@ Mix of Lazyweb and web-captured screenshots. Label each source.}
 ![Stripe Pricing](references/stripe-pricing-page.png)
 *Stripe — Toggle between monthly/annual, social proof above pricing tiers [Web]*
 
-![Linear Onboarding](references/linear-onboarding.png)
+![Linear Onboarding]({Lazyweb imageUrl})
 *Linear — Single question per screen, progress bar, minimal UI [Lazyweb]*
 
 ## Patterns
@@ -368,10 +369,10 @@ Web sources listed here with URLs.}
 ### 9. HTML Requirements
 
 The `report.html` file should:
-- Be a self-contained single HTML file with inline CSS (no external dependencies)
+- Be a single HTML file with inline CSS (no external CSS/JS dependencies)
 - Use clean, readable styling: system fonts, max-width 900px, comfortable line-height
-- Reference images using RELATIVE paths (`references/filename.png`) — HTML files loaded
-  in a browser resolve relative paths correctly from their own directory
+- Use absolute Lazyweb `imageUrl` values for Lazyweb references
+- Use relative paths (`references/filename.png`) only for current-state and web-captured screenshots saved locally
 - Style images with rounded corners, subtle shadow, max-width that fits the layout
 - Use a light blue callout box for the TL;DR section
 - Include proper semantic HTML (h1, h2, h3, p, ul, ol, table)

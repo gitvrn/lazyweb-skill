@@ -76,7 +76,7 @@ When a mode is clear:
 1. Read the corresponding `SKILL.md`.
 2. Follow that mode from the top.
 3. Use Lazyweb MCP tools for database-backed evidence.
-4. Download referenced images and write the report files required by that mode.
+4. Embed Lazyweb database images directly with returned `imageUrl` values, and save only current-state or web-captured screenshots locally when the selected mode requires them.
 5. Cite whether each reference came from Lazyweb or the web.
 
 If the local host exposes the mode skills directly in its slash menu, users may

@@ -26,7 +26,7 @@ allowed-tools:
 or not, ALWAYS:
 
 1. Write the HTML report to `.lazyweb/design-brainstorm/{topic}-{date}/report.html`
-2. Download references to `.lazyweb/design-brainstorm/{topic}-{date}/references/`
+2. Embed Lazyweb references directly with their `imageUrl`; save only current-state and web-captured screenshots under `.lazyweb/design-brainstorm/{topic}-{date}/references/`
 3. Do NOT create `report.md` or any other Markdown report artifact
 4. Do NOT write brainstorm content into a plan file
 5. After saving, show the user a summary of ideas and tell them where the files are
@@ -269,10 +269,10 @@ REPORT_DIR="$(pwd)/.lazyweb/design-brainstorm/{topic-slug}-{YYYY-MM-DD}"
 mkdir -p "$REPORT_DIR/references"
 ```
 
-Download Lazyweb results (cap 30):
-```bash
-curl -sL "{imageUrl}" -o "$REPORT_DIR/references/{company}-{screen}.png"
-```
+Do not download Lazyweb database images. Use the `imageUrl` returned by Lazyweb
+directly in the HTML report. Lazyweb image URLs are storage-backed and intended
+for report embedding; if a selected Lazyweb result has no `imageUrl`, omit the
+image and rely on `visionDescription` plus text.
 
 For web-captured examples:
 ```bash
@@ -327,13 +327,13 @@ HIGH novelty AND HIGH feasibility — not just weird for weird's sake.}
 {What everyone in this category does — the "zig."
 Brief, with 1-2 example screenshots from the user's category.}
 
-![Typical Example](references/typical-category-app.png)
+![Typical Example]({Lazyweb imageUrl or local web-capture path})
 *{Company} — the standard approach in {category} [{Lazyweb|Web}]*
 
 ## Cross-Pollination Ideas
 
 ### From {Source Category}: {Company}
-![Reference](references/company-screen.png)
+![Reference]({Lazyweb imageUrl or local web-capture path})
 *{Company} — {What they do} [{Lazyweb|Web}]*
 
 **The Pattern:** {What's the underlying design pattern, abstracted from the specific app}
@@ -375,9 +375,10 @@ Label each reference `[Lazyweb]` or `[Web]` so the user knows where it came from
 ### 10. HTML Requirements
 
 The `report.html` file should:
-- Be a self-contained single HTML file with inline CSS (no external dependencies)
+- Be a single HTML file with inline CSS (no external CSS/JS dependencies)
 - Use clean, readable styling: system fonts, max-width 900px, comfortable line-height
-- Reference images using RELATIVE paths (`references/filename.png`)
+- Use absolute Lazyweb `imageUrl` values for Lazyweb references
+- Use relative paths (`references/filename.png`) only for current-state and web-captured screenshots saved locally
 - Style images with rounded corners, subtle shadow, max-width that fits the layout
 - Use a light blue callout box for the TL;DR section
 - Make tables clean with light borders and header background
