@@ -46,7 +46,7 @@ Before searching, ground the work in what the user is building, and avoid guessi
 
 1. **Detect context.** Run `lazyweb-context-detect` (on `PATH` when installed as a plugin; otherwise `<plugin-root>/bin/lazyweb-context-detect`). It prints the project, platform (mobile/desktop), and stack. Use it to bias the `platform` filter and to caption references accurately. (You will also capture the current screen below; context-detect grounds the surrounding product.)
 2. **Clarify only what's missing.** If it reports `platform=unknown`, or you can't tell the product/screen from the request, ask ONE AskUserQuestion to pin down product/screen, mobile vs desktop, and the specific outcome. Skip anything the context already answered; don't interrogate when the request is already clear.
-3. **Search from multiple angles.** Cast 3-5 `lazyweb_search` queries with different wordings and filters (by screen, by competitor `company`, by `category`, by `platform`, by `high_design_bar`) instead of one, and read each result's `visionDescription` before using it.
+3. **Search from multiple angles.** Cast 3-5 `lazyweb_search` queries with different wordings and filters (by screen, by competitor `company`, by `category`, by `platform`, and by `high_design_bar` only when exposed) instead of one, and read each result's `visionDescription` before using it.
 
 ## When to Use This
 
@@ -64,22 +64,19 @@ Before searching, ground the work in what the user is building, and avoid guessi
 
 Use the hosted Lazyweb MCP tools at `https://www.lazyweb.com/mcp` for all Lazyweb database access.
 
-Required MCP tools:
+Required current public MCP tools:
 - `lazyweb_search` — text search over mobile and desktop screenshots
 - `lazyweb_find_similar` — more results like a known Lazyweb screenshot ID
 - `lazyweb_compare_image` — visual search from `image_base64` + `mime_type` or `image_url`
-- `lazyweb_find_experiments` — generic A/B experiment evidence for the screen or category
-- `lazyweb_recent_experiments` — latest 10, 25, or 50 generic experiment rows
-- `lazyweb_ab_test_research` — PM-facing synthesis wrapper over experiment evidence
+- `lazyweb_ab_test_research` — public paid A/B Test Agent wrapper when growth experiment evidence is needed
 - `lazyweb_health` — connectivity check
 
-These are stable public compatibility aliases. The server may also expose canonical
-tools such as `search_screenshots`, `list_filters`, `vision_screenshots`, and
-`metadata_screenshots`; prefer the `lazyweb_*` names in this skill.
-Use `high_design_bar: true` in `lazyweb_search`, `lazyweb_find_similar`,
-`lazyweb_compare_image`, and experiment tools when the user asks for high-design,
-premium, best-designed, or stronger visual-quality examples. This filters to
-companies where `companies.high_design_bar = true`.
+Some backend/internal MCP surfaces may also expose `lazyweb_find_experiments`,
+`lazyweb_recent_experiments`, `list_companies_by_categories`, canonical tools
+such as `search_screenshots`, `list_filters`, `vision_screenshots`, and
+`metadata_screenshots`, or `high_design_bar` filters. Use those only when the
+live tool list and schema expose them. Prefer the public `lazyweb_*` gateway
+names in this skill.
 
 Before searching, verify MCP is available by listing tools and running
 `lazyweb_health`.
@@ -182,10 +179,13 @@ Mismatched references destroy user trust faster than anything else.
 ### 3. Pull Experiment Evidence
 
 When the user is optimizing a growth, monetization, onboarding, checkout, paywall,
-activation, or cancellation screen, call `lazyweb_find_experiments` with the same
-screen/category filters. Use `lazyweb_recent_experiments` for latest/recent tests.
-If the user asks for high-design-bar or premium examples, include
-`"high_design_bar": true` on both the design search and experiment calls.
+activation, or cancellation screen, first inspect the live Lazyweb tool list. If
+only the current public gateway is exposed, call `lazyweb_ab_test_research` with
+the target screen, product/category context, conversion goal, and constraints.
+If backend/internal tools are exposed, call `lazyweb_find_experiments` with the
+same screen/category filters, and use `lazyweb_recent_experiments` for
+latest/recent tests. If the user asks for high-design-bar or premium examples,
+include `"high_design_bar": true` only on tools whose live schema supports it.
 
 Treat `_experiments` as limited screenshot-diff evidence: use it to strengthen or
 weaken each recommendation, but do not claim measured lift unless the evidence says

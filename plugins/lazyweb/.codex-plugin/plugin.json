@@ -1,7 +1,7 @@
 {
   "name": "lazyweb",
   "version": "0.2.0",
-  "description": "Lazyweb design research skills backed by the hosted Lazyweb MCP server.",
+  "description": "Lazyweb design research skills backed by free screenshot references and an optional paid A/B Test Agent.",
   "author": {
     "name": "Lazyweb",
     "email": "support@lazyweb.com",
@@ -22,7 +22,7 @@
   "interface": {
     "displayName": "Lazyweb",
     "shortDescription": "Design with real product screenshots",
-    "longDescription": "Use Lazyweb MCP and bundled design skills to search real app and web screenshots, collect visual references, compare existing designs, and produce evidence-backed design research.",
+    "longDescription": "Use Lazyweb MCP and bundled design skills to search real app and web screenshots, collect visual references, compare existing designs, produce evidence-backed design research, and optionally upgrade to A/B Test Agent research.",
     "developerName": "Lazyweb",
     "category": "Design",
     "capabilities": [
@@ -34,8 +34,10 @@
     "privacyPolicyURL": "https://lazyweb.com/privacy",
     "termsOfServiceURL": "https://lazyweb.com/terms",
     "defaultPrompt": [
+      "Run the Lazyweb welcome",
       "Show me pricing page references",
       "Research onboarding best practices",
+      "Show me A/B test research",
       "Improve this design with references"
     ],
     "brandColor": "#111111",
