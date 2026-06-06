@@ -250,6 +250,24 @@ Do not create a Markdown version.
 
 **Reverse pyramid:** Lead with the patterns (the answer), then show the evidence.
 
+**Reference presentation contract:** Do not stack every reference as full-width
+figures down the page. Each pattern should use a compact carousel or horizontal
+scroll-snap reference deck so the reader can flip back and forth between examples
+without losing the analysis. Each slide/card must include:
+- Company/product name, source label (`[Lazyweb]`, `[Web]`, `[Mobbin]`, etc.),
+  and URL when available
+- A one-line "why this is here" caption tying the reference to the pattern
+- The key visual detail to borrow or avoid
+
+For desktop/web landing-page screenshots, never render long full-page captures at
+natural height. Show them in a desktop viewport frame instead: use a 16:10 or
+1440x900-style crop with `overflow: hidden`, `object-fit: cover`, and
+`object-position: top`. If the full page is useful, provide a small "open full
+image/page" link, but keep the in-report visual cropped to desktop dimensions.
+For live web captures, prefer viewport screenshots over full-page screenshots.
+Mobile screenshots can remain portrait, but constrain them with a reasonable
+`max-height` and `object-fit: contain` so they do not dominate the report.
+
 Use this content outline, rendered as semantic HTML:
 
 ```text
@@ -270,11 +288,12 @@ Put this FIRST so the user gets the answer immediately.}
 ## References
 
 ### Pattern A: {Name}
-![Company Screen]({Lazyweb imageUrl or local web-capture path})
-*{Company} — {What this screen shows, 1 line} [{Lazyweb|Web}]*
+{2-4 sentence pattern explanation}
 
-![Company2 Screen]({Lazyweb imageUrl or local web-capture path})
-*{Company2} — {What this screen shows} [{Lazyweb|Web}]*
+Reference carousel:
+- Slide 1: {Company} [{Lazyweb|Web}] - why this reference is here; key detail to borrow
+- Slide 2: {Company2} [{Lazyweb|Web}] - why this reference is here; key detail to borrow
+- Slide 3: {Company3} [{Lazyweb|Web}] - why this reference is here; key detail to borrow
 
 {What these have in common — 1-2 sentences}
 
@@ -313,7 +332,9 @@ The `report.html` file should:
 - Use clean, readable styling: system fonts, max-width 900px, comfortable line-height
 - Use absolute Lazyweb `imageUrl` values for Lazyweb references
 - Use relative paths (`references/filename.png`) only for current-state and web-captured screenshots saved locally
-- Style images with rounded corners, subtle shadow, max-width that fits the layout
+- Use per-pattern reference carousels or horizontal scroll-snap decks instead of long vertical image stacks
+- Crop desktop/web landing-page screenshots into a fixed desktop viewport frame; do not show very long page captures at full height in the report body
+- Style images with rounded corners, subtle shadow, max-width that fits the layout, and height constraints that prevent zoomed-in or oversized visuals
 - Use a light blue callout box for the TL;DR section
 - Open the HTML file in the user's browser: `open "$REPORT_DIR/report.html"`
 

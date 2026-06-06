@@ -292,6 +292,26 @@ get the answer in the first 30 seconds, then optionally dive deeper.
 
 **Skip sections that don't apply.** A narrow question doesn't need all sections. Only include sections where you have real findings.
 
+**Reference presentation contract:** Do not stack every reference as full-width
+figures down the page. Key examples and recommendation evidence should use a
+compact carousel or horizontal scroll-snap reference deck so the reader can flip
+back and forth between examples while keeping the recommendation in view. Each
+slide/card must include:
+- Company/product name, source label (`[Lazyweb]`, `[Web]`, `[Mobbin]`, etc.),
+  and URL when available
+- A one-line "why this is here" caption tying the reference to the specific
+  recommendation, pattern, anti-pattern, or insight
+- The key visual detail to borrow, adapt, or avoid
+
+For desktop/web landing-page screenshots, never render long full-page captures at
+natural height. Show them in a desktop viewport frame instead: use a 16:10 or
+1440x900-style crop with `overflow: hidden`, `object-fit: cover`, and
+`object-position: top`. If the full page is useful, provide a small "open full
+image/page" link, but keep the in-report visual cropped to desktop dimensions.
+For live web captures, prefer viewport screenshots over full-page screenshots.
+Mobile screenshots can remain portrait, but constrain them with a reasonable
+`max-height` and `object-fit: contain` so they do not dominate the report.
+
 Use this content outline, rendered as semantic HTML:
 
 ```text
@@ -335,14 +355,14 @@ These sketches help the user visualize the recommendation without needing to
 open a design tool. They don't need to be pixel-perfect — just communicative.
 
 ## Key Examples
-{The visual centerpiece. Screenshot gallery with company, source, and 1-line insight.
-Mix of Lazyweb and web-captured screenshots. Label each source.}
+{The visual centerpiece. Use a reference carousel or horizontal scroll-snap deck,
+not a long vertical gallery. Mix Lazyweb and web-captured screenshots. Label each
+source. Each slide includes company, URL/source, why it is included, and the
+specific visual detail that supports the recommendation.}
 
-![Stripe Pricing](references/stripe-pricing-page.png)
-*Stripe — Toggle between monthly/annual, social proof above pricing tiers [Web]*
-
-![Linear Onboarding]({Lazyweb imageUrl})
-*Linear — Single question per screen, progress bar, minimal UI [Lazyweb]*
+Reference carousel:
+- Slide 1: Stripe [Web] - why this supports the recommendation; key detail to borrow
+- Slide 2: Linear [Lazyweb] - why this supports the recommendation; key detail to borrow
 
 ## Patterns
 {Common denominators — things the best examples share.
@@ -373,7 +393,9 @@ The `report.html` file should:
 - Use clean, readable styling: system fonts, max-width 900px, comfortable line-height
 - Use absolute Lazyweb `imageUrl` values for Lazyweb references
 - Use relative paths (`references/filename.png`) only for current-state and web-captured screenshots saved locally
-- Style images with rounded corners, subtle shadow, max-width that fits the layout
+- Use reference carousels or horizontal scroll-snap decks for key examples and evidence instead of long vertical image stacks
+- Crop desktop/web landing-page screenshots into a fixed desktop viewport frame; do not show very long page captures at full height in the report body
+- Style images with rounded corners, subtle shadow, max-width that fits the layout, and height constraints that prevent zoomed-in or oversized visuals
 - Use a light blue callout box for the TL;DR section
 - Include proper semantic HTML (h1, h2, h3, p, ul, ol, table)
 - Make tables clean with light borders and header background
