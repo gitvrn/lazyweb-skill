@@ -7,12 +7,21 @@ import { spawnSync } from "node:child_process";
 const root = path.resolve(new URL("..", import.meta.url).pathname);
 const pluginDir = path.join(root, "plugins/lazyweb");
 
-const publicTools = new Set([
+const publicGatewayTools = new Set([
   "lazyweb_health",
   "lazyweb_search",
   "lazyweb_find_similar",
   "lazyweb_compare_image",
   "lazyweb_get_flows",
+  "lazyweb_list_categories",
+  "lazyweb_list_collections",
+  "lazyweb_ab_test_research"
+]);
+
+const documentedLazywebTools = new Set([
+  ...publicGatewayTools,
+  "lazyweb_find_experiments",
+  "lazyweb_recent_experiments",
   "search_screenshots",
   "list_filters",
   "list_all_filters",
@@ -96,7 +105,7 @@ function assertSkills() {
   }
 
   for (const tool of mentionedTools) {
-    assert.ok(publicTools.has(tool), `skill docs mention an unknown Lazyweb MCP tool: ${tool}`);
+    assert.ok(documentedLazywebTools.has(tool), `skill docs mention an unknown Lazyweb MCP tool: ${tool}`);
   }
 }
 
@@ -259,14 +268,13 @@ async function assertLiveMcpToolNamesWhenRequested() {
   }
 
   const liveTools = await listLiveMcpTools();
-  // These lazyweb_* tools must be explicitly listed: the canonical-tool loop below
-  // skips every entry starting with "lazyweb_", so adding one to publicTools alone
-  // does NOT make the live check require it. lazyweb_get_flows is gated here so a
-  // server that hasn't deployed the flows gateway fails this check (intended).
-  for (const tool of ["lazyweb_health", "lazyweb_search", "lazyweb_find_similar", "lazyweb_compare_image", "lazyweb_get_flows"]) {
-    assert.ok(liveTools.has(tool), `live MCP missing compatibility tool ${tool}`);
+  // Lazyweb_* gateway tools must be asserted explicitly: the canonical-tool
+  // loop below skips lazyweb_* aliases so backend/internal docs-only tools do
+  // not make the public live check fail.
+  for (const tool of publicGatewayTools) {
+    assert.ok(liveTools.has(tool), `live MCP missing public gateway tool ${tool}`);
   }
-  for (const tool of publicTools) {
+  for (const tool of documentedLazywebTools) {
     if (tool.startsWith("lazyweb_")) continue;
     assert.ok(liveTools.has(tool), `live MCP missing canonical tool ${tool}`);
   }

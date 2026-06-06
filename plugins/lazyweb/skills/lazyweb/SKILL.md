@@ -2,11 +2,12 @@
 name: lazyweb
 description: |
   Lazyweb entry point — one command for every Lazyweb design tool. Routes the user to
-  the right skill: deep design research, quick screenshot references, improving an
-  existing design, cross-category brainstorming, or connecting/disconnecting external
-  inspiration libraries. Use when the user types /lazyweb, says "lazyweb", asks what
-  Lazyweb can do, or makes a design-evidence request and the specific sub-skill is
-  unclear. Design with evidence, not vibes.
+  the right skill: welcome/getting started, deep design research, quick screenshot
+  references, improving an existing design, A/B test research, cross-category
+  brainstorming, feedback, or connecting/disconnecting external inspiration
+  libraries. Use when the user types /lazyweb, says "lazyweb", asks what Lazyweb
+  can do, or makes a design-evidence or experiment-evidence request and the
+  specific sub-skill is unclear. Design with evidence, not vibes.
   Trigger on: "lazyweb", "use lazyweb", "what can lazyweb do", "ask lazyweb", and any
   design research / reference / inspiration request where the right sub-skill is unclear.
 allowed-tools:
@@ -90,10 +91,13 @@ Pick the one sub-skill that matches the user's request and hand off to it.
 
 | The user wants… | Route to |
 |---|---|
+| Welcome, getting started, first-run orientation, what Lazyweb can do | `lazyweb-welcome` |
 | Deep competitive analysis / best-practices research, a full report with references | `lazyweb-design-research` |
 | Just a few screenshots / references, fast — no full report | `lazyweb-quick-references` |
 | Improvement ideas for a design they already have | `lazyweb-design-improve` |
+| A/B tests, experiments, growth hypotheses, monetization strategy | `lazyweb-ab-test-research` |
 | Creative, cross-category ideas ("zig when everyone zags") | `lazyweb-design-brainstorm` |
+| Send product feedback, bug reports, feature requests, or onboarding friction to Lazyweb | `lazyweb-feedback` |
 | A real multi-screen flow (onboarding, checkout, paywall) step by step | `lazyweb-flows` |
 | Connect an external inspiration library (Mobbin, Savee, Dribbble…) | `lazyweb-add-inspo-source` |
 | Disconnect an inspiration library | `lazyweb-remove-inspo-source` |
@@ -112,9 +116,7 @@ Pick the one sub-skill that matches the user's request and hand off to it.
    skills as options, each with a one-line "best when…", plus a recommendation. Route to
    the chosen one. Do not guess when the cost of guessing wrong is a wasted full report.
 
-3. **Bare `/lazyweb` with no task:** briefly say what Lazyweb does (the table above, in
-   plain language: research, quick references, improve a design, brainstorm, manage
-   inspiration sources) and ask what they want to work on.
+3. **Bare `/lazyweb` with no task:** route to `lazyweb-welcome`.
 
 Do not re-implement a sub-skill here. Always hand off to the real skill file so there is
 one source of truth.
@@ -122,6 +124,19 @@ one source of truth.
 ## Notes
 
 - Every sub-skill stays directly invocable (e.g. `/lazyweb:lazyweb-design-research`).
-- All skills are backed by the hosted Lazyweb MCP tools (`lazyweb_search`,
-  `lazyweb_find_similar`, `lazyweb_compare_image`, `lazyweb_health`). If MCP is not
-  installed, the skills degrade to web research and tell the user how to install it.
+- All skills are backed by the hosted Lazyweb MCP tools. The current public
+  gateway normally exposes `lazyweb_search`, `lazyweb_find_similar`,
+  `lazyweb_compare_image`, `lazyweb_get_flows`, `lazyweb_list_categories`,
+  `lazyweb_list_collections`, `lazyweb_ab_test_research`, and
+  `lazyweb_health`. Richer backend/internal surfaces may also expose
+  `lazyweb_find_experiments`, `lazyweb_recent_experiments`, and
+  `list_companies_by_categories`. Always list the live tools before assuming
+  one of the internal aliases is callable. If MCP is not installed, the skills
+  degrade to web research and tell the user how to install it.
+- Pass `high_design_bar: true` only to tools whose live schema exposes it when
+  the user asks for high-design-bar, premium, best-designed, or stronger
+  visual-quality examples. The filter is backed by
+  `companies.high_design_bar = true` on the backend/internal surfaces that
+  support it.
+- Feedback is sent through the Lazyweb CLI command `lazyweb feedback`; the
+  packaged skill should not write directly to Supabase.

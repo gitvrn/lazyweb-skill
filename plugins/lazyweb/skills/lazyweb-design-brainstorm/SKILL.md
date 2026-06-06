@@ -50,7 +50,7 @@ Before searching, ground the work in what the user is building, and avoid guessi
 
 1. **Detect context.** Run `lazyweb-context-detect` (on `PATH` when installed as a plugin; otherwise `<plugin-root>/bin/lazyweb-context-detect`). It prints the project, platform (mobile/desktop), and stack. Use it to keep ideas applicable to the user's platform even while you search outside their category.
 2. **Clarify only what's missing.** If it reports `platform=unknown`, or you can't tell the product/problem from the request, ask ONE AskUserQuestion to pin down the product, the platform, and what they're trying to spark. Skip anything the context already answered.
-3. **Search from multiple angles.** Cast 3-5 `lazyweb_search` queries across deliberately different categories (the cross-pollination move) and read each result's `visionDescription` before using it.
+3. **Search from multiple angles.** Cast 3-5 `lazyweb_search` queries across deliberately different categories (the cross-pollination move) and read each result's `visionDescription` before using it. Add `high_design_bar: true` only when the live schema exposes it and the user asks for high-design-bar, premium, best-designed, or stronger visual-quality examples.
 
 ## When to Use This
 
@@ -75,9 +75,11 @@ Required MCP tools:
 - `lazyweb_compare_image` — visual search from `image_base64` + `mime_type` or `image_url`
 - `lazyweb_health` — connectivity check
 
-These are stable public compatibility aliases. The server may also expose canonical
-tools such as `search_screenshots`, `list_filters`, `vision_screenshots`, and
-`metadata_screenshots`; prefer the `lazyweb_*` names in this skill.
+These are the current public gateway names. Backend/internal surfaces may also
+expose canonical tools such as `search_screenshots`, `list_filters`,
+`vision_screenshots`, and `metadata_screenshots`; prefer the `lazyweb_*` names
+in this skill. Use `high_design_bar: true` only when the live schema exposes it
+to filter to companies where `companies.high_design_bar = true`.
 
 Before searching, verify MCP is available by listing tools and running
 `lazyweb_health`.

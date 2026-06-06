@@ -68,9 +68,13 @@ Required MCP tools:
 - `lazyweb_compare_image` — visual search from `image_base64` + `mime_type` or `image_url`
 - `lazyweb_health` — connectivity check
 
-These are stable public compatibility aliases. The server may also expose canonical
-tools such as `search_screenshots`, `list_filters`, `vision_screenshots`, and
-`metadata_screenshots`; prefer the `lazyweb_*` names in this skill.
+These are the current public gateway names. Backend/internal surfaces may also
+expose canonical tools such as `search_screenshots`, `list_filters`,
+`vision_screenshots`, and `metadata_screenshots`; prefer the `lazyweb_*` names
+in this skill. Use `high_design_bar: true` only when the live tool schema exposes
+it and the user asks for high-design-bar companies, premium examples,
+best-designed apps, or stronger visual-quality filtering. That filter is backed
+by `companies.high_design_bar = true`.
 
 Before searching, verify MCP is available by listing tools and running
 `lazyweb_health`.
@@ -143,7 +147,7 @@ Call `lazyweb_search` 2-4 times with different angles:
 - Think in concrete UI elements: "pricing page with toggle", "dark mode settings", "onboarding with progress bar"
 - Use `--category` for domain filtering: "Health & Fitness", "Finance", "Productivity"
 - Use `--company` to find specific apps: `--company "stripe"`
-- Use `--fields high_design_bar` to filter for quality
+- Use `high_design_bar: true` to filter for quality only when the live schema exposes it
 
 **Platform routing:** Lazyweb has both mobile app screenshots and desktop/web site screenshots.
 - `--platform mobile` — mobile app screenshots only
@@ -322,3 +326,4 @@ Tell the user where the report was saved.
 - **"Same company"** → call `lazyweb_search` with `{"query":"<query>","company":"<name>","limit":30}`
 - **"Different style"** → Rephrase query emphasizing the desired difference
 - **"What about competitors?"** → Search for the same screen across different companies
+- **"Higher design bar"** → call `lazyweb_search` or `lazyweb_find_similar` with `{"high_design_bar":true}` only when exposed

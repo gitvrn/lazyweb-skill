@@ -62,9 +62,13 @@ Required MCP tools:
 - `lazyweb_compare_image` — visual search from `image_base64` + `mime_type` or `image_url`
 - `lazyweb_health` — connectivity check
 
-These are stable public compatibility aliases. The server may also expose canonical
-tools such as `search_screenshots`, `list_filters`, `vision_screenshots`, and
-`metadata_screenshots`; prefer the `lazyweb_*` names in this skill.
+These are the current public gateway names. Backend/internal surfaces may also
+expose canonical tools such as `search_screenshots`, `list_filters`,
+`vision_screenshots`, and `metadata_screenshots`; prefer the `lazyweb_*` names
+in this skill. Use `high_design_bar: true` only when the live tool schema exposes
+it and the user asks for high-design-bar companies, premium examples,
+best-designed apps, or stronger visual-quality filtering. That filter is backed
+by `companies.high_design_bar = true`.
 
 Before searching, verify MCP is available by listing tools and running
 `lazyweb_health`.
@@ -156,6 +160,9 @@ Call `lazyweb_search` multiple times with different angles:
 {"query":"<different description of same thing>","limit":30}
 {"query":"<even more specific variant>","limit":30}
 ```
+
+If the live schema exposes `high_design_bar`, add it to one search when the user
+asks for high-design-bar, premium, or best-designed examples.
 
 **Platform routing:** Lazyweb has both mobile app screenshots and desktop/web site screenshots.
 - `--platform mobile` — mobile app screenshots only
