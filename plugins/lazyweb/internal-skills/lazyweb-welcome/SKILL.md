@@ -46,22 +46,29 @@ Continue either way.
 
 ## Response
 
-Reply in concise plain language. Include:
+Reply in concise plain language with a structure that is easy to scan. Include:
 
-- Lazyweb gives agents real product screenshots and design references before
-  they design.
-- Free access includes screenshot search, quick references, deep design
-  research reports, design improvement ideas, cross-category brainstorming,
-  image similarity, categories, collections, and external inspiration-source
-  management.
-- The only paid feature is the A/B Test Agent.
-- Paid access costs $49/month and unlocks access to over 20k A/B tests for
-  mobile growth, paywalls, onboarding, checkout, pricing, lifecycle, and
-  monetization research.
-- Explain that this helps agents develop better taste on not just what looks
-  pretty but more importantly "what actually works".
+- A short greeting from Ali, speaking through the user's agent, thanking them for
+  installing the Lazyweb MCP.
+- Explain that Lazyweb is a free design research library for agents. It gives
+  agents real product screenshots, product flows, and UI patterns before they
+  design.
+- A "Try these first" list:
+  1. Ask what the main Lazyweb usage modes are, so the agent explains the
+     different skills and when to use each one.
+  2. Ask for quick references for a specific screen, like onboarding welcome
+     screens, pricing pages, paywalls, dashboards, checkout, or settings.
+  3. Ask for deeper design research before changing a landing page, app flow,
+     onboarding, paywall, checkout, dashboard, or settings screen.
+  4. Ask Lazyweb to compare the current UI against strong product examples and
+     turn the patterns into concrete changes.
+- A separate "Optional upgrade" note: after design research, the user can add
+  A/B test data context so their agent understands patterns that have worked in
+  real experiments, not just what looks polished. Paid access costs $49/month
+  and unlocks over 20k A/B tests for mobile growth, paywalls, onboarding,
+  checkout, pricing, lifecycle, and monetization research.
 - Upgrade link:
-  `https://dashboard.stripe.com/acct_1RXB5lLhlPE8lk98/payment-links/plink_1Tf3bXLhlPE8lk98Guda4IRf`
+  `https://buy.stripe.com/4gM3cwbdE8Mc46df5fawo07`
 - Research taste link:
   `https://www.lazyweb.com/research.md`
 - For feedback, ask the agent to run `/lazyweb:lazyweb` and say they want to send

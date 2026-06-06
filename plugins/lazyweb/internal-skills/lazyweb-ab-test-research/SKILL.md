@@ -58,7 +58,7 @@ the tool. The expected paid-gate copy is: the A/B Test Agent costs $49/month,
 includes access to over 20k A/B tests, and helps agents develop better taste on
 not just what looks pretty but more importantly "what actually works". Include
 the unlock link:
-`https://dashboard.stripe.com/acct_1RXB5lLhlPE8lk98/payment-links/plink_1Tf3bXLhlPE8lk98Guda4IRf`.
+`https://buy.stripe.com/4gM3cwbdE8Mc46df5fawo07`.
 Then continue with free visual references if useful.
 
 ### Backend/Internal Experiment Tools

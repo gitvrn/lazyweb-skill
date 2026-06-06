@@ -148,9 +148,24 @@ test("README documents first-run welcome, free screenshots, paid A/B, and feedba
   assert.match(readme, /\$49\/month/);
   assert.match(readme, /over 20k.*A\/B tests/i);
   assert.match(readme, /what actually works/);
-  assert.match(readme, /https:\/\/dashboard\.stripe\.com\/acct_1RXB5lLhlPE8lk98\/payment-links\/plink_1Tf3bXLhlPE8lk98Guda4IRf/);
+  assert.match(readme, /https:\/\/buy\.stripe\.com\/4gM3cwbdE8Mc46df5fawo07/);
+  assert.doesNotMatch(readme, /dashboard\.stripe\.com/);
+  assert.match(readme, /welcome screen inspiration/);
   assert.match(readme, /https:\/\/www\.lazyweb\.com\/research\.md/);
   assert.match(readme, /lazyweb feedback/);
+});
+
+test("welcome and paid-gate skills use public checkout URL and structured first-run copy", () => {
+  const welcome = read("plugins/lazyweb/internal-skills/lazyweb-welcome/SKILL.md");
+  assert.match(welcome, /short greeting from Ali/i);
+  assert.match(welcome, /Try these first/);
+  assert.match(welcome, /Optional upgrade/);
+  assert.match(welcome, /https:\/\/buy\.stripe\.com\/4gM3cwbdE8Mc46df5fawo07/);
+  assert.doesNotMatch(welcome, /dashboard\.stripe\.com/);
+
+  const abTest = read("plugins/lazyweb/internal-skills/lazyweb-ab-test-research/SKILL.md");
+  assert.match(abTest, /https:\/\/buy\.stripe\.com\/4gM3cwbdE8Mc46df5fawo07/);
+  assert.doesNotMatch(abTest, /dashboard\.stripe\.com/);
 });
 
 test("A/B research skill documents limited data and interesting learning default", () => {

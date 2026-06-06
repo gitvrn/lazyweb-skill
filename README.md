@@ -128,7 +128,7 @@ Test Agent is the only paid feature. It costs $49/month and unlocks access to
 over 20k mobile growth, paywall, onboarding, checkout, pricing, lifecycle, and
 monetization A/B tests. It helps agents develop better taste on not just what
 looks pretty but more importantly "what actually works":
-https://dashboard.stripe.com/acct_1RXB5lLhlPE8lk98/payment-links/plink_1Tf3bXLhlPE8lk98Guda4IRf
+https://buy.stripe.com/4gM3cwbdE8Mc46df5fawo07
 
 To get a taste of the experiment library, read Lazyweb Research:
 https://www.lazyweb.com/research.md
@@ -141,10 +141,10 @@ First run the router in welcome mode:
 /lazyweb:lazyweb
 ```
 
-Then list MCP tools, run `lazyweb_health`, and run `lazyweb_search` with:
+Then list MCP tools, run `lazyweb_health`, and run `lazyweb_search` with a neutral setup check:
 
 ```json
-{"query":"pricing page","limit":3}
+{"query":"welcome screen inspiration","limit":3}
 ```
 
 ## Tool surfaces
@@ -286,7 +286,7 @@ The test command runs plugin validation checks used by the plugin marketplace an
 3. Run one smoke command such as `lazyweb_search` for a simple query:
 
 ```json
-{"query":"pricing page","limit":3}
+{"query":"welcome screen inspiration","limit":3}
 ```
 
 ## License
