@@ -46,10 +46,17 @@ if [ -z "$REMOTE_VERSION" ]; then
   printf '%s\n%s\n' "$now" "$REMOTE_VERSION" > "$CACHE_FILE" 2>/dev/null || true
 fi
 
-# Print only when the remote version is strictly greater (numeric, dot-separated,
-# up to 4 segments: MAJOR.MINOR.PATCH.BUILD).
+# Print only when the remote version is strictly greater. Compare ONLY the numeric
+# dotted base (strip any pre-release/build suffix like "-rc1" or "+build"): a plain
+# sort ranks "1.2.3-rc1" above "1.2.3" lexically, which would wrongly report a stable
+# install as upgradable to a same-version pre-release. Stripping to the numeric base
+# means a same-base pre-release is never an upgrade.
 [ "$REMOTE_VERSION" = "$LOCAL_VERSION" ] && exit 0
-higher=$(printf '%s\n%s\n' "$LOCAL_VERSION" "$REMOTE_VERSION" \
+_lbase=$(printf '%s' "$LOCAL_VERSION" | sed 's/[^0-9.].*$//')
+_rbase=$(printf '%s' "$REMOTE_VERSION" | sed 's/[^0-9.].*$//')
+[ -z "$_rbase" ] && exit 0
+[ "$_rbase" = "$_lbase" ] && exit 0
+higher=$(printf '%s\n%s\n' "$_lbase" "$_rbase" \
   | sort -t. -k1,1n -k2,2n -k3,3n -k4,4n 2>/dev/null | tail -1)
-[ "$higher" = "$REMOTE_VERSION" ] && printf 'UPGRADE_AVAILABLE %s %s\n' "$LOCAL_VERSION" "$REMOTE_VERSION"
+[ "$higher" = "$_rbase" ] && printf 'UPGRADE_AVAILABLE %s %s\n' "$LOCAL_VERSION" "$REMOTE_VERSION"
 exit 0

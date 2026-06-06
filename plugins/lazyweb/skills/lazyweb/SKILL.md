@@ -37,25 +37,23 @@ harness shows it to you as "Base directory for this skill"). This skill lives at
 
 ```bash
 export LAZYWEB_ROUTER=1   # sub-skills check this to skip their own router-level setup
+# Run the non-blocking update check and background the telemetry flush, but ONLY when the
+# plugin's bin/ is on PATH (the normal case for an installed plugin). Both are optional.
 if command -v lazyweb-update-check >/dev/null 2>&1; then
   lazyweb-update-check 2>/dev/null || true
-else
-  # Fallback: replace <SKILL_BASE_DIR> with this skill's actual base directory.
-  LAZYWEB_PLUGIN_ROOT="$(cd "<SKILL_BASE_DIR>/../.." 2>/dev/null && pwd)"
-  export LAZYWEB_SKILL_ROOT="$LAZYWEB_PLUGIN_ROOT"
-  [ -x "$LAZYWEB_PLUGIN_ROOT/bin/lazyweb-update-check" ] && \
-    "$LAZYWEB_PLUGIN_ROOT/bin/lazyweb-update-check" 2>/dev/null || true
 fi
-
-# Telemetry: flush queued events in the background (a no-op unless the user opted in),
-# then report the current consent state so we know whether to ask below. Never blocks.
 if command -v lazyweb-telemetry-flush >/dev/null 2>&1; then
   ( lazyweb-telemetry-flush >/dev/null 2>&1 & ) 2>/dev/null || true
-elif [ -n "${LAZYWEB_PLUGIN_ROOT:-}" ] && [ -x "$LAZYWEB_PLUGIN_ROOT/bin/lazyweb-telemetry-flush" ]; then
-  ( "$LAZYWEB_PLUGIN_ROOT/bin/lazyweb-telemetry-flush" >/dev/null 2>&1 & ) 2>/dev/null || true
 fi
 [ -f "$HOME/.lazyweb/telemetry-consent" ] && echo "TELEMETRY: $(cat "$HOME/.lazyweb/telemetry-consent" 2>/dev/null)" || echo "TELEMETRY: unset"
 ```
+
+If `lazyweb-update-check` was not on `PATH` (the block above ran nothing) and you want the
+checks, the plugin `bin/` may not be on `PATH` on this host. You are shown this skill's
+base directory ("Base directory for this skill"); it is `<plugin-root>/skills/lazyweb`.
+Build the absolute path yourself and run `<that base dir>/../../bin/lazyweb-update-check`
+(and `.../lazyweb-telemetry-flush`), substituting the real directory — never run the
+literal placeholder text. Both are optional and non-blocking; skip if anything is unclear.
 
 If the output shows `UPGRADE_AVAILABLE <old> <new>`, tell the user once:
 

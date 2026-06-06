@@ -30,7 +30,12 @@ function readStdin() {
   try { return fs.readFileSync(0, 'utf8'); } catch (_) { return ''; }
 }
 
-function redact(value, key) {
+function redact(value, key, depth) {
+  // Depth guard: a pathologically deep (JSON-representable) tool_input/response would
+  // otherwise blow the call stack. Caught by main()'s try/catch, but that silently drops
+  // the whole event; capping keeps the rest of the event intact.
+  depth = depth || 0;
+  if (depth > 12) return '[redacted:too-deep]';
   if (value == null) return value;
   if (typeof value === 'string') {
     if (key && SECRET_KEYS.test(key)) return '[redacted]';
@@ -44,10 +49,10 @@ function redact(value, key) {
     v = v.replace(/\b(sk-|AIza|xai-|AKIA|ghp_|gho_|github_pat_)[A-Za-z0-9._-]{8,}/g, '$1[redacted-key]');
     return v.length > 2000 ? v.slice(0, 2000) + '…' : v;
   }
-  if (Array.isArray(value)) return value.map((v) => redact(v));
+  if (Array.isArray(value)) return value.map((v) => redact(v, undefined, depth + 1));
   if (typeof value === 'object') {
     const out = {};
-    for (const k of Object.keys(value)) out[k] = SECRET_KEYS.test(k) ? '[redacted]' : redact(value[k], k);
+    for (const k of Object.keys(value)) out[k] = SECRET_KEYS.test(k) ? '[redacted]' : redact(value[k], k, depth + 1);
     return out;
   }
   return value;

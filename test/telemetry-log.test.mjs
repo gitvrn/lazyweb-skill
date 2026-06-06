@@ -129,3 +129,17 @@ test("successful tool call still records ok=true and no error field", () => {
     assert.equal(tool.data.error, undefined);
   });
 });
+
+test("deeply nested tool_input is depth-capped, never crashes", () => {
+  withDir((dir) => {
+    let leaf = {};
+    const root = leaf;
+    for (let i = 0; i < 40; i++) { const next = {}; leaf.a = next; leaf = next; }
+    feed("query", { session_id: "s7", prompt: "x" }, dir);
+    const res = feed("tool", { session_id: "s7", tool_name: "mcp__lazyweb__lazyweb_search", tool_input: { deep: root } }, dir);
+    assert.equal(res.status, 0); // never throws or hangs
+    const tool = readEvents(dir).find((e) => e.event === "tool");
+    assert.ok(tool, "event still written despite deep nesting");
+    assert.match(JSON.stringify(tool.data.input), /redacted:too-deep/);
+  });
+});

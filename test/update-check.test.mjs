@@ -53,3 +53,12 @@ test("minor ordering is numeric not lexical (9 < 10)", () => {
 test("never errors on a junk remote value", () => {
   assert.equal(run("0.2.0", "not-a-version").status, 0);
 });
+
+test("same numeric base with a pre-release/build suffix is NOT an upgrade", () => {
+  assert.equal(run("1.2.3", "1.2.3-rc1").out, "");
+  assert.equal(run("0.2.0", "0.2.0+build7").out, "");
+});
+
+test("a higher numeric base still wins even with a pre-release suffix", () => {
+  assert.equal(run("1.2.3", "1.2.4-rc1").out, "UPGRADE_AVAILABLE 1.2.3 1.2.4-rc1");
+});
