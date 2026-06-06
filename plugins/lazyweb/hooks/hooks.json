@@ -9,9 +9,17 @@
     ],
     "PostToolUse": [
       {
-        "matcher": "mcp__.*lazyweb.*__.*",
+        "matcher": "mcp__.*lazyweb__.*",
         "hooks": [
           { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/bin/lazyweb-log tool" }
+        ]
+      }
+    ],
+    "PostToolUseFailure": [
+      {
+        "matcher": "mcp__.*lazyweb__.*",
+        "hooks": [
+          { "type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/bin/lazyweb-log tool-failure" }
         ]
       }
     ],

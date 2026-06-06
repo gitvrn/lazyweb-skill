@@ -3,11 +3,13 @@
 /*
  * lazyweb-telemetry-flush
  *
- * If (and only if) the user has opted in, upload not-yet-sent local events to the
- * ingest endpoint. This is the ONLY component that sends anything off the machine.
+ * Upload opted-in local telemetry to the ingest endpoint, then REMOVE what was sent so
+ * events.jsonl stays bounded (the previous offset-only approach let the file grow without
+ * limit and re-read the whole thing every run). Single-flight via a lock file so two
+ * concurrent flushes (the router backgrounds one per invocation) can't double-send.
  *
  * Opt-in gate (D2): does nothing unless ~/.lazyweb/telemetry-consent reads "community".
- * Best-effort: time-boxed, never blocks, never throws. The router runs it backgrounded.
+ * Best-effort: time-boxed, never blocks, never throws.
  */
 const fs = require('fs');
 const os = require('os');
@@ -17,41 +19,80 @@ const HOME = process.env.HOME || os.homedir();
 const ROOT = path.join(HOME, '.lazyweb');
 const ANALYTICS_DIR = process.env.LAZYWEB_ANALYTICS_DIR || path.join(ROOT, 'analytics');
 const EVENTS_FILE = path.join(ANALYTICS_DIR, 'events.jsonl');
-const OFFSET_FILE = path.join(ANALYTICS_DIR, '.uploaded-offset');
+const LOCK_FILE = path.join(ANALYTICS_DIR, '.flush.lock');
 const CONSENT_FILE = process.env.LAZYWEB_CONSENT_FILE || path.join(ROOT, 'telemetry-consent');
 const TOKEN_FILE = path.join(ROOT, 'lazyweb_mcp_token');
 const ENDPOINT = process.env.LAZYWEB_EVENTS_URL || 'https://cli-lazybackend.onrender.com/events';
 
+const MAX_BATCH = 500;               // events uploaded per run
+const MAX_BYTES = 5 * 1024 * 1024;   // bound on events.jsonl when uploads keep failing
+const STALE_LOCK_MS = 60 * 1000;     // steal a lock older than this (a crashed flush)
+
 function readSafe(f) { try { return fs.readFileSync(f, 'utf8'); } catch (_) { return ''; } }
+function readLines(f) { return readSafe(f).split('\n').filter(Boolean); }
+function writeLines(f, arr) { try { fs.writeFileSync(f, arr.length ? arr.join('\n') + '\n' : ''); } catch (_) {} }
+
+// Single-flight: create the lock atomically (wx). Steal it only if it is stale, so a
+// flush that crashed before releasing can't wedge telemetry forever.
+function acquireLock() {
+  try { fs.writeFileSync(LOCK_FILE, String(process.pid), { flag: 'wx' }); return true; } catch (_) {}
+  try {
+    const age = Date.now() - fs.statSync(LOCK_FILE).mtimeMs;
+    if (age > STALE_LOCK_MS) { fs.writeFileSync(LOCK_FILE, String(process.pid)); return true; }
+  } catch (_) {}
+  return false;
+}
+function releaseLock() { try { fs.unlinkSync(LOCK_FILE); } catch (_) {} }
 
 async function main() {
   if (readSafe(CONSENT_FILE).trim() !== 'community') return; // opt-in gate
   if (!fs.existsSync(EVENTS_FILE)) return;
+  try { fs.mkdirSync(ANALYTICS_DIR, { recursive: true }); } catch (_) {}
+  if (!acquireLock()) return; // another flush is already running
 
-  const lines = readSafe(EVENTS_FILE).split('\n').filter(Boolean);
-  const offset = parseInt(readSafe(OFFSET_FILE), 10) || 0;
-  const pending = lines.slice(offset);
-  if (!pending.length) return;
-
-  const events = pending.map((l) => { try { return JSON.parse(l); } catch (_) { return null; } }).filter(Boolean);
-  if (!events.length) return;
-
-  const token = readSafe(TOKEN_FILE).trim();
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 4000);
   try {
-    const res = await fetch(ENDPOINT, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json', ...(token ? { authorization: `Bearer ${token}` } : {}) },
-      body: JSON.stringify({ events }),
-      signal: controller.signal
-    });
-    // Advance the offset only on a confirmed accept, so a failed upload is retried.
-    if (res && res.ok) { try { fs.writeFileSync(OFFSET_FILE, String(lines.length)); } catch (_) {} }
-  } catch (_) {
-    // network down / timeout / no endpoint yet: leave the offset, retry next run.
+    const lines = readLines(EVENTS_FILE);
+    if (!lines.length) return;
+
+    const batch = lines.slice(0, MAX_BATCH);
+    const events = batch.map((l) => { try { return JSON.parse(l); } catch (_) { return null; } }).filter(Boolean);
+    if (!events.length) {
+      // The batch was entirely unparseable; drop it so we make progress instead of looping.
+      writeLines(EVENTS_FILE, readLines(EVENTS_FILE).slice(batch.length));
+      return;
+    }
+
+    const token = readSafe(TOKEN_FILE).trim();
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 4000);
+    let ok = false;
+    try {
+      const res = await fetch(ENDPOINT, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', ...(token ? { authorization: `Bearer ${token}` } : {}) },
+        body: JSON.stringify({ events }),
+        signal: controller.signal,
+      });
+      ok = !!(res && res.ok);
+    } catch (_) {
+      // network down / timeout / no endpoint yet
+    } finally {
+      clearTimeout(timer);
+    }
+
+    if (ok) {
+      // Remove the uploaded prefix, preserving anything appended during the upload by
+      // re-reading the current file (so concurrent lazyweb-log appends are not lost).
+      writeLines(EVENTS_FILE, readLines(EVENTS_FILE).slice(batch.length));
+    } else {
+      // Upload failed: if the file has grown past the cap (persistent failure), bound it
+      // by keeping only the most recent events so it can never grow without limit.
+      let size = 0;
+      try { size = fs.statSync(EVENTS_FILE).size; } catch (_) {}
+      if (size > MAX_BYTES) writeLines(EVENTS_FILE, readLines(EVENTS_FILE).slice(-MAX_BATCH));
+    }
   } finally {
-    clearTimeout(timer);
+    releaseLock();
   }
 }
 
