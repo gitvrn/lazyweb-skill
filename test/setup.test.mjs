@@ -42,6 +42,12 @@ test("setup installs visible skills and direct MCP config into detected local cl
   try {
     const first = runSetup(home, fakeBin);
     assert.equal(first.status, 0, first.stderr || first.stdout);
+    assert.match(first.stdout, /Welcome to Lazyweb/);
+    assert.match(first.stdout, /Hey, Ali here through your agent/);
+    assert.match(first.stdout, /Ask what the main Lazyweb usage modes are/);
+    assert.match(first.stdout, /lazyweb_get_workflows/);
+    assert.match(first.stdout, /first run Lazyweb capabilities/);
+    assert.match(first.stdout, /Do not call lazyweb_get_flows for the first-run capability guide/);
     const second = runSetup(home, fakeBin);
     assert.equal(second.status, 0, second.stderr || second.stdout);
 

@@ -59,14 +59,15 @@ the selected mode instead of reimplementing the workflow.
 
 After setup, reload or restart the client, then:
 
-1. Run `/lazyweb` if the skill is visible.
-2. List MCP tools and confirm `lazyweb_health` and `lazyweb_search` are present.
-3. Run `lazyweb_health`.
-4. Run `lazyweb_search` with:
+1. Show the Welcome to Lazyweb message from setup, or fetch `https://www.lazyweb.com/api/mcp/welcome-message` and show it to the user.
+2. List MCP tools and confirm `lazyweb_get_workflows` is present.
+3. Call `lazyweb_get_workflows` with:
 
 ```json
-{"query":"welcome screen inspiration","limit":3}
+{"operation":"list","task_context":"first run Lazyweb capabilities"}
 ```
+
+4. Summarize the returned workflows as Lazyweb's super powers. Do not call `lazyweb_get_flows` for this first-run capability guide; that is a separate tool for ordered product journeys.
 
 Lazyweb MCP tokens are free no-billing bearer tokens for UI reference tools.
 They do not authorize purchases, paid spend, private user data, or destructive
@@ -103,10 +104,12 @@ Current public gateway tools:
 | `lazyweb_find_similar` | Find screenshots similar to a known Lazyweb screenshot ID. |
 | `lazyweb_list_categories` | List public company categories. |
 | `lazyweb_list_collections` | List or fetch curated Lazyweb collections. |
+| `lazyweb_get_workflows` | Discover and fetch current Lazyweb workflow instructions. |
+| `lazyweb_get_flows` | Fetch ordered multi-screen product journeys. |
 | `lazyweb_ab_test_research` | Paid A/B Test Agent wrapper for PM-facing research. |
 
 Richer backend/internal surfaces may also expose `lazyweb_find_experiments`,
-`lazyweb_recent_experiments`, `lazyweb_get_flows`, and
+`lazyweb_recent_experiments`, and
 `list_companies_by_categories`. Use those only when the live schema shows them.
 
 The A/B Test Agent is the only paid feature. It costs $49/month and unlocks

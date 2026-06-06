@@ -44,10 +44,15 @@ Lazyweb MCP tokens are free no-billing bearer tokens for UI reference tools.
 They do not authorize purchases, paid spend, private user data, or destructive
 actions. Keep tokens out of public git, but ignored local MCP config is fine.
 
-After setup, list MCP tools and verify:
+After setup, show the user what Lazyweb can do:
 
-1. `lazyweb_health`
-2. `lazyweb_search` with `{"query":"welcome screen inspiration","limit":3}`
+1. Fetch `https://www.lazyweb.com/api/mcp/welcome-message` and show the welcome message.
+2. List MCP tools and confirm `lazyweb_get_workflows` is present.
+3. Call `lazyweb_get_workflows` with `{"operation":"list","task_context":"first run Lazyweb capabilities"}`.
+4. Summarize the returned workflows as Lazyweb's super powers.
+
+Do not call `lazyweb_get_flows` for the first-run capability guide. That is a
+separate tool for ordered product journeys.
 
 If MCP tools are unavailable, tell the user to run the installer above, then
 continue with web research only if they want a degraded fallback.
@@ -90,10 +95,10 @@ not sure which mode to use.
   backend/internal aliases are available.
 - The current public gateway normally exposes `lazyweb_health`,
   `lazyweb_search`, `lazyweb_find_similar`, `lazyweb_compare_image`,
-  `lazyweb_list_categories`, `lazyweb_list_collections`, and
-  `lazyweb_ab_test_research`.
+  `lazyweb_list_categories`, `lazyweb_list_collections`,
+  `lazyweb_get_workflows`, `lazyweb_get_flows`, and `lazyweb_ab_test_research`.
 - Richer internal/backend surfaces may expose `lazyweb_find_experiments`,
-  `lazyweb_recent_experiments`, `lazyweb_get_flows`, or
+  `lazyweb_recent_experiments`, or
   `list_companies_by_categories`; use them only when the live tool schema shows
   them.
 - Pass `high_design_bar: true` only to tools whose live schema exposes it, and

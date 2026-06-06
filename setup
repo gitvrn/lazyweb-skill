@@ -299,6 +299,16 @@ cat <<EOF
 
 Lazyweb setup complete.
 
+Welcome to Lazyweb.
+Hey, Ali here through your agent. I am the founder of Lazyweb. Thanks for installing our MCP.
+Lazyweb gives your agent real product screenshots, product flows, and UI patterns before it designs.
+
+Try these first:
+  1. Ask what the main Lazyweb usage modes are.
+  2. Ask for quick references for a specific screen, like onboarding welcome screens, pricing pages, paywalls, dashboards, checkout, or settings.
+  3. Ask for deeper design research before changing a landing page, app flow, onboarding, paywall, checkout, dashboard, or settings screen.
+  4. Ask Lazyweb to compare your current UI against strong product examples and turn the patterns into concrete changes.
+
 Token file:
   $TOKEN_FILE
 
@@ -309,6 +319,8 @@ Manual MCP config for any unsupported local client:
 
 First checks:
   1. Reload/restart the client.
-  2. Run /lazyweb if the skill is visible.
-  3. List MCP tools and confirm lazyweb_health and lazyweb_search are present.
+  2. Show the Welcome to Lazyweb message above to the user.
+  3. List MCP tools and confirm lazyweb_get_workflows is present.
+  4. Call lazyweb_get_workflows with operation=list and task_context="first run Lazyweb capabilities"; summarize the returned workflows as Lazyweb's super powers.
+  5. Do not call lazyweb_get_flows for the first-run capability guide. That is a separate tool for ordered product journeys.
 EOF
