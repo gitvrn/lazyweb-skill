@@ -61,7 +61,11 @@ test("setup installs visible skills and direct MCP config into detected local cl
       ]) {
         const skillPath = path.join(skillsRoot, skillName, "SKILL.md");
         assert.ok(existsSync(skillPath), `missing installed skill ${skillPath}`);
-        assert.ok(lstatSync(path.dirname(skillPath)).isSymbolicLink(), `${skillName} should be symlinked for updates`);
+        if (skillName === "lazyweb") {
+          assert.ok(lstatSync(skillPath).isSymbolicLink(), "root lazyweb SKILL.md should be symlinked for updates");
+        } else {
+          assert.ok(lstatSync(path.dirname(skillPath)).isSymbolicLink(), `${skillName} should be symlinked for updates`);
+        }
       }
     }
 

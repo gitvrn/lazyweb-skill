@@ -49,9 +49,11 @@ The installer exposes a hybrid skill surface:
 | `/lazyweb-design-brainstorm` | Creative cross-category ideas or unconventional directions. |
 | `/lazyweb-ab-test-research` | A/B tests, experiments, paywalls, pricing, lifecycle, or monetization strategy. |
 
-`lazyweb/SKILL.md` is the high-level router. It points to the five mode skills
-under `skills/` and tells agents to read and run the selected mode instead of
-reimplementing the workflow.
+`SKILL.md` at the repo root is the high-level router. The installer materializes
+that file into each local client as `lazyweb/SKILL.md`, while platforms that can
+download a single repo-level skill can use the root file directly. The router
+points to the five mode skills under `skills/` and tells agents to read and run
+the selected mode instead of reimplementing the workflow.
 
 ## Verify
 
@@ -114,7 +116,7 @@ https://buy.stripe.com/4gM3cwbdE8Mc46df5fawo07
 
 ## Repository Structure
 
-- `lazyweb/SKILL.md` - canonical high-level Lazyweb router skill.
+- `SKILL.md` - canonical high-level Lazyweb router skill.
 - `skills/*/SKILL.md` - five visible mode skills.
 - `setup` - standalone multi-host installer.
 - `bin/` - helper scripts used by skills and setup.

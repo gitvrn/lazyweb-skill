@@ -4,8 +4,7 @@ import path from "node:path";
 
 const root = path.resolve(new URL("..", import.meta.url).pathname);
 
-const visibleSkillDirs = [
-  "lazyweb",
+const visibleModeSkillDirs = [
   "skills/lazyweb-design-research",
   "skills/lazyweb-quick-references",
   "skills/lazyweb-design-improve",
@@ -15,6 +14,7 @@ const visibleSkillDirs = [
 
 const removedPluginPaths = [
   "plugins",
+  "lazyweb",
   ".agents/plugins/marketplace.json",
   ".claude-plugin/marketplace.json"
 ];
@@ -55,12 +55,13 @@ for (const removedPath of removedPluginPaths) {
   assert.equal(existsSync(path.join(root, removedPath)), false, `${removedPath} should not exist in standalone skill pack`);
 }
 
-for (const dir of visibleSkillDirs) {
+assert.ok(existsSync(path.join(root, "SKILL.md")), "missing root SKILL.md");
+for (const dir of visibleModeSkillDirs) {
   assert.ok(existsSync(path.join(root, dir, "SKILL.md")), `missing ${dir}/SKILL.md`);
 }
 
-const router = assertSkillFile("lazyweb/SKILL.md", "lazyweb");
-for (const mode of visibleSkillDirs.slice(1)) {
+const router = assertSkillFile("SKILL.md", "lazyweb");
+for (const mode of visibleModeSkillDirs) {
   assert.match(router, new RegExp(`${mode}/SKILL\\.md`), `router must point to ${mode}/SKILL.md`);
 }
 for (const removedMode of ["lazyweb-welcome", "lazyweb-feedback", "lazyweb-flows", "lazyweb-add-inspo-source", "lazyweb-remove-inspo-source"]) {
@@ -68,14 +69,16 @@ for (const removedMode of ["lazyweb-welcome", "lazyweb-feedback", "lazyweb-flows
 }
 assert.match(router, /curl -fsSL https:\/\/www\.lazyweb\.com\/install\.sh \| bash/);
 
-for (const dir of visibleSkillDirs.slice(1)) {
+for (const dir of visibleModeSkillDirs) {
   const name = path.basename(dir);
   const text = assertSkillFile(`${dir}/SKILL.md`, name);
   assert.match(text, /lazyweb_health/, `${dir} should verify MCP health`);
   assert.match(text, /https:\/\/www\.lazyweb\.com\/install\.sh/, `${dir} should point to standalone installer`);
 }
 
-const allSkillText = visibleSkillDirs.map((dir) => read(`${dir}/SKILL.md`)).join("\n");
+const allSkillText = ["SKILL.md", ...visibleModeSkillDirs.map((dir) => `${dir}/SKILL.md`)]
+  .map((relativePath) => read(relativePath))
+  .join("\n");
 for (const match of allSkillText.matchAll(/\b(?:lazyweb_(?:health|search|find_similar|compare_image|list_categories|list_collections|ab_test_research|get_flows|find_experiments|recent_experiments)|search_screenshots|list_filters|list_all_filters|vision_screenshots|metadata_screenshots|get_company_details|list_companies_by_categories)\b/g)) {
   assert.ok(documentedLazywebTools.has(match[0]), `skill docs mention unknown Lazyweb MCP tool: ${match[0]}`);
 }
@@ -91,7 +94,7 @@ for (const binName of ["lazyweb-context-detect", "lazyweb-log", "lazyweb-telemet
 }
 
 const pluginInstallPattern = /codex plugin marketplace|claude plugin install|lazyweb@lazyweb|plugins\/lazyweb|\.codex-plugin|\.claude-plugin/;
-for (const relativePath of ["README.md", "setup", ...visibleSkillDirs.map((dir) => `${dir}/SKILL.md`)]) {
+for (const relativePath of ["README.md", "setup", "SKILL.md", ...visibleModeSkillDirs.map((dir) => `${dir}/SKILL.md`)]) {
   const text = read(relativePath);
   assert.doesNotMatch(text, pluginInstallPattern, `${relativePath} still mentions plugin install paths`);
 }

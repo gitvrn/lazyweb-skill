@@ -101,7 +101,9 @@ ensure_token() {
 install_skills_to_root() {
   local skills_root="$1"
   mkdir -p "$skills_root"
-  link_or_copy "$ROOT/lazyweb" "$skills_root/lazyweb"
+  rm -rf "$skills_root/lazyweb"
+  mkdir -p "$skills_root/lazyweb"
+  link_or_copy "$ROOT/SKILL.md" "$skills_root/lazyweb/SKILL.md"
   for skill_dir in \
     lazyweb-design-research \
     lazyweb-quick-references \
