@@ -47,12 +47,13 @@ The installer exposes a hybrid skill surface:
 | `/lazyweb-quick-references` | Quick examples, UI references, or screenshots without a full report. |
 | `/lazyweb-design-improve` | Improve, critique, or compare an existing design. |
 | `/lazyweb-design-brainstorm` | Creative cross-category ideas or unconventional directions. |
-| `/lazyweb-ab-test-research` | A/B tests, experiments, paywalls, pricing, lifecycle, or monetization strategy. |
+| `/lazyweb-paywall-optimization` | Paywall screen redesign, critique, or conversion optimization. |
+| `/lazyweb-ab-test-research` | A/B tests, experiments, pricing, lifecycle, or monetization strategy. |
 
 `SKILL.md` at the repo root is the high-level router. The installer materializes
 that file into each local client as `lazyweb/SKILL.md`, while platforms that can
 download a single repo-level skill can use the root file directly. The router
-points to the five mode skills under `skills/` and tells agents to read and run
+points to the six mode skills under `skills/` and tells agents to read and run
 the selected mode instead of reimplementing the workflow.
 
 ## Verify

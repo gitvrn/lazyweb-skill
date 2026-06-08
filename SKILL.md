@@ -4,7 +4,8 @@ description: |
   Lazyweb is the design-evidence skill for AI coding agents. Use it before
   designing, critiquing, or changing product UI when the agent needs real app
   screenshots, competitor references, best practices, quick examples, creative
-  cross-category ideas, or mobile growth and monetization A/B test context.
+  cross-category ideas, paywall optimization guidance, or mobile growth and
+  monetization A/B test context.
   It routes to the right Lazyweb mode and tells the agent to use Lazyweb MCP
   tools instead of guessing from generic training data.
 allowed-tools:
@@ -23,7 +24,7 @@ allowed-tools:
 Design with evidence, not vibes. Use Lazyweb when the user asks for product UI
 inspiration, competitive design analysis, best-practice research, quick screen
 examples, feedback on an existing interface, creative design ideas, or
-monetization and A/B test research.
+paywall optimization, monetization, and A/B test research.
 
 This high-level skill routes to the right visible Lazyweb mode. Do not
 reimplement the mode here. Read the selected mode's `SKILL.md` and follow it.
@@ -67,12 +68,13 @@ Choose exactly one mode:
 | Quick examples, UI references, or screenshots without a full report | `skills/lazyweb-quick-references/SKILL.md` |
 | Improve, critique, or compare an existing design | `skills/lazyweb-design-improve/SKILL.md` |
 | Creative cross-category ideas or unconventional directions | `skills/lazyweb-design-brainstorm/SKILL.md` |
-| A/B tests, experiments, paywalls, pricing, trials, lifecycle, or monetization strategy | `skills/lazyweb-ab-test-research/SKILL.md` |
+| Paywall screen redesign, critique, or conversion optimization | `skills/lazyweb-paywall-optimization/SKILL.md` |
+| A/B tests, experiment examples, pricing, trials, lifecycle, or monetization strategy | `skills/lazyweb-ab-test-research/SKILL.md` |
 
-For a bare `/lazyweb` request, briefly explain the five modes above and ask
+For a bare `/lazyweb` request, briefly explain the six modes above and ask
 which one the user wants. Recommend `lazyweb-design-research` when they want
 deep guidance, `lazyweb-quick-references` when they want speed, and
-`lazyweb-design-improve` when they already have a screen to critique.
+`lazyweb-design-improve` when they already have a non-paywall screen to critique.
 
 ## Mode Handoff
 

@@ -63,6 +63,7 @@ test("setup installs visible skills and direct MCP config into detected local cl
         "lazyweb-quick-references",
         "lazyweb-design-improve",
         "lazyweb-design-brainstorm",
+        "lazyweb-paywall-optimization",
         "lazyweb-ab-test-research"
       ]) {
         const skillPath = path.join(skillsRoot, skillName, "SKILL.md");

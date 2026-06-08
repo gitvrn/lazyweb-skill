@@ -9,6 +9,7 @@ const visibleModeSkillDirs = [
   "skills/lazyweb-quick-references",
   "skills/lazyweb-design-improve",
   "skills/lazyweb-design-brainstorm",
+  "skills/lazyweb-paywall-optimization",
   "skills/lazyweb-ab-test-research"
 ];
 

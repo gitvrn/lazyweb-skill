@@ -109,6 +109,7 @@ install_skills_to_root() {
     lazyweb-quick-references \
     lazyweb-design-improve \
     lazyweb-design-brainstorm \
+    lazyweb-paywall-optimization \
     lazyweb-ab-test-research
   do
     link_or_copy "$ROOT/skills/$skill_dir" "$skills_root/$skill_dir"
