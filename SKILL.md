@@ -152,8 +152,10 @@ These rules apply to every `lazyweb_search` call in every mode:
   construct storage URLs from raw paths.
 - `lazyweb_find_similar` accepts `image_url` or `image_base64` plus `mime_type`;
   it does not take a screenshot ID.
-- `lazyweb_compare_image` does real image-similarity. Prefer `image_base64` —
-  localhost and file paths are unreachable from the server. A public web PAGE
-  url also works where supported: the server screenshots it automatically.
-  Failed calls return a `how_to_fix` field — follow it instead of retrying
-  the same input.
+- `lazyweb_compare_image` does real image-similarity. Always send
+  `image_base64` — localhost, file paths, and web-page URLs are unreachable
+  from the server. When you only have a page URL or a running local app,
+  capture it yourself with your client's built-in screenshot/browser tool
+  (browser screenshot, Playwright, device screenshot) and pass the capture as
+  `image_base64`. Failed calls return a `how_to_fix` field — follow it instead
+  of retrying the same input.
