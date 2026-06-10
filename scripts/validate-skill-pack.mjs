@@ -1,17 +1,19 @@
 import assert from "node:assert/strict";
-import { existsSync, readFileSync, statSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import path from "node:path";
 
 const root = path.resolve(new URL("..", import.meta.url).pathname);
 
-const visibleModeSkillDirs = [
-  "skills/lazyweb-design-research",
-  "skills/lazyweb-quick-references",
-  "skills/lazyweb-design-improve",
-  "skills/lazyweb-design-brainstorm",
-  "skills/lazyweb-paywall-optimization",
-  "skills/lazyweb-ab-test-research"
-];
+// Discover mode skills by iterating skills/*/ instead of a hardcoded list.
+// A hardcoded list is the exact trap that left lazyweb-paywall-cta and
+// lazyweb-signup-optimization unvalidated (and undocumented) after 0.4.0:
+// a new mode must be picked up by adding its directory, nothing else.
+const visibleModeSkillDirs = readdirSync(path.join(root, "skills"), { withFileTypes: true })
+  .filter((entry) => entry.isDirectory() && existsSync(path.join(root, "skills", entry.name, "SKILL.md")))
+  .map((entry) => `skills/${entry.name}`)
+  .sort();
+
+assert.ok(visibleModeSkillDirs.length > 0, "no mode skills found under skills/");
 
 const removedPluginPaths = [
   "plugins",
@@ -28,6 +30,7 @@ const documentedLazywebTools = new Set([
   "lazyweb_list_categories",
   "lazyweb_list_collections",
   "lazyweb_ab_test_research",
+  "lazyweb_paywall_cta_research",
   "lazyweb_get_workflows",
   "lazyweb_get_flows",
   "lazyweb_find_experiments",
@@ -81,7 +84,7 @@ for (const dir of visibleModeSkillDirs) {
 const allSkillText = ["SKILL.md", ...visibleModeSkillDirs.map((dir) => `${dir}/SKILL.md`)]
   .map((relativePath) => read(relativePath))
   .join("\n");
-for (const match of allSkillText.matchAll(/\b(?:lazyweb_(?:health|search|find_similar|compare_image|list_categories|list_collections|ab_test_research|get_workflows|get_flows|find_experiments|recent_experiments)|search_screenshots|list_filters|list_all_filters|vision_screenshots|metadata_screenshots|get_company_details|list_companies_by_categories)\b/g)) {
+for (const match of allSkillText.matchAll(/\b(?:lazyweb_(?:health|search|find_similar|compare_image|list_categories|list_collections|ab_test_research|paywall_cta_research|get_workflows|get_flows|find_experiments|recent_experiments)|search_screenshots|list_filters|list_all_filters|vision_screenshots|metadata_screenshots|get_company_details|list_companies_by_categories)\b/g)) {
   assert.ok(documentedLazywebTools.has(match[0]), `skill docs mention unknown Lazyweb MCP tool: ${match[0]}`);
 }
 
@@ -93,6 +96,15 @@ for (const binName of ["lazyweb-context-detect", "lazyweb-log", "lazyweb-telemet
   const binPath = path.join(root, "bin", binName);
   assert.ok(existsSync(binPath), `missing bin/${binName}`);
   assert.ok(statSync(binPath).mode & 0o111, `bin/${binName} must be executable`);
+}
+
+// Every discovered mode skill must be documented in the README "Visible
+// Skills" table, so the docs can't drift from disk the way they did before
+// (paywall-cta and signup-optimization were on disk but absent from README).
+const readmeText = read("README.md");
+for (const dir of visibleModeSkillDirs) {
+  const slashCommand = `/${path.basename(dir)}`;
+  assert.match(readmeText, new RegExp(slashCommand.replace(/[-/]/g, "\\$&")), `README.md missing ${slashCommand} in the Visible Skills table`);
 }
 
 const pluginInstallPattern = /codex plugin marketplace|claude plugin install|lazyweb@lazyweb|plugins\/lazyweb|\.codex-plugin|\.claude-plugin/;
