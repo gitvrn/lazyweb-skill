@@ -132,7 +132,7 @@ for (const relativePath of ["README.md", "SKILL.md", ...visibleModeSkillDirs.map
 
 const designResearchText = read("skills/lazyweb-design-research/SKILL.md");
 for (const pattern of [
-  /## Report v2 Contract/,
+  /## Report v3 Contract/,
   /## Goal/,
   /## Recommendation/,
   /## Inspo/,
@@ -141,32 +141,55 @@ for (const pattern of [
   /High fidelity/,
   /Medium fidelity/,
   /Low fidelity/,
-  /\.prototype/,
+  /\.compare/,
+  /\.cmp-frame/,
+  /\.option-deck/,
   /\.inspo-map/,
   /\.inspo-point/,
   /\.inspo-img/,
   /\.pattern-shot/,
-  /\.pattern-crop/,
-  /\.hypothesis-strip/,
-  /\.hypothesis/,
-  /\.prototype-options/,
+  /\.annotated/,
+  /\.bbox/,
   /\.prototype-option/,
   /\.prototype-img/,
+  /\.proto-full/,
+  /\.opt-points/,
   /\.build-prompt/,
-  /prototype-led/i,
-  /stacked `Control` then\s+prototype options/i,
-  /Do not place control and\s+prototype side\s+by side/i,
-  /Hypothesis-to-prompt workflow/,
-  /2-4 alternative hypotheses/,
-  /detailed agent\s+prompt/i,
+  /side-by-side compare/i,
+  /Control on the left, the recommended\s+prototype on the right/,
+  /height-locked frames/i,
+  /variant switcher/i,
+  /options carousel/i,
+  /## Agent Instructions/,
+  /\.agent-instructions/,
+  /\.ai-block/,
+  /\.corpus/,
+  /\.scalebar/,
+  /\.vnav/,
+  /\.cluster-label/,
+  /\.patterns-grid/,
+  /\.rec-intro/,
+  /\.why-h/,
+  /Report rescale \+ lightbox/,
+  /Creativity engine/,
+  /Bet archetypes/,
+  /Safe bet/,
+  /Bold bet/,
+  /Wild card/,
+  /planning-meeting test/i,
+  /reasonableness test/i,
+  /prevalence ceiling/i,
+  /Divergence between options/,
+  /Hypothesis-to-prototype workflow/,
+  /2-4 bets/,
+  /detailed `\.build-prompt`/i,
   /generated bitmap prototype images/i,
   /image generation is available/i,
   /HTML\/CSS only as a fallback/i,
-  /2-4\s+`\.prototype-option` outputs/,
+  /same-size `\.prototype-option` card/i,
   /horizontal snap scroller/i,
-  /recommended\/default prototype should be first/i,
-  /take most of the available\s+viewport width/i,
-  /Do not render metric or evidence-summary chips/i,
+  /recommended first/i,
+  /never as standalone metric chips/i,
   /8 selected references/,
   /Fast parallel image generation/,
   /launch all prototype generations in\s+parallel/i,
@@ -175,9 +198,7 @@ for (const pattern of [
   /Normal skill execution must not run full `npm test`/,
   /Provider fallback order/,
   /native host image generation tool/i,
-  /Codex CLI fallback/,
-  /codex exec/,
-  /model_reasoning_effort/,
+  /Do not use Codex CLI for image generation/i,
   /Nano Banana/,
   /Gemini/,
   /CONTROL/,
@@ -188,20 +209,17 @@ for (const pattern of [
   /INSPO A/,
   /INSPO B/,
   /Anti-collapse rules/,
-  /conversion mechanism/,
+  /persuasion mechanism/,
   /information architecture/,
   /trust source/,
   /primary\s+component set/i,
-  /long-scroll screenshot/i,
-  /decisive crops/i,
-  /6-10 references/i,
-  /4-8 high-signal pattern\s+crops/i,
-  /cropped reference screenshots/i,
-  /uploaded\/current\/control screenshot/i,
-  /Do not draw red bounding boxes/i,
-  /Do not add explanatory copy under the crop/i,
-  /320-460px wide/i,
-  /width:min\(440px,100%\)/,
+  /Long-scroll pages/i,
+  /decisive region/i,
+  /8-16 points/i,
+  /5-9 patterns/i,
+  /viewport-window reference screenshots/i,
+  /CSS bounding-box callouts/i,
+  /not the user's\s+control screenshot/i,
   /image-only/i,
   /## Comparison Eval Contract/,
   /metrics\.json/,
@@ -214,11 +232,10 @@ for (const pattern of [
   /Sharp recommendation/,
   /Trust in process\/evidence/
 ]) {
-  assert.match(designResearchText, pattern, `design-research v2 contract missing ${pattern}`);
+  assert.match(designResearchText, pattern, `design-research v3 contract missing ${pattern}`);
 }
 
 for (const forbiddenHeading of [
-  /^## Agent Instructions\b/m,
   /^## Recommendations \/ Next Steps\b/m,
   /^## Key Examples\b/m,
   /^## Patterns\b/m,
@@ -237,27 +254,29 @@ for (const forbiddenV2Pattern of [
   /<h3>Rec<\/h3>/,
   /<h3>Why<\/h3>/
 ]) {
-  assert.doesNotMatch(designResearchText, forbiddenV2Pattern, `design-research v2 should keep Recommendation prototype-led, stacked when applicable, and inspo image-only: ${forbiddenV2Pattern}`);
+  assert.doesNotMatch(designResearchText, forbiddenV2Pattern, `design-research v3 should keep Recommendation side-by-side, option-led, and inspo image-only: ${forbiddenV2Pattern}`);
 }
 
-const agentsGuidance = read("AGENTS.md");
-assert.match(agentsGuidance, /Design-research v2 exception/, "AGENTS.md should document the design-research v2 exception");
-assert.match(agentsGuidance, /\.prototype-img.*\.build-prompt.*\.prototype.*\.inspo-map.*\.inspo-point.*\.inspo-img.*\.pattern-shot.*\.pattern-crop/s, "AGENTS.md should name the design-research v2 components");
-assert.match(agentsGuidance, /stacked `Control` then prototype options/, "AGENTS.md should require stacked control/prototype-options for design-research v2");
-assert.match(agentsGuidance, /2-4 distinct hypotheses.*detailed agent prompt.*2-4 `\.prototype-option` outputs/s, "AGENTS.md should require hypothesis-to-prompt prototype options for broad design-research work");
-assert.match(agentsGuidance, /generated bitmap prototype images.*image generation is available.*HTML\/CSS `\.prototype` only as a fallback/s, "AGENTS.md should require image-generated prototypes before HTML fallback for broad design-research work");
-assert.match(agentsGuidance, /prototype options.*horizontal snap scroller.*recommended option is first.*takes most of the viewport/s, "AGENTS.md should require horizontal prototype option scrolling");
-assert.match(agentsGuidance, /parallel at medium effort.*low effort.*high effort/s, "AGENTS.md should require parallel medium/low-effort image generation defaults");
-assert.match(agentsGuidance, /Codex CLI.*model_reasoning_effort="medium".*Nano Banana\/Gemini/s, "AGENTS.md should document provider fallback through Codex CLI and external image APIs");
-assert.match(agentsGuidance, /CONTROL.*WHAT TO IMPROVE.*HOW TO IMPROVE.*INSPIRATION.*ATTACHMENTS/s, "AGENTS.md should require the structured image prompt template");
-assert.match(agentsGuidance, /INSPO A.*INSPO B/s, "AGENTS.md should require labeled control and inspiration attachments");
-assert.match(agentsGuidance, /conversion mechanism.*information architecture.*not only color/s, "AGENTS.md should require anti-collapse prototype differentiation");
-assert.match(agentsGuidance, /recommendation metric chips such as `8 selected references`/, "AGENTS.md should forbid recommendation metric chips");
-assert.match(agentsGuidance, /crops long desktop\/web screenshots/, "AGENTS.md should require cropped long-scroll evidence in design-research v2");
-assert.match(agentsGuidance, /Interesting Patterns.*larger cropped reference images.*must not use the uploaded\/current\/control picture.*must not draw red boxes or numbered callouts.*must not place explanatory copy under the crop/s, "AGENTS.md should require crop-only Interesting Patterns");
-assert.match(agentsGuidance, /6-10 references.*4-8 high-signal pattern crops/s, "AGENTS.md should require a broader selected proof set when the corpus supports it");
+for (const guidanceFile of ["AGENTS.md", "CLAUDE.md"]) {
+  const guidance = read(guidanceFile);
+  assert.match(guidance, /report v3/, `${guidanceFile} should document the design-research v3 exception`);
+  assert.match(guidance, /\.compare.*\.option-deck.*\.pattern-shot.*\.annotated.*\.bbox/s, `${guidanceFile} should name the design-research v3 components`);
+  assert.match(guidance, /side-by-side `\.compare`.*Control × Recommended.*height-locked frames.*variant switcher/s, `${guidanceFile} should require side-by-side control/recommendation comparison for design-research v3`);
+  assert.match(guidance, /ranking is carried by order \+ a `Recommended` flag/, `${guidanceFile} should require order plus Recommended flag for design-research ranking`);
+  assert.match(guidance, /\.pattern-shot`\/`\.annotated` viewport-window figures with `\.bbox` overlays/, `${guidanceFile} should require annotated viewport-window patterns`);
+  assert.match(guidance, /CSS gotcha/, `${guidanceFile} should carry the font-shorthand CSS gotcha`);
+}
 
-assert.match(allSkillText, /signed for\s+90 days/i, "skill docs should state Lazyweb storage image URLs are signed for 90 days");
+// The invalid `font: ... inherit` shorthand is silently dropped by browsers;
+// the prose mention ends with a backtick, real CSS ends with ; or } — only the
+// latter is forbidden. Scoped to design-research for now: the other skills'
+// CSS contracts still carry the legacy bug (tracked for a separate fix) —
+// broaden to allSkillText once they are cleaned.
+assert.doesNotMatch(designResearchText, /font:[^;{}`]*\binherit\s*[;}]/, "design-research CSS contract must not use `inherit` inside the font shorthand (browsers drop the declaration)");
+
+assert.match(allSkillText, /signed for\s+365 days/i, "skill docs should state Lazyweb storage image URLs are signed for 365 days");
+assert.doesNotMatch(allSkillText, /signed for\s+90 days/i, "stale 90-day signing claim must not reappear in skill docs");
+assert.doesNotMatch(read("README.md"), /signed for\s+90 days/i, "stale 90-day signing claim must not reappear in README.md");
 assert.match(allSkillText, /lazyweb_find_similar` accepts `image_url` or `image_base64`/i, "router should document lazyweb_find_similar image URL input");
 
 console.log("Lazyweb skill-pack validation passed");

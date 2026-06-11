@@ -135,7 +135,7 @@ Current public gateway tools:
 | `lazyweb_ab_test_research` | Paid A/B Test Agent wrapper for PM-facing research; when `include_images` is true, evidence includes full control/variant image URLs. |
 
 All Lazyweb screenshot-bearing tools return usable full URLs for screenshots.
-Supabase storage-backed image URLs are signed for 90 days. Do not ask tools for
+Supabase storage-backed image URLs are signed for 365 days. Do not ask tools for
 screenshot IDs, do not pass screenshot IDs between Lazyweb tools, and do not
 construct storage URLs from raw paths; embed the returned `imageUrl`/`image_url`
 or A/B `control_image_url`/`variant_image_url` fields directly.

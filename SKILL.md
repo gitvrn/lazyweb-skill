@@ -151,7 +151,7 @@ These rules apply to every `lazyweb_search` call in every mode:
   only when the user asks for premium, stronger, high-design-bar, or
   best-designed examples.
 - Screenshot-bearing tools return full image URLs. Supabase storage-backed URLs
-  are signed for 90 days. Do not request or pass screenshot IDs, and do not
+  are signed for 365 days. Do not request or pass screenshot IDs, and do not
   construct storage URLs from raw paths.
 - `lazyweb_find_similar` accepts `image_url` or `image_base64` plus `mime_type`;
   it does not take a screenshot ID.
