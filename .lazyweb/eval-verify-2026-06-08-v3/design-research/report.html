@@ -1,0 +1,390 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Design Research: Transactional Email API — Landing + Feature Page</title>
+<style>
+/* ---- base ---- */
+*{box-sizing:border-box}
+body{font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:#1f2328;margin:0;background:#fff}
+main{max-width:900px;margin:0 auto;padding:28px 20px 80px}
+h1{font-size:28px;line-height:1.2;margin:0 0 6px}
+h2{font-size:21px;margin:34px 0 8px;padding-top:10px;border-top:1px solid #eaeef2}
+h3{font-size:16px}
+p{margin:8px 0}
+a{color:#0969da}
+.sub{color:#57606a;font-size:15px;margin:0 0 6px}
+code{font:13px/1.4 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:#f6f8fa;border:1px solid #eaeef2;border-radius:5px;padding:1px 5px}
+table.data{border-collapse:collapse;width:100%;font-size:13.5px;margin:10px 0}
+table.data th,table.data td{border:1px solid #d0d7de;padding:7px 9px;text-align:left;vertical-align:top}
+table.data th{background:#f6f8fa;font-weight:600}
+details{margin:10px 0;border:1px solid #d0d7de;border-radius:8px;padding:4px 12px;background:#fcfcfd}
+summary{cursor:pointer;font-weight:600;padding:6px 0}
+ul.tight{margin:6px 0;padding-left:20px}ul.tight li{margin:3px 0}
+.src-list{font-size:13.5px;color:#57606a}
+.src-list li{margin:4px 0}
+
+/* ===== Report essentials shared CSS (section 9.D — verbatim) ===== */
+:root{--ink:#1f2328;--mut:#57606a;--line:#d0d7de;--soft:#eef4fb;--accent:#0969da}
+.agent-instructions{background:var(--soft);border-left:4px solid var(--accent);border-radius:8px;padding:14px 16px;margin:18px 0}
+.ai-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:8px}
+.ai-badge{font-size:11px;font-weight:700;letter-spacing:.04em;color:#0a3b78}
+.ai-copy{font:600 12px/1 inherit;cursor:pointer;border:1px solid var(--accent);color:var(--accent);background:#fff;border-radius:6px;padding:5px 11px}
+.ai-copy:hover{background:var(--accent);color:#fff}
+.ai-human{margin:0 0 10px;font-size:15px}
+.ai-block{white-space:pre-wrap;word-break:break-word;background:#fff;border:1px solid var(--line);border-radius:6px;padding:12px 13px;margin:0;font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--ink);user-select:all}
+.mock{margin:14px 0;font-family:inherit}
+.mock .frame{border:1px solid var(--line);border-radius:14px;background:#fff;box-shadow:0 1px 4px rgba(31,35,40,.06);overflow:hidden}
+.mock.mobile .frame{max-width:300px;border-radius:26px;border:8px solid #1f2328}
+.mock.desktop .frame{max-width:760px}
+.mock .bar{display:flex;align-items:center;gap:6px;padding:7px 10px;background:#f6f8fa;border-bottom:1px solid var(--line);font-size:12px;color:var(--mut)}
+.mock .dot{width:9px;height:9px;border-radius:50%;background:#d0d7de}
+.mock .url{flex:1;text-align:center;background:#fff;border:1px solid var(--line);border-radius:5px;padding:2px 8px;font-size:11px;color:var(--mut)}
+.mock .notch{width:46%;height:16px;margin:6px auto 0;background:#1f2328;border-radius:0 0 12px 12px}
+.mock .body{padding:14px;display:flex;flex-direction:column;gap:10px}
+.mock .box{background:var(--soft);border:1px dashed #b9c7d6;border-radius:8px;min-height:34px;display:flex;align-items:center;justify-content:center;color:#4a5a6a;font-size:12px;text-align:center;padding:8px}
+.mock .box.tall{min-height:120px}.mock .box.cta{background:var(--accent);border:0;color:#fff;font-weight:600;min-height:40px}
+.mock .row{display:flex;gap:10px}.mock .row>.box{flex:1}
+.mock .cap{font-size:12px;color:var(--mut);margin-top:6px;text-align:center}
+
+/* ===== Evidence components CSS (section "Operating principles" — verbatim) ===== */
+.deck{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px;padding:4px 0 8px}
+.deck.web{grid-template-columns:repeat(auto-fill,minmax(380px,1fr))}
+.deck>figure{margin:0;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff}
+.deck>figure>img{display:block;width:100%;height:auto;max-height:620px;object-fit:contain;background:#fafbfc}
+.deck>figure.shot-web>img{aspect-ratio:16/10;max-height:none;object-fit:cover;object-position:top}
+.deck>figure.tall>img{object-fit:contain}
+.deck>figure.img-missing>img{display:none}
+.deck>figure.img-missing figcaption::after{content:' — image unavailable; see description';color:#cf222e}
+.deck .cap{font-size:12px;color:var(--mut);padding:7px 9px;line-height:1.4}
+.deck .cap b{color:var(--ink)}
+.deck .src{font-size:10.5px;font-weight:700;letter-spacing:.03em;color:var(--accent)}
+.deck-hint{font-size:11.5px;color:var(--mut);margin:-2px 0 6px}
+.pat{border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin:14px 0;background:#fff}
+.pat-h{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px;margin-bottom:4px}
+.pat-h h3{margin:0;font-size:16px}
+.pat-claim{color:var(--mut);font-size:14px;margin:2px 0 10px}
+.prev{font:600 11.5px/1 inherit;color:#0a3b78;background:var(--soft);border-radius:20px;padding:4px 10px}
+.tag{font:700 10.5px/1 inherit;letter-spacing:.03em;border-radius:5px;padding:3px 7px}
+.tag.strong{color:#0a5d2a;background:#e6f4ea;border:1px solid #b7e0c4}
+.tag.directional{color:#8a5a00;background:#fff8e6;border:1px solid #f0e0b0}
+.tag.weak{color:#6e7781;background:#f6f8fa;border:1px solid var(--line)}
+.tag.avoid{color:#a40e26;background:#fdeef0;border:1px solid #f5c2c7}
+.lead{border:2px solid var(--accent);border-radius:12px;padding:14px 16px 14px 18px;margin:16px 0;background:linear-gradient(0deg,#fff,var(--soft));position:relative}
+.lead::before{content:'RECOMMENDED PATH — START HERE';position:absolute;top:-10px;left:14px;background:var(--accent);color:#fff;font:700 10px/1 inherit;letter-spacing:.05em;border-radius:10px;padding:4px 9px}
+.lead h3{margin:6px 0 4px;font-size:17px}
+.lead .why{font-size:14px;color:var(--mut);margin:0}
+table.ranked{border-collapse:collapse;width:100%;font-size:13.5px;margin:12px 0}
+table.ranked th,table.ranked td{border:1px solid var(--line);padding:8px 9px;vertical-align:middle}
+table.ranked th{background:#f6f8fa;font-weight:600;text-align:left}
+table.ranked .rank{font-weight:700;text-align:center;width:34px}
+table.ranked tr.is-lead{background:var(--soft)}
+table.ranked .thumb{width:64px}
+table.ranked .thumb img{width:56px;height:56px;object-fit:cover;border:1px solid var(--line);border-radius:6px;display:block}
+table.ranked .verdict{font:700 11px/1 inherit;border-radius:5px;padding:3px 7px;white-space:nowrap}
+table.ranked .verdict.do{color:#0a5d2a;background:#e6f4ea}
+table.ranked .verdict.explore{color:#8a5a00;background:#fff8e6}
+table.ranked .verdict.skip{color:#6e7781;background:#f6f8fa}
+table.ranked .skipif{color:var(--mut);font-size:12.5px}
+.corpus{display:flex;gap:8px;align-items:flex-start;font-size:13px;color:#8a5a00;background:#fff8e6;border:1px solid #f0e0b0;border-radius:8px;padding:9px 12px;margin:14px 0}
+.corpus b{color:var(--ink)}
+.ebadge{font:700 10.5px/1 inherit;letter-spacing:.02em;border-radius:20px;padding:4px 9px;display:inline-block}
+.ebadge.measured{color:#0a5d2a;background:#e6f4ea;border:1px solid #b7e0c4}
+.ebadge.directional{color:#8a5a00;background:#fff8e6;border:1px solid #f0e0b0}
+.ebadge.single{color:#a40e26;background:#fdeef0;border:1px solid #f5c2c7}
+.caveat-inline{font:700 10px/1 inherit;color:#8a5a00;background:#fff8e6;border:1px solid #f0e0b0;border-radius:5px;padding:2px 6px;margin-left:6px}
+.rec-thumb{display:flex;gap:6px}
+.rec-thumb img{height:64px;width:auto;border:1px solid var(--line);border-radius:6px}
+</style>
+</head>
+<body>
+<main>
+
+<h1>Design Research: Transactional Email API</h1>
+<p class="sub">Marketing landing page + a key feature page for a developer-first transactional email API (a Resend / Postmark / Loops competitor). Code-first hero · "how it works" / feature section · developer social proof. Desktop / web only.</p>
+
+<!-- ============ 1. AGENT INSTRUCTIONS ============ -->
+<section id="agent-instructions" class="agent-instructions">
+  <div class="ai-head"><span class="ai-badge">FOR THE CODING AGENT</span>
+    <button class="ai-copy" type="button" onclick="
+      var sec=this.closest('.agent-instructions'); var txt=sec.querySelector('.ai-block').innerText;
+      var done=function(ok){this.textContent=ok?'Copied':'Press Cmd/Ctrl+C';setTimeout(function(){this.textContent='Copy';}.bind(this),1500);}.bind(this);
+      if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(function(){done(true);},function(){done(false);});}
+      else{var r=document.createRange();r.selectNodeContents(sec.querySelector('.ai-block'));var s=getSelection();s.removeAllRanges();s.addRange(r);try{document.execCommand('copy');done(true);}catch(e){done(false);}}">Copy</button>
+  </div>
+  <p class="ai-human">Put a runnable send-an-email code block in the hero — that single move is the strongest, most repeated pattern across every developer-API page in this corpus.</p>
+  <pre class="ai-block">LAZYWEB REPORT — AGENT HANDOFF
+Use this report as a starting point for implementing a transactional-email-API landing page + feature page using competitor-validated design patterns.
+
+TOP RECOMMENDATIONS (do first):
+1. Hero = headline + a real, copy-pasteable "send your first email" code/curl block (not an illustration); primary CTA "Get started", secondary "View docs".
+2. Add a quantified deliverability/scale trust strip directly under the hero (e.g. "X emails/mo · 99%+ delivered") plus a row of real customer logos.
+3. Feature page = a numbered "send your first email" how-it-works flow (Install SDK → Add key → Send → see it in the dashboard) shown with the actual dashboard UI.
+
+INDEX ON: code-in-the-first-fold (seen in 6 of 11 references); quantified-scale + logo trust strip (5 of 11); a stepwise "first email" onboarding tied to a dashboard screenshot (3 of 11).
+DO NOT OVER-INDEX ON: dark "terminal" theme as a requirement (aesthetic-only, 4/11, not tied to any outcome data); per-request pricing copy lifted from off-category APIs (single-source); any "outperforms competitor" deliverability claim — none of this is measured.
+DIVE FURTHER: /lazyweb-design-improve to pressure-test your build against these references, or lazyweb_find_similar to widen a specific pattern (e.g. the code-in-hero cluster).
+
+Evidence basis: 11 Lazyweb desktop screenshots, no live web captures this run · 2026-06-08</pre>
+</section>
+
+<!-- ============ CORPUS HONESTY BANNER ============ -->
+<div class="corpus"><span>&#9888;</span><p style="margin:0"><b>Evidence basis:</b> 11 Lazyweb desktop screenshots, <b>no live web captures this run</b> (headless), similarity ~0.39&ndash;0.59, mostly matchCount 1&ndash;2/3. The exact category (transactional email API) is <b>thin in-corpus</b> — direct competitors Resend, Postmark and Loops returned <b>no usable screenshot</b> (Resend results had empty vision data and were excluded; Postmark/Loops absent). Findings lean on adjacent developer-API pages, so treat every prevalence claim as <b>directional</b> (visual prevalence), never measured. No A/B experiment data was pulled this run.</p></div>
+
+<!-- ============ 2. RECOMMENDATIONS ============ -->
+<h2>Recommendations / Next steps</h2>
+<p>One ranked path, then the trade-offs. Each row links to the screenshot that justifies it.</p>
+
+<div class="lead">
+  <h3>1 &middot; Put a real "send your first email" code block in the hero</h3>
+  <p class="why">Highest leverage, lowest risk for a developer-API page. The dominant pattern in this corpus: 6 of 11 references lead with a command/code/trace block (or a product-UI showing one) instead of a lifestyle image. Borrow the curl-snippet framing from the email/validation-API examples specifically. <span class="ebadge directional">Directional &middot; 6/11 refs &middot; no outcome data</span></p>
+</div>
+
+<table class="ranked">
+  <thead><tr><th class="rank">#</th><th>Move</th><th class="thumb">Proof</th><th>Evidence</th><th>Verdict</th><th>Skip if</th></tr></thead>
+  <tbody>
+    <tr class="is-lead">
+      <td class="rank">1</td>
+      <td>Runnable code / curl block in the hero</td>
+      <td class="thumb"><a href="#pat-code"><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/sites/snov-io/snov-io_4ea813925921a38ebc1d.png" alt="curl-in-hero proof"></a></td>
+      <td><span class="tag strong">Strong</span> 6/11 refs</td>
+      <td><span class="verdict do">Do first</span></td>
+      <td class="skipif">&mdash;</td>
+    </tr>
+    <tr>
+      <td class="rank">2</td>
+      <td>Quantified scale/deliverability + customer-logo trust strip under the hero</td>
+      <td class="thumb"><a href="#pat-trust"><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/sites/twilio/twilio_83ce2bb7095e45dcf759.png" alt="trust strip proof"></a></td>
+      <td><span class="tag directional">Directional</span> 5/11</td>
+      <td><span class="verdict do">Do</span></td>
+      <td class="skipif">you have no real volume/deliverability number yet — ship logos only, never a fake metric</td>
+    </tr>
+    <tr>
+      <td class="rank">3</td>
+      <td>Feature page = numbered "first email" flow shown on the real dashboard</td>
+      <td class="thumb"><a href="#pat-how"><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/sites/sendgrid/sendgrid_8d2d260c01bb9f988a24.png" alt="how-it-works proof"></a></td>
+      <td><span class="tag directional">Directional</span> 3/11</td>
+      <td><span class="verdict do">Do</span></td>
+      <td class="skipif">the dashboard UI isn't built — use a code-only walkthrough instead, not a mock screenshot</td>
+    </tr>
+    <tr>
+      <td class="rank">4</td>
+      <td>Dark, terminal-forward visual theme</td>
+      <td class="thumb"><a href="#pat-dark"><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/sites/termius/termius_ea8a27c0623e41d600c7.png" alt="dark theme proof"></a></td>
+      <td><span class="tag directional">Directional</span> 4/11 aesthetic-only</td>
+      <td><span class="verdict explore">Explore</span></td>
+      <td class="skipif">your brand reads cleaner in light mode — the code block matters far more than the theme</td>
+    </tr>
+    <tr>
+      <td class="rank">5</td>
+      <td>Per-request "$ / million" pricing copy on the feature page</td>
+      <td class="thumb"><a href="#pat-uniq"><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/sites/apollo-graphql/apollo-graphql_b9ce553abb7f80513acf.png" alt="pricing proof"></a></td>
+      <td><span class="tag weak">Weak</span> single-source, off-category</td>
+      <td><span class="verdict skip">Skip</span></td>
+      <td class="skipif">always for v1 of the feature page — one off-category (GraphQL) reference; keep pricing on /pricing, link to it</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 style="margin-top:22px">Proposed layouts (mock-frames)</h3>
+<div style="display:flex;gap:18px;flex-wrap:wrap">
+  <figure class="mock desktop"><div class="frame"><div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url">yourapi.com</span></div><div class="body">
+    <div class="row"><div class="box">Logo</div><div class="box">Docs &middot; Pricing &middot; Blog</div><div class="box">Sign in</div></div>
+    <div class="row"><div class="box tall">Headline + subhead<br>"Get started" / "View docs"</div><div class="box tall">Runnable code block:<br>POST /emails (curl/Node)</div></div>
+    <div class="box">Trust strip: "100M+ emails/mo · 99%+ delivered" + customer logos</div>
+  </div></div><figcaption class="cap">Mock-frame — landing hero: split headline + live code, trust strip below (Recs 1&ndash;2).</figcaption></figure>
+
+  <figure class="mock desktop"><div class="frame"><div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url">yourapi.com/send-email</span></div><div class="body">
+    <div class="row"><div class="box">1 · Install SDK</div><div class="box">2 · Add API key</div><div class="box">3 · Send</div></div>
+    <div class="box tall">Dashboard screenshot: delivered / opened / bounced for that first send</div>
+    <div class="box cta">Send your first email</div>
+  </div></div><figcaption class="cap">Mock-frame — feature page: numbered "first email" flow + real dashboard (Rec 3).</figcaption></figure>
+</div>
+
+<!-- ============ 3. KEY EXAMPLES ============ -->
+<h2>Key examples</h2>
+<p class="deck-hint">&#9656; scroll each deck to flip through the proof — every shot is a desktop above-the-fold crop</p>
+<div class="deck web">
+  <figure class="shot-web"><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/sites/snov-io/snov-io_4ea813925921a38ebc1d.png" alt="Snov.io email API" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+    <figcaption class="cap"><span class="src">[Lazyweb]</span> <b>Snov.io email-verification API</b> &mdash; a <code>curl</code> GET example sits in the hero next to a "Try Free" CTA; the request <i>is</i> the value prop. <a href="https://snov.io/email-verification-api">snov.io</a></figcaption></figure>
+  <figure class="shot-web"><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/sites/twilio/twilio_83ce2bb7095e45dcf759.png" alt="Twilio SendGrid Email API" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+    <figcaption class="cap"><span class="src">[Lazyweb]</span> <b>Twilio SendGrid Email API</b> <span class="caveat-inline">brand inferred from URL &mdash; verify</span> &mdash; hero pairs "send 100M+ emails/mo" with "Get Started"/"Send Email" CTAs and a Zendesk/ServiceNow logo row. <a href="https://www.twilio.com/en-us/products/email-api">twilio.com/products/email-api</a></figcaption></figure>
+  <figure class="shot-web"><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/sites/sendgrid/sendgrid_8d2d260c01bb9f988a24.png" alt="SendGrid onboarding dashboard" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+    <figcaption class="cap"><span class="src">[Lazyweb]</span> <b>Twilio SendGrid dashboard</b> <span class="caveat-inline">brand inferred from URL &mdash; verify</span> &mdash; "send your first email via API" steps with inline code snippets + open-rate tracking. <a href="https://www.twilio.com/docs/sendgrid">twilio.com/docs/sendgrid</a></figcaption></figure>
+  <figure class="shot-web"><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/sites/surge/surge_a0f903d944f8358232ae.png" alt="Surge" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+    <figcaption class="cap"><span class="src">[Lazyweb]</span> <b>Surge</b> &mdash; deploy framed as a few command-line keystrokes; CLI install is the hero action, key stats above it. <a href="https://surge.sh/">surge.sh</a></figcaption></figure>
+  <figure class="shot-web"><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/sites/github/github_5040154ab15319d3b40f.png" alt="GitHub Codespaces" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+    <figcaption class="cap"><span class="src">[Lazyweb]</span> <b>GitHub Codespaces</b> &mdash; dev-container product UI carries the hero; "start coding" CTA + FAQ; clean light theme. <a href="https://github.com/features/codespaces">github.com/features/codespaces</a></figcaption></figure>
+</div>
+
+<!-- ============ 4. PATTERNS ============ -->
+<h2>Patterns</h2>
+
+<div class="pat" id="pat-code">
+  <div class="pat-h"><h3>Code / command lives in the first fold</h3>
+    <span class="tag strong">Strong</span><span class="prev">seen in 6 of 11 references</span>
+    <span class="ebadge directional">Directional</span></div>
+  <p class="pat-claim">Table stakes for a developer-API page: the hero shows a real, copy-pasteable request (curl/SDK call) or a product UI containing one — not a stock illustration. The request itself is the value proposition.</p>
+  <p class="deck-hint">&#9656; scroll to flip through the proof</p>
+  <div class="deck web">
+    <figure class="shot-web"><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/sites/snov-io/snov-io_4ea813925921a38ebc1d.png" alt="Snov.io" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+      <figcaption class="cap"><span class="src">[Lazyweb]</span> <b>Snov.io</b> &mdash; <code>curl</code> GET to validate an email, right beside the "Try Free" CTA.</figcaption></figure>
+    <figure class="shot-web"><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/sites/surge/surge_a0f903d944f8358232ae.png" alt="Surge" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+      <figcaption class="cap"><span class="src">[Lazyweb]</span> <b>Surge</b> &mdash; "deploy in a few keystrokes": the command line is the hero.</figcaption></figure>
+    <figure class="shot-web"><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/sites/sendgrid/sendgrid_8d2d260c01bb9f988a24.png" alt="SendGrid dashboard" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+      <figcaption class="cap"><span class="src">[Lazyweb]</span> <b>Twilio SendGrid</b> <span class="caveat-inline">brand inferred &mdash; verify</span> &mdash; first-email instructions wrap highlighted code snippets.</figcaption></figure>
+    <figure class="shot-web"><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/sites/github/github_5040154ab15319d3b40f.png" alt="GitHub Codespaces" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+      <figcaption class="cap"><span class="src">[Lazyweb]</span> <b>GitHub Codespaces</b> &mdash; the dev-environment product screenshot anchors the fold.</figcaption></figure>
+  </div>
+</div>
+
+<div class="pat" id="pat-trust">
+  <div class="pat-h"><h3>Quantified scale + customer-logo trust strip under the hero</h3>
+    <span class="tag directional">Directional</span><span class="prev">seen in 5 of 11 references</span>
+    <span class="ebadge directional">Directional</span></div>
+  <p class="pat-claim">Developer-infrastructure pages back the headline with a hard number (emails/mo, delivery %, requests) and a row of recognizable customer logos, immediately — credibility before features.</p>
+  <p class="deck-hint">&#9656; scroll to flip through the proof</p>
+  <div class="deck web">
+    <figure class="shot-web"><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/sites/twilio/twilio_83ce2bb7095e45dcf759.png" alt="Twilio SendGrid" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+      <figcaption class="cap"><span class="src">[Lazyweb]</span> <b>Twilio SendGrid Email API</b> <span class="caveat-inline">brand inferred &mdash; verify</span> &mdash; "100M+ emails/mo" + Zendesk/ServiceNow/QVC logos in the fold.</figcaption></figure>
+    <figure class="shot-web"><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/sites/github/github_1681fa42c8854a99aada.png" alt="GitHub features" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+      <figcaption class="cap"><span class="src">[Lazyweb]</span> <b>GitHub features</b> &mdash; feature sections each paired with benefit cards + customer proof.</figcaption></figure>
+    <figure class="shot-web"><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/sites/brave/brave_6a9df4be6a598c2ebdd9.png" alt="Brave Search API" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+      <figcaption class="cap"><span class="src">[Lazyweb]</span> <b>Brave Search API</b> &mdash; hero value prop + customer logos + enterprise-readiness row.</figcaption></figure>
+    <figure class="shot-web"><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/sites/genius/genius_f3308230efde5b1eb111.png" alt="Genius developers" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+      <figcaption class="cap"><span class="src">[Lazyweb]</span> <b>Genius developers</b> &mdash; API portal hero with "create an API client" + integration/example proof.</figcaption></figure>
+  </div>
+</div>
+
+<div class="pat" id="pat-how">
+  <div class="pat-h"><h3>"Send your first email" — a numbered flow tied to the real dashboard</h3>
+    <span class="tag directional">Directional</span><span class="prev">seen in 3 of 11 references</span>
+    <span class="ebadge directional">Directional</span></div>
+  <p class="pat-claim">The feature/how-it-works section reduces time-to-first-success to explicit steps (Install SDK &rarr; key &rarr; send) and shows the actual product screen where the result appears — not an abstract diagram.</p>
+  <p class="deck-hint">&#9656; scroll to flip through the proof</p>
+  <div class="deck web">
+    <figure class="shot-web"><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/sites/sendgrid/sendgrid_8d2d260c01bb9f988a24.png" alt="SendGrid onboarding" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+      <figcaption class="cap"><span class="src">[Lazyweb]</span> <b>Twilio SendGrid</b> <span class="caveat-inline">brand inferred &mdash; verify</span> &mdash; step-by-step "send your first email via API" with code + open-rate tracking on one screen.</figcaption></figure>
+    <figure class="shot-web"><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/sites/photoroom/photoroom_738d210c84ad2858a29a.png" alt="Photoroom API playground" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+      <figcaption class="cap"><span class="src">[Lazyweb]</span> <b>Photoroom API</b> &mdash; an in-page playground: upload, call the API, see the instant result before signing up.</figcaption></figure>
+    <figure class="shot-web"><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/sites/metamask/metamask_0224e4abf6bca6c18e5b.png" alt="MetaMask SDK" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+      <figcaption class="cap"><span class="src">[Lazyweb]</span> <b>MetaMask SDK</b> &mdash; "simplified code integration" steps + implementation case-study cards.</figcaption></figure>
+  </div>
+</div>
+
+<!-- ============ 5. ANTI-PATTERNS ============ -->
+<h2>Anti-patterns</h2>
+
+<div class="pat" id="anti-lifestyle">
+  <div class="pat-h"><h3>A lifestyle/marketing hero that hides the product</h3>
+    <span class="tag avoid">Avoid</span><span class="prev">contrast example, 1 of 11</span>
+    <span class="ebadge directional">Directional</span></div>
+  <p class="pat-claim">For a developer audience, a polished marketing hero that leads with brand storytelling and dashboards-as-decoration — with no visible code — buries the one thing a dev came to evaluate. The shot below is a strong general landing page; the lesson is what's <i>missing</i> in the first fold for a code-first product, not that the page is bad.</p>
+  <div class="deck web">
+    <figure class="shot-web"><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/sites/stripe-dashboard/stripe-dashboard_06a23127d968ee3ab336.png" alt="Stripe homepage" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+      <figcaption class="cap"><span class="src">[Lazyweb]</span> <b>Stripe (homepage)</b> &mdash; UI mockups + logos lead; no code in the first fold. Don't copy this for a code-first email API hero &mdash; Stripe earns it with brand; you should show the request instead.</figcaption></figure>
+  </div>
+</div>
+
+<div class="pat" id="anti-pricewall">
+  <div class="pat-h"><h3>Turning the feature page into a pricing wall</h3>
+    <span class="tag avoid">Avoid</span>
+    <span class="ebadge single">Single-source &middot; off-category</span></div>
+  <p class="pat-claim">Leading the feature page with tiered plan cards and "$ per million / talk to sales" pushes the developer toward a buying decision before they've sent a test email. Keep pricing on <code>/pricing</code> and link to it; the feature page's job is first success. The Apollo example is a <i>pricing</i> page (off-category for "feature page"), shown only to mark the trap.</p>
+  <div class="deck web">
+    <figure class="shot-web"><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/sites/apollo-graphql/apollo-graphql_b9ce553abb7f80513acf.png" alt="Apollo GraphQL pricing" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+      <figcaption class="cap"><span class="src">[Lazyweb]</span> <b>Apollo GraphQL pricing</b> <span class="caveat-inline">off-category &mdash; pricing page, not a feature page</span> &mdash; four plan cards + "Talk to sales"; fine on /pricing, wrong as the first feature-page fold.</figcaption></figure>
+  </div>
+</div>
+
+<!-- ============ 6. UNIQUE ANGLES ============ -->
+<h2>Unique angles</h2>
+
+<div class="pat" id="pat-uniq">
+  <div class="pat-h"><h3>Make the API runnable on the page itself</h3>
+    <span class="tag directional">Directional</span><span class="prev">2 standout references</span>
+    <span class="ebadge directional">Directional</span></div>
+  <p class="pat-claim">The most "you have to see it" detail: a live, in-page playground (or a literal curl you can copy) that lets a developer get a real response <i>before</i> creating an account. For an email API this maps to a "send a test email to yourself" widget in the hero.</p>
+  <p class="deck-hint">&#9656; scroll to flip through the proof</p>
+  <div class="deck web">
+    <figure class="shot-web"><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/sites/photoroom/photoroom_738d210c84ad2858a29a.png" alt="Photoroom API playground" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+      <figcaption class="cap"><span class="src">[Lazyweb]</span> <b>Photoroom API playground</b> &mdash; the X100 detail: upload an image, hit the API, see the instant result in the page. Mirror with a "send test email" box.</figcaption></figure>
+    <figure class="shot-web"><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/sites/snov-io/snov-io_4ea813925921a38ebc1d.png" alt="Snov.io curl" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+      <figcaption class="cap"><span class="src">[Lazyweb]</span> <b>Snov.io</b> &mdash; the precise element to borrow: the literal <code>curl</code> request rendered as hero copy, one click from "Try Free".</figcaption></figure>
+  </div>
+</div>
+
+<div class="pat" id="pat-dark">
+  <div class="pat-h"><h3>Dark, terminal-forward developer aesthetic</h3>
+    <span class="tag directional">Directional</span><span class="prev">seen in 4 of 11 references</span>
+    <span class="ebadge directional">Directional &middot; aesthetic-only</span></div>
+  <p class="pat-claim">A recurring <i>look</i> (not a proven lever): dark backgrounds with terminal/code panels signal "built for engineers". Treat as optional styling — the code block earns trust, the dark theme just dresses it. No outcome data backs the theme itself.</p>
+  <p class="deck-hint">&#9656; scroll to flip through the proof</p>
+  <div class="deck web">
+    <figure class="shot-web"><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/sites/termius/termius_ea8a27c0623e41d600c7.png" alt="Termius" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+      <figcaption class="cap"><span class="src">[Lazyweb]</span> <b>Termius</b> &mdash; dark hero with tabbed terminal sessions as the product visual.</figcaption></figure>
+    <figure class="shot-web"><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/sites/raycast/raycast_f3a98b6f3865effcb210.png" alt="Raycast" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+      <figcaption class="cap"><span class="src">[Lazyweb]</span> <b>Raycast</b> &mdash; dark theme; feature sections built around code/terminal screenshots.</figcaption></figure>
+    <figure class="shot-web"><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/sites/hiro/hiro_2b8ad1aa5488bd6e9172.png" alt="Hiro" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+      <figcaption class="cap"><span class="src">[Lazyweb]</span> <b>Hiro</b> &mdash; dark hero with a live code preview + "View Docs" beside "Try" CTA.</figcaption></figure>
+    <figure class="shot-web"><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/sites/chatgpt/chatgpt_a4a95721c7076501eab4.png" alt="OpenAI Codex" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+      <figcaption class="cap"><span class="src">[Lazyweb]</span> <b>OpenAI Codex</b> <span class="caveat-inline">brand inferred from URL &mdash; verify</span> &mdash; large product-UI preview, "sign up / try" CTAs, logo proof.</figcaption></figure>
+  </div>
+</div>
+
+<!-- ============ 7. FINDINGS ============ -->
+<h2>Findings</h2>
+<details>
+  <summary>How we got here — evidence table &amp; search log</summary>
+  <p style="margin-top:10px">8 desktop searches via <code>lazyweb_search (platform=desktop)</code>. References cluster at similarity ~0.39&ndash;0.59, matchCount mostly 1&ndash;2/3 — a <b>directional</b>, not measured, corpus. Brands on crawl-seed rows are derived from <code>pageUrl</code> and tagged "verify"; vision text occasionally mislabels the brand (e.g. calling the Twilio email-API page "Helio"/"Resend") so captions use only URL-consistent, UI-consistent facts.</p>
+  <table class="data">
+    <thead><tr><th>Company (from URL)</th><th>Source</th><th>matchCount</th><th>similarity</th><th>Supports</th></tr></thead>
+    <tbody>
+      <tr><td>Snov.io <code>/email-verification-api</code></td><td>[Lazyweb]</td><td>1/3</td><td>0.46</td><td>Rec 1 · code-in-hero · unique angle</td></tr>
+      <tr><td>Twilio SendGrid <code>/products/email-api</code> <span class="caveat-inline">inferred</span></td><td>[Lazyweb]</td><td>1/3</td><td>0.47</td><td>Rec 1 &amp; 2 · code-in-hero · trust strip</td></tr>
+      <tr><td>Twilio SendGrid <code>/docs/sendgrid</code> <span class="caveat-inline">inferred</span></td><td>[Lazyweb]</td><td>1/3</td><td>0.48</td><td>Rec 3 · how-it-works · code-in-hero</td></tr>
+      <tr><td>Surge <code>surge.sh</code></td><td>[Lazyweb]</td><td>1/3</td><td>0.39</td><td>Rec 1 · code-in-hero (CLI)</td></tr>
+      <tr><td>GitHub Codespaces <code>/features/codespaces</code></td><td>[Lazyweb]</td><td>3/3</td><td>0.44</td><td>Rec 1 · code-in-hero (product UI)</td></tr>
+      <tr><td>GitHub <code>/features</code></td><td>[Lazyweb]</td><td>2/3</td><td>0.58</td><td>Rec 2 · feature sections + logos</td></tr>
+      <tr><td>Brave Search API <code>/search/api</code></td><td>[Lazyweb]</td><td>2/3</td><td>0.47</td><td>Rec 2 · trust strip + logos</td></tr>
+      <tr><td>Genius <code>/developers</code></td><td>[Lazyweb]</td><td>2/3</td><td>0.59</td><td>Rec 2 · API portal hero + proof</td></tr>
+      <tr><td>Photoroom API <code>/api/playground</code></td><td>[Lazyweb]</td><td>1/3</td><td>0.41</td><td>Rec 3 · how-it-works · unique angle (playground)</td></tr>
+      <tr><td>MetaMask SDK <code>/developer/sdk</code></td><td>[Lazyweb]</td><td>2/3</td><td>0.41</td><td>Rec 3 · code-integration steps</td></tr>
+      <tr><td>Termius <code>termius.com</code></td><td>[Lazyweb]</td><td>2/3</td><td>0.42</td><td>Rec 4 · dark/terminal theme</td></tr>
+      <tr><td>Raycast <code>/core-features/ai</code></td><td>[Lazyweb]</td><td>1/3</td><td>0.55</td><td>Rec 4 · dark/terminal theme</td></tr>
+      <tr><td>Hiro <code>hiro.is</code></td><td>[Lazyweb]</td><td>1/3</td><td>0.42</td><td>Rec 4 · dark theme + live code preview</td></tr>
+      <tr><td>OpenAI Codex <code>/codex</code> <span class="caveat-inline">inferred</span></td><td>[Lazyweb]</td><td>3/3</td><td>0.41</td><td>Rec 4 · product-UI hero</td></tr>
+      <tr><td>Apollo GraphQL <code>/pricing</code></td><td>[Lazyweb]</td><td>1/3</td><td>0.48</td><td>Anti-pattern / Skip · pricing-wall (off-category)</td></tr>
+      <tr><td>Stripe <code>stripe.com</code></td><td>[Lazyweb]</td><td>1/3</td><td>0.59</td><td>Anti-pattern · lifestyle hero (contrast)</td></tr>
+    </tbody>
+  </table>
+  <p><b>Evidence-of-search for the absence claim:</b> 8 queries run (developer-API hero, transactional email API, email send SDK snippet, how-it-works feature section, developer social proof, Postmark deliverability, code/terminal-in-hero, API pricing). Direct competitors: <b>Resend</b> appeared twice (<code>resend.com</code>, <code>resend.com/docs/send-with-remix</code>) but <b>both had empty vision descriptions</b>, so per the evidence rules no Resend screenshot is embedded. <b>Postmark</b> and <b>Loops</b> returned no results. Closest in-category near-misses captured instead: Twilio SendGrid email-api, Mailjet/Mailchimp/ActiveCampaign transactional-email feature pages (described, not all embedded).</p>
+</details>
+
+<!-- ============ 8. SOURCES ============ -->
+<h2>Sources</h2>
+<p class="src-list">Lazyweb desktop screenshots are cited inline above (each with its <code>pageUrl</code>). Primary source URLs:</p>
+<ul class="src-list tight">
+  <li>[Lazyweb] Snov.io email-verification API — <a href="https://snov.io/email-verification-api">snov.io/email-verification-api</a></li>
+  <li>[Lazyweb] Twilio SendGrid Email API — <a href="https://www.twilio.com/en-us/products/email-api">twilio.com/en-us/products/email-api</a> <span class="caveat-inline">brand inferred</span></li>
+  <li>[Lazyweb] Twilio SendGrid docs/dashboard — <a href="https://www.twilio.com/docs/sendgrid">twilio.com/docs/sendgrid</a> <span class="caveat-inline">brand inferred</span></li>
+  <li>[Lazyweb] Surge — <a href="https://surge.sh/">surge.sh</a></li>
+  <li>[Lazyweb] GitHub Codespaces — <a href="https://github.com/features/codespaces">github.com/features/codespaces</a></li>
+  <li>[Lazyweb] GitHub features — <a href="https://github.com/features">github.com/features</a></li>
+  <li>[Lazyweb] Brave Search API — <a href="https://brave.com/search/api/">brave.com/search/api</a></li>
+  <li>[Lazyweb] Genius developers — <a href="https://genius.com/developers">genius.com/developers</a></li>
+  <li>[Lazyweb] Photoroom API playground — <a href="https://www.photoroom.com/en/api/playground">photoroom.com/en/api/playground</a></li>
+  <li>[Lazyweb] MetaMask SDK — <a href="https://metamask.io/developer/sdk">metamask.io/developer/sdk</a></li>
+  <li>[Lazyweb] Termius — <a href="https://termius.com/">termius.com</a></li>
+  <li>[Lazyweb] Raycast — <a href="https://www.raycast.com/core-features/ai">raycast.com</a></li>
+  <li>[Lazyweb] Hiro — <a href="https://hiro.is/">hiro.is</a></li>
+  <li>[Lazyweb] OpenAI Codex — <a href="https://openai.com/codex/">openai.com/codex</a> <span class="caveat-inline">brand inferred</span></li>
+  <li>[Lazyweb] Apollo GraphQL pricing — <a href="https://www.apollographql.com/pricing">apollographql.com/pricing</a></li>
+  <li>[Lazyweb] Stripe — <a href="https://stripe.com/">stripe.com</a></li>
+  <li>Direct competitors referenced in text only (no usable screenshot in-corpus this run): <a href="https://resend.com/">Resend</a>, Postmark, Loops.</li>
+</ul>
+
+</main>
+</body>
+</html>

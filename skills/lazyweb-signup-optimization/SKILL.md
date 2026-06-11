@@ -1,5 +1,6 @@
 ---
 name: lazyweb-signup-optimization
+route: 'Sign-up / registration screen optimization'
 description: |
   Optimize a sign-up / registration screen by reading the target screen,
   diagnosing signup friction, and producing 2-4 falsifiable redesign

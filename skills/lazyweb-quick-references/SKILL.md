@@ -1,5 +1,6 @@
 ---
 name: lazyweb-quick-references
+route: 'Quick examples / screenshots / UI references, no full report'
 description: |
   Find app screenshots and UI references quickly. Embeds Lazyweb results by
   storage-backed URL and groups them by pattern. Use when the user wants to see examples of a specific

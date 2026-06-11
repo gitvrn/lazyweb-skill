@@ -1,5 +1,6 @@
 ---
 name: lazyweb-design-research
+route: 'Design research, best practices, competitive analysis, "what do top apps do"'
 description: |
   Deep design research combining Lazyweb's screenshot database with web research.
   Produces a structured research report with downloaded reference screenshots.

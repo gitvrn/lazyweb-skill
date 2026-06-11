@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Design Research: Transactional Email API — Marketing Landing + Feature Page</title>
+<style>
+  :root{--ink:#1f2328;--mut:#57606a;--line:#d0d7de;--soft:#eef4fb;--accent:#0969da}
+  *{box-sizing:border-box}
+  body{font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;color:var(--ink);max-width:900px;margin:0 auto;padding:28px 20px 80px}
+  h1{font-size:30px;line-height:1.2;margin:0 0 6px}
+  .sub{color:var(--mut);font-size:15px;margin:0 0 8px}
+  h2{font-size:22px;margin:34px 0 8px;padding-bottom:6px;border-bottom:1px solid var(--line)}
+  h3{font-size:16px}
+  p{margin:8px 0}
+  a{color:var(--accent)}
+  code{font:13px/1.4 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:#f6f8fa;border:1px solid var(--line);border-radius:4px;padding:1px 5px}
+
+  /* Agent Instructions */
+  .agent-instructions{background:var(--soft);border-left:4px solid var(--accent);border-radius:8px;padding:14px 16px;margin:18px 0}
+  .ai-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:8px}
+  .ai-badge{font-size:11px;font-weight:700;letter-spacing:.04em;color:#0a3b78}
+  .ai-copy{font:600 12px/1 inherit;cursor:pointer;border:1px solid var(--accent);color:var(--accent);background:#fff;border-radius:6px;padding:5px 11px}
+  .ai-copy:hover{background:var(--accent);color:#fff}
+  .ai-human{margin:0 0 10px;font-size:15px}
+  .ai-block{white-space:pre-wrap;word-break:break-word;background:#fff;border:1px solid var(--line);border-radius:6px;padding:12px 13px;margin:0;font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--ink);user-select:all}
+
+  /* Mock-frames */
+  .mock{margin:14px 0;font-family:inherit}
+  .mock .frame{border:1px solid var(--line);border-radius:14px;background:#fff;box-shadow:0 1px 4px rgba(31,35,40,.06);overflow:hidden}
+  .mock.mobile .frame{max-width:300px;border-radius:26px;border:8px solid #1f2328}
+  .mock.desktop .frame{max-width:760px}
+  .mock .bar{display:flex;align-items:center;gap:6px;padding:7px 10px;background:#f6f8fa;border-bottom:1px solid var(--line);font-size:12px;color:var(--mut)}
+  .mock .dot{width:9px;height:9px;border-radius:50%;background:#d0d7de}
+  .mock .url{flex:1;text-align:center;background:#fff;border:1px solid var(--line);border-radius:5px;padding:2px 8px;font-size:11px;color:var(--mut)}
+  .mock .notch{width:46%;height:16px;margin:6px auto 0;background:#1f2328;border-radius:0 0 12px 12px}
+  .mock .body{padding:14px;display:flex;flex-direction:column;gap:10px}
+  .mock .box{background:var(--soft);border:1px dashed #b9c7d6;border-radius:8px;min-height:34px;display:flex;align-items:center;justify-content:center;color:#4a5a6a;font-size:12px;text-align:center;padding:8px}
+  .mock .box.tall{min-height:120px}.mock .box.cta{background:var(--accent);border:0;color:#fff;font-weight:600;min-height:40px}
+  .mock .box.code{background:#0d1117;border:1px solid #30363d;color:#9ecbff;font:11px/1.5 ui-monospace,Menlo,Consolas,monospace;justify-content:flex-start;align-items:flex-start;text-align:left;white-space:pre;min-height:96px}
+  .mock .row{display:flex;gap:10px}.mock .row>.box{flex:1}
+  .mock .cap{font-size:12px;color:var(--mut);margin-top:6px;text-align:center}
+
+  /* Evidence components */
+  .deck{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;padding:4px 2px 12px;scrollbar-width:thin}
+  .deck::after{content:'';flex:0 0 2px}
+  .deck>figure{flex:0 0 78%;max-width:300px;scroll-snap-align:start;margin:0;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff}
+  @media(min-width:620px){.deck>figure{flex:0 0 46%}}
+  .deck>figure>img{display:block;width:100%;height:200px;object-fit:cover;object-position:top;background:#fafbfc}
+  .deck>figure.tall>img{height:360px;object-fit:contain}
+  .deck>figure.img-missing>img{display:none}
+  .deck>figure.img-missing figcaption::after{content:' — image unavailable; see description';color:#cf222e}
+  .deck .cap{font-size:12px;color:var(--mut);padding:7px 9px;line-height:1.4}
+  .deck .cap b{color:var(--ink)}
+  .deck .src{font-size:10.5px;font-weight:700;letter-spacing:.03em;color:var(--accent)}
+  .deck-hint{font-size:11.5px;color:var(--mut);margin:-2px 0 6px}
+  .pat{border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin:14px 0;background:#fff}
+  .pat-h{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px;margin-bottom:4px}
+  .pat-h h3{margin:0;font-size:16px}
+  .pat-claim{color:var(--mut);font-size:14px;margin:2px 0 10px}
+  .prev{font:600 11.5px/1 inherit;color:#0a3b78;background:var(--soft);border-radius:20px;padding:4px 10px}
+  .tag{font:700 10.5px/1 inherit;letter-spacing:.03em;border-radius:5px;padding:3px 7px}
+  .tag.strong{color:#0a5d2a;background:#e6f4ea;border:1px solid #b7e0c4}
+  .tag.directional{color:#8a5a00;background:#fff8e6;border:1px solid #f0e0b0}
+  .tag.weak{color:#6e7781;background:#f6f8fa;border:1px solid var(--line)}
+  .tag.avoid{color:#a40e26;background:#fdeef0;border:1px solid #f5c2c7}
+  .lead{border:2px solid var(--accent);border-radius:12px;padding:14px 16px 14px 18px;margin:16px 0;background:linear-gradient(0deg,#fff,var(--soft));position:relative}
+  .lead::before{content:'RECOMMENDED PATH — START HERE';position:absolute;top:-10px;left:14px;background:var(--accent);color:#fff;font:700 10px/1 inherit;letter-spacing:.05em;border-radius:10px;padding:4px 9px}
+  .lead h3{margin:6px 0 4px;font-size:17px}
+  .lead .why{font-size:14px;color:var(--mut);margin:0}
+  table.ranked{border-collapse:collapse;width:100%;margin:8px 0 4px;font-size:14px}
+  table.ranked td,table.ranked th{vertical-align:middle;border:1px solid var(--line);padding:8px 10px;text-align:left}
+  table.ranked th{background:#f6f8fa;font-size:12.5px;letter-spacing:.02em}
+  table.ranked .rank{font-weight:700;text-align:center;width:34px}
+  table.ranked tr.is-lead{background:var(--soft)}
+  table.ranked .thumb{width:64px}
+  table.ranked .thumb img{width:56px;height:56px;object-fit:cover;border:1px solid var(--line);border-radius:6px;display:block}
+  table.ranked .verdict{font:700 11px/1 inherit;border-radius:5px;padding:3px 7px;white-space:nowrap}
+  table.ranked .verdict.do{color:#0a5d2a;background:#e6f4ea}
+  table.ranked .verdict.explore{color:#8a5a00;background:#fff8e6}
+  table.ranked .verdict.skip{color:#6e7781;background:#f6f8fa}
+  table.ranked .skipif{color:var(--mut);font-size:12.5px}
+  .corpus{display:flex;gap:8px;align-items:flex-start;font-size:13px;color:#8a5a00;background:#fff8e6;border:1px solid #f0e0b0;border-radius:8px;padding:9px 12px;margin:14px 0}
+  .corpus b{color:var(--ink)}
+  .ebadge{font:700 10.5px/1 inherit;letter-spacing:.02em;border-radius:20px;padding:4px 9px;display:inline-block}
+  .ebadge.measured{color:#0a5d2a;background:#e6f4ea;border:1px solid #b7e0c4}
+  .ebadge.directional{color:#8a5a00;background:#fff8e6;border:1px solid #f0e0b0}
+  .ebadge.single{color:#a40e26;background:#fdeef0;border:1px solid #f5c2c7}
+  .caveat-inline{font:700 10px/1 inherit;color:#8a5a00;background:#fff8e6;border:1px solid #f0e0b0;border-radius:5px;padding:2px 6px;margin-left:6px}
+  .rec-thumb{display:flex;gap:6px}
+  .rec-thumb img{height:64px;width:auto;border:1px solid var(--line);border-radius:6px}
+
+  /* misc */
+  details{border:1px solid var(--line);border-radius:8px;padding:6px 12px;margin:12px 0;background:#fff}
+  details summary{cursor:pointer;font-weight:600;padding:6px 0}
+  table.ev{border-collapse:collapse;width:100%;font-size:13px;margin:8px 0}
+  table.ev td,table.ev th{border:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+  table.ev th{background:#f6f8fa}
+  ul.src{font-size:14px;color:var(--mut);padding-left:20px}
+  .reclist{padding-left:20px}
+  .reclist li{margin:6px 0}
+  .badge-row{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 0}
+</style>
+</head>
+<body>
+
+<h1>Design Research: Transactional Email API</h1>
+<p class="sub">Marketing landing page + one feature page · developer audience · web/desktop · Resend / Postmark / Loops competitor · 2026-06-08</p>
+
+<!-- ============ 1. AGENT INSTRUCTIONS (section #1) ============ -->
+<section id="agent-instructions" class="agent-instructions">
+  <div class="ai-head"><span class="ai-badge">FOR THE CODING AGENT</span>
+    <button class="ai-copy" type="button" onclick="
+      var sec=this.closest('.agent-instructions'); var txt=sec.querySelector('.ai-block').innerText;
+      var done=function(ok){this.textContent=ok?'Copied':'Press Cmd/Ctrl+C';setTimeout(function(){this.textContent='Copy';}.bind(this),1500);}.bind(this);
+      if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(function(){done(true);},function(){done(false);});}
+      else{var r=document.createRange();r.selectNodeContents(sec.querySelector('.ai-block'));var s=getSelection();s.removeAllRanges();s.addRange(r);try{document.execCommand('copy');done(true);}catch(e){done(false);}}">Copy</button>
+  </div>
+  <p class="ai-human">Build the hero around a runnable code block (send-an-email snippet + a delivered/log response), not an illustration — that is the single highest-leverage move and it is what the strongest dev-API pages in this corpus do.</p>
+  <pre class="ai-block">LAZYWEB REPORT — AGENT HANDOFF
+Use this report as a starting point for implementing a transactional-email-API marketing landing page + a key feature page using competitor-validated design patterns.
+
+TOP RECOMMENDATIONS (do first):
+1. Put the product in the hero: a tabbed/runnable send-email code block (curl + SDK tabs) paired with a "delivered" log/response panel — copy Surge/Blindpay/CapCut/remove-bg framing.
+2. Add a 3-step "How it works" strip (Install SDK → Send → Track delivery), each step anchored to a real UI artifact (snippet, dashboard preview), mirroring Appcues' three-step getting-started block.
+3. Add a developer trust strip: real customer logos + a hard deliverability/volume number, the Twilio-SendGrid / Shortcut / Pendo pattern.
+
+INDEX ON: code-first hero (5 of 9 dev-API refs); 3-step how-it-works with real artifacts (3 of 9); quantified logo trust strip (4 of 9).
+DO NOT OVER-INDEX ON: dark "crypto" aesthetic (off-audience, 1 ref, Coinbase); long-scroll feature walls with no code (hurts dev trust); 3D abstract hero art with no product (ClearBank — looks generic).
+DIVE FURTHER: /lazyweb-design-improve to pressure-test your build against these references, or lazyweb_find_similar to widen the code-in-hero pattern.
+
+Evidence basis: 9 Lazyweb desktop screenshots, no live web captures this run · 2026-06-08</pre>
+</section>
+
+<!-- ============ CORPUS BANNER (right after Agent Instructions) ============ -->
+<div class="corpus"><span>&#9888;</span><p style="margin:0"><b>Corpus strength:</b> 9 Lazyweb desktop screenshots across 5 search angles, no live web captures this run; similarity clustered <b>~0.42–0.61</b>, mostly matchCount 1–2/3. Treat every prevalence claim below as <b>Directional</b> (visual prevalence), not measured — there is no A/B lift data behind these (A/B research is a paid Lazyweb add-on and was not run). Several desktop crawl seeds are mislabeled, so brands are derived from <code>pageUrl</code> and tagged <b>"brand inferred — verify"</b> where the seed and vision text disagreed.</p></div>
+
+<!-- ============ RECOMMENDATIONS / NEXT STEPS ============ -->
+<h2>Recommendations / Next Steps</h2>
+<p>In priority order. Each ties to the visual evidence in <a href="#patterns">Patterns</a> and the ranked table directly below.</p>
+<ol class="reclist">
+  <li><b>Code-first hero.</b> Lead the landing page with a tabbed code block (<code>curl</code> + Node/Python SDK) sending one email, beside a "delivered" response/log card. Surge, Blindpay, CapCut and remove-bg all sell the API by showing the call, not an illustration. <span class="ebadge directional">Directional · 5/9 refs · no outcome data</span></li>
+  <li><b>3-step "How it works" strip.</b> Install SDK → Send your first email → Track delivery, each step pinned to a real artifact (snippet, dashboard preview), like Appcues' "Install SDK / Create messages / …" block and Ramp's developer-tools layout. <span class="ebadge directional">Directional · 3/9 refs</span></li>
+  <li><b>Quantified developer trust strip.</b> Customer logos plus one concrete deliverability/volume number (e.g. "99%+ delivered", "100M+/mo"), as Twilio-SendGrid, Shortcut and Pendo do. Use only numbers you can truly back. <span class="ebadge directional">Directional · 4/9 refs</span></li>
+  <li><b>Feature page = product screenshot + inline code, not prose.</b> The deliverability/feature page should show the logs/events dashboard and the matching webhook snippet side by side (Mode's split console, Stripe's UI-mockup feature blocks). <span class="ebadge directional">Directional · 3/9 refs</span></li>
+</ol>
+<p style="font-size:13.5px;color:var(--mut)"><b>Mockups</b> for the proposed hero and how-it-works layouts are shown as mock-frames below. No image-generation tool was available this run, so these are HTML/CSS wireframes (never ASCII).</p>
+
+<!-- mock-frames -->
+<div style="display:flex;gap:18px;flex-wrap:wrap">
+<figure class="mock desktop"><div class="frame"><div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url">yourmail.dev</span></div><div class="body">
+  <div class="row"><div class="box">Logo</div><div class="box">Docs · Pricing</div><div class="box">Sign in</div></div>
+  <div class="row">
+    <div class="box tall" style="flex:1.1">Headline: "Send email developers love"<br>+ Start free / Read docs</div>
+    <div class="box code" style="flex:1">POST /emails
+  to: "dev@app.com"
+  subject: "Welcome"
+&gt; 200 delivered (id_8f3a)
+&gt; opened 0.4s later</div>
+  </div>
+  <div class="box cta">Get your API key</div>
+</div></div><figcaption class="cap">Mock-frame — code-first hero: runnable snippet + delivered-log beside the value prop (Rec 1).</figcaption></figure>
+
+<figure class="mock desktop"><div class="frame"><div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url">yourmail.dev/#how</span></div><div class="body">
+  <div class="box">How it works</div>
+  <div class="row"><div class="box">1 · Install SDK<br><code>npm i @mail/sdk</code></div><div class="box">2 · Send<br>one API call</div><div class="box">3 · Track<br>logs + webhooks</div></div>
+  <div class="box tall">Live delivery-log preview (real artifact under each step)</div>
+</div></div><figcaption class="cap">Mock-frame — 3-step "How it works" strip, each step anchored to a real UI artifact (Rec 2).</figcaption></figure>
+</div>
+
+<!-- ============ KEY EXAMPLES (carousel) ============ -->
+<h2>Key Examples</h2>
+<p>The visual centerpiece — flip through the references that drive the recommendations. Mixed brands; all <span class="src" style="color:var(--accent);font-weight:700">[Lazyweb]</span> desktop captures this run.</p>
+<p class="deck-hint">&#9656; scroll to flip through the proof</p>
+<div class="deck">
+  <figure><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/sites/surge/surge_a0f903d944f8358232ae.png" alt="Surge" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+    <figcaption class="cap"><span class="src">[Lazyweb]</span> <b>Surge</b> (<a href="https://surge.sh/">surge.sh</a>) &mdash; sells the product by showing the CLI command in the hero; deploy-in-keystrokes framing. <i>Borrow:</i> command/snippet IS the value prop.</figcaption></figure>
+  <figure><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/sites/blindpay/blindpay_8eb8c8274c4619c1614f.png" alt="Blindpay" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+    <figcaption class="cap"><span class="src">[Lazyweb]</span> <b>Blindpay</b> (<a href="https://www.blindpay.com/global-payments">blindpay.com</a>) &mdash; toggleable code snippets for API calls + "Get started for free". <i>Borrow:</i> language tabs over the code block.</figcaption></figure>
+  <figure><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/sites/twilio/twilio_83ce2bb7095e45dcf759.png" alt="Twilio SendGrid email API" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+    <figcaption class="cap"><span class="src">[Lazyweb]</span> <b>Twilio SendGrid</b> <span class="caveat-inline">brand inferred from pageUrl — verify</span> (<a href="https://www.twilio.com/en-us/products/email-api">twilio.com/email-api</a>) &mdash; the direct-competitor email-API hero: volume claim ("100M+/mo"), brand logos, Send-Test-Email + Get-Started CTAs. <i>Borrow:</i> quantified deliverability proof.</figcaption></figure>
+  <figure><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/sites/mode-analytics/mode-analytics_f51319cb0e3f145a990b.png" alt="Mode split console" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+    <figcaption class="cap"><span class="src">[Lazyweb]</span> <b>Mode</b> (<a href="https://mode.com/developer/api-reference/introduction/">mode.com/developer</a>) &mdash; split-screen: docs left, live API console with a <code>curl</code> example right. <i>Borrow:</i> the "try the call right here" split for the feature page.</figcaption></figure>
+  <figure><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/sites/shortcut/shortcut_90870b6645e4181ff11d.png" alt="Shortcut trust strip" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+    <figcaption class="cap"><span class="src">[Lazyweb]</span> <b>Shortcut</b> (<a href="https://www.shortcut.com/customer-stories">shortcut.com</a>) &mdash; "Trusted By Teams Worldwide" logo wall (Twilio, Fireflies) + 5-star ratings above the fold. <i>Borrow:</i> logos high, near the CTA.</figcaption></figure>
+</div>
+
+<!-- ============ PATTERNS (.pat cards w/ flippable .deck) ============ -->
+<h2 id="patterns">Patterns</h2>
+<p style="color:var(--mut);font-size:14px">Table-stakes patterns across the dev-API landing pages pulled. Each card shows the shared pattern with the real screenshots that exhibit it — flip the deck to see the proof.</p>
+
+<div class="pat">
+  <div class="pat-h">
+    <h3>Code / command visible in the hero</h3>
+    <span class="tag strong">Strong</span>
+    <span class="prev">seen in 5 of 9 references</span>
+    <span class="ebadge directional">Directional · prevalence only</span>
+  </div>
+  <p class="pat-claim">Table stakes: the strongest developer-API pages put a runnable snippet, command, or live call in the first fold instead of a hero illustration — the code <i>is</i> the value prop.</p>
+  <p class="deck-hint">&#9656; scroll to flip through the proof</p>
+  <div class="deck">
+    <figure><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/sites/surge/surge_a0f903d944f8358232ae.png" alt="Surge" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+      <figcaption class="cap"><span class="src">[Lazyweb]</span> <b>Surge</b> &mdash; deploy-by-CLI command shown as the hero; "few keystrokes" copy beside it.</figcaption></figure>
+    <figure><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/sites/blindpay/blindpay_8eb8c8274c4619c1614f.png" alt="Blindpay" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+      <figcaption class="cap"><span class="src">[Lazyweb]</span> <b>Blindpay</b> &mdash; toggleable code snippets for REST/SDK/webhook calls in the hero region.</figcaption></figure>
+    <figure><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/sites/reap-video/reap-video_f4b899eb142c36e2dd8d.png" alt="CapCut video API" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+      <figcaption class="cap"><span class="src">[Lazyweb]</span> <b>CapCut Video API</b> <span class="caveat-inline">brand inferred from pageUrl — verify</span> &mdash; a "Quick Start" code snippet sits beside Sign-Up / Read-Docs CTAs.</figcaption></figure>
+    <figure><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/sites/remove-bg/remove-bg_8694f8a82ff2cbbcf4fe.png" alt="remove.bg API" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+      <figcaption class="cap"><span class="src">[Lazyweb]</span> <b>remove.bg</b> &mdash; "single API call" headline with sample code + quick-start, before-and-after demo.</figcaption></figure>
+  </div>
+</div>
+
+<div class="pat">
+  <div class="pat-h">
+    <h3>3-step "How it works" anchored to real artifacts</h3>
+    <span class="tag directional">Directional</span>
+    <span class="prev">seen in 3 of 9 references</span>
+    <span class="ebadge directional">Directional · prevalence only</span>
+  </div>
+  <p class="pat-claim">A short numbered getting-started strip (Install → Use → Track), each step pinned to an actual UI element rather than a generic icon, lowers the perceived time-to-first-call.</p>
+  <p class="deck-hint">&#9656; scroll to flip through the proof</p>
+  <div class="deck">
+    <figure><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/sites/wix/wix_f5237b352f4c527a26cd.png" alt="Wix Studio developers" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+      <figcaption class="cap"><span class="src">[Lazyweb]</span> <b>Wix Studio (developers)</b> &mdash; hero CTA then stacked capability sections (headless APIs, monetization) walking the dev through the platform.</figcaption></figure>
+    <figure><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/sites/ramp/ramp_6988e7b0596959328ba6.png" alt="Ramp developer tools" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+      <figcaption class="cap"><span class="src">[Lazyweb]</span> <b>Ramp</b> (developer-tools) &mdash; capability-by-capability feature walk (issue cards, schedule payments, sync GL) with "explore docs" CTA.</figcaption></figure>
+    <figure><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/sites/spothero/spothero_07e369cb1bb3aa52ed51.png" alt="SpotHero developers" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+      <figcaption class="cap"><span class="src">[Lazyweb]</span> <b>SpotHero</b> (developers) &mdash; explicit "how it works" nav + use-case sections with request-access / docs CTAs.</figcaption></figure>
+  </div>
+</div>
+
+<div class="pat">
+  <div class="pat-h">
+    <h3>Quantified logo trust strip near the top</h3>
+    <span class="tag directional">Directional</span>
+    <span class="prev">seen in 4 of 9 references</span>
+    <span class="ebadge directional">Directional · prevalence only</span>
+  </div>
+  <p class="pat-claim">Customer logos paired with a hard number (deliverability %, monthly volume, ratings) carry more weight for a developer audience than adjectives — and they sit high on the page, near the primary CTA.</p>
+  <p class="deck-hint">&#9656; scroll to flip through the proof</p>
+  <div class="deck">
+    <figure><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/sites/twilio/twilio_83ce2bb7095e45dcf759.png" alt="Twilio SendGrid" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+      <figcaption class="cap"><span class="src">[Lazyweb]</span> <b>Twilio SendGrid</b> <span class="caveat-inline">brand inferred from pageUrl — verify</span> &mdash; "100M+ emails/mo" + brand logos (Zendesk, ServiceNow) under the hero.</figcaption></figure>
+    <figure><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/sites/shortcut/shortcut_90870b6645e4181ff11d.png" alt="Shortcut" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+      <figcaption class="cap"><span class="src">[Lazyweb]</span> <b>Shortcut</b> &mdash; "Trusted By Teams Worldwide" logo row + 5-star ratings right under the hero CTAs.</figcaption></figure>
+    <figure><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/sites/pendo/pendo_d65d89a9333bb4921b0b.png" alt="Pendo" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+      <figcaption class="cap"><span class="src">[Lazyweb]</span> <b>Pendo</b> &mdash; trusted-partner logos (Apple, Amazon, Cisco) above a 3-card "How Pendo" benefits block.</figcaption></figure>
+    <figure><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/sites/readme/readme_20c0fcec959b2441dac7.png" alt="ReadMe" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+      <figcaption class="cap"><span class="src">[Lazyweb]</span> <b>ReadMe</b> &mdash; "trusted from startups to Fortune 500" with partner logos + customer-story cards for API tooling.</figcaption></figure>
+  </div>
+</div>
+
+<!-- ============ ANTI-PATTERNS ============ -->
+<h2>Anti-Patterns</h2>
+<p style="color:var(--mut);font-size:14px">What not to copy — each is shown with the real screenshot of the pattern (or labelled directional when no in-corpus shot exists).</p>
+
+<div class="pat">
+  <div class="pat-h">
+    <h3>Dark "crypto/trading" aesthetic for a dev-tools audience</h3>
+    <span class="tag avoid">Avoid</span>
+    <span class="prev">1 of 9 references (off-audience)</span>
+    <span class="ebadge single">Single-source · off-category</span>
+  </div>
+  <p class="pat-claim">A dark, finance/crypto-styled hero reads as the wrong category for a transactional-email API and can erode the "clean, developer-trusted" signal you want. Shown for contrast — do not copy the styling for this audience.</p>
+  <div class="deck">
+    <figure><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/sites/coinbase/coinbase_528c44fa3b47c17bd2d3.png" alt="Coinbase developer platform" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+      <figcaption class="cap"><span class="src">[Lazyweb]</span> <b>Coinbase</b> (developer-platform/trading) &mdash; crypto-trading API hero. Fine for crypto; off-audience for an email API. <i>Avoid:</i> borrowing the trading-desk look.</figcaption></figure>
+  </div>
+</div>
+
+<div class="pat">
+  <div class="pat-h">
+    <h3>Abstract 3D hero art with no product in view</h3>
+    <span class="tag avoid">Avoid</span>
+    <span class="prev">1 of 9 references</span>
+    <span class="ebadge single">Single-source · directional</span>
+  </div>
+  <p class="pat-claim">A vibrant 3D-shape hero with only "For Developers / Connect through our API" copy and no code or product shot is generic — developers can't tell what the call looks like. Show the API instead.</p>
+  <div class="deck">
+    <figure><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/sites/clearbank/clearbank_ae785a108a2fcd5dbfc1.png" alt="ClearBank developers" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+      <figcaption class="cap"><span class="src">[Lazyweb]</span> <b>ClearBank</b> <span class="caveat-inline">brand inferred from pageUrl — verify</span> (clear.bank) &mdash; 3D geometric hero, slogan-only, no code. <i>Avoid:</i> decorative hero with nothing runnable.</figcaption></figure>
+  </div>
+</div>
+
+<div class="pat">
+  <div class="pat-h">
+    <h3>Marketer-first transactional framing (no code path) on a dev page</h3>
+    <span class="tag avoid">Avoid</span>
+    <span class="prev">no in-corpus screenshot — directional</span>
+    <span class="ebadge single">Single-source / directional</span>
+  </div>
+  <p class="pat-claim">Several incumbents lead the transactional-email page with marketer-oriented "automated receipts/confirmations" copy and templates before any code. For a developer-first competitor, leading with prose + templates instead of a snippet buries the thing your audience came for. <b>No clean in-corpus screenshot isolates this as a bad example</b>, so this is directional — based on the marketer-led framing seen across the incumbent transactional pages pulled (Mailchimp/Brevo/ActiveCampaign seeds), not a single captured shot.</p>
+</div>
+
+<!-- ============ UNIQUE ANGLES ============ -->
+<h2>Unique Angles</h2>
+<p style="color:var(--mut);font-size:14px">"You have to see it" details worth stealing — each pinned to the exact screenshot showing the element.</p>
+
+<div class="pat">
+  <div class="pat-h">
+    <h3>Split-screen "docs + live console" you can call from the page</h3>
+    <span class="tag strong">Borrow</span>
+    <span class="prev">1 standout (feature-page model)</span>
+    <span class="ebadge directional">Directional · single strong ref</span>
+  </div>
+  <p class="pat-claim">The X100 detail: Mode puts onboarding docs on the left and an interactive API-discovery console with a live <code>curl</code> example on the right — the reader can conceptually run the call without leaving the page. This is the model for your feature page's "try it" moment.</p>
+  <div class="deck">
+    <figure class="tall"><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/sites/mode-analytics/mode-analytics_f51319cb0e3f145a990b.png" alt="Mode split console" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+      <figcaption class="cap"><span class="src">[Lazyweb]</span> <b>Mode</b> &mdash; left: getting-started docs; <b>right: live console with a runnable <code>curl</code> request</b>. That right-hand console is the detail to replicate.</figcaption></figure>
+  </div>
+</div>
+
+<div class="pat">
+  <div class="pat-h">
+    <h3>Code/terminal screenshots threaded through every feature block</h3>
+    <span class="tag directional">Borrow</span>
+    <span class="prev">1 standout (dark dev aesthetic done right)</span>
+    <span class="ebadge directional">Directional · single strong ref</span>
+  </div>
+  <p class="pat-claim">Raycast's dark dev landing page repeats code/terminal screenshots inside each stacked feature section (not just the hero) — proof that a developer page can be dark <i>and</i> code-led without reading "crypto". Borrow the cadence: every feature claim carries a snippet.</p>
+  <div class="deck">
+    <figure class="tall"><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/sites/raycast/raycast_f3a98b6f3865effcb210.png" alt="Raycast dark dev landing" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+      <figcaption class="cap"><span class="src">[Lazyweb]</span> <b>Raycast</b> &mdash; dark hero + <b>code/terminal screenshots repeated in each feature block</b>, testimonials, pricing tiers. The recurring terminal shot is the element to steal.</figcaption></figure>
+  </div>
+</div>
+
+<!-- ============ WHAT TO BUILD FIRST (.ranked + .lead) ============ -->
+<h2>What to build first</h2>
+<div class="lead">
+  <h3>1 &middot; Code-first hero (send-email snippet + delivered-log)</h3>
+  <p class="why">Highest leverage, lowest risk. The dominant pattern in this corpus — shown in 5 of 9 dev-API references (Surge, Blindpay, CapCut, remove-bg, and partly Twilio-SendGrid). Evidence: <b>Directional</b> (visual prevalence), no measured lift in this run. It is also exactly what the closest direct competitors (Resend/Postmark category) lead with.</p>
+</div>
+<table class="ranked">
+  <thead><tr><th class="rank">#</th><th>What to build</th><th class="thumb">Proof</th><th>Evidence</th><th>Verdict</th><th>Skip if</th></tr></thead>
+  <tbody>
+    <tr class="is-lead">
+      <td class="rank">1</td><td>Code-first hero: tabbed send-email snippet + "delivered" log</td>
+      <td class="thumb"><a href="#patterns"><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/sites/surge/surge_a0f903d944f8358232ae.png" alt=""></a></td>
+      <td><span class="tag strong">Strong</span> 5/9 refs</td>
+      <td><span class="verdict do">Do first</span></td><td class="skipif">&mdash;</td>
+    </tr>
+    <tr>
+      <td class="rank">2</td><td>3-step "How it works" strip, each step on a real artifact</td>
+      <td class="thumb"><a href="#patterns"><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/sites/ramp/ramp_6988e7b0596959328ba6.png" alt=""></a></td>
+      <td><span class="tag directional">Directional</span> 3/9</td>
+      <td><span class="verdict do">Do</span></td><td class="skipif">if the snippet alone already shows the full flow</td>
+    </tr>
+    <tr>
+      <td class="rank">3</td><td>Quantified developer trust strip (logos + delivery number)</td>
+      <td class="thumb"><a href="#patterns"><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/sites/shortcut/shortcut_90870b6645e4181ff11d.png" alt=""></a></td>
+      <td><span class="tag directional">Directional</span> 4/9</td>
+      <td><span class="verdict do">Do</span></td><td class="skipif">you have no real logos/metrics yet — never fake them</td>
+    </tr>
+    <tr>
+      <td class="rank">4</td><td>Feature page as split "docs + live console"</td>
+      <td class="thumb"><a href="#patterns"><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/sites/mode-analytics/mode-analytics_f51319cb0e3f145a990b.png" alt=""></a></td>
+      <td><span class="tag directional">Directional</span> 1 strong</td>
+      <td><span class="verdict explore">Explore</span></td><td class="skipif">a static annotated screenshot is cheaper and enough for v1</td>
+    </tr>
+    <tr>
+      <td class="rank">5</td><td>Dark "crypto/trading" hero aesthetic</td>
+      <td class="thumb"><a href="#patterns"><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/sites/coinbase/coinbase_528c44fa3b47c17bd2d3.png" alt=""></a></td>
+      <td><span class="tag weak">Weak</span> off-audience</td>
+      <td><span class="verdict skip">Skip</span></td><td class="skipif">always for this audience — see Coinbase anti-pattern</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- ============ FINDINGS (collapsed details + evidence table) ============ -->
+<h2>Findings</h2>
+<details>
+  <summary>How we got here — searches run &amp; evidence table</summary>
+  <p style="font-size:13.5px;color:var(--mut)">Five <code>lazyweb_search</code> calls (platform=desktop): "developer API landing page code hero", "transactional email API developer marketing site", "API code snippet quickstart curl example developer hero", "developer social proof trusted by logos testimonials SaaS landing", "how it works steps integration feature section developer product". No live web captures and no A/B/experiment lookup this run (A/B research is a paid add-on). Similarity clustered ~0.42–0.61; most selected refs were matchCount 1–2/3, so claims are framed as directional. <b>Evidence of absence:</b> no clean in-corpus screenshot isolated "marketer-first transactional page" as a bad example — the closest near-misses (Mailchimp/Brevo/ActiveCampaign transactional pages) were themselves marketer-led, so that anti-pattern is labelled directional rather than shown.</p>
+  <table class="ev">
+    <thead><tr><th>Brand (from pageUrl)</th><th>Source</th><th>match</th><th>sim</th><th>Supports</th><th>Note</th></tr></thead>
+    <tbody>
+      <tr><td>Surge (surge.sh)</td><td>[Lazyweb]</td><td>1/3</td><td>0.37</td><td>Rec 1 / code-hero pattern (lead)</td><td>CLI command as hero</td></tr>
+      <tr><td>Blindpay (blindpay.com)</td><td>[Lazyweb]</td><td>1/3</td><td>0.43</td><td>Rec 1 / code-hero pattern</td><td>toggleable code snippets</td></tr>
+      <tr><td>CapCut Video API (reap.video)</td><td>[Lazyweb]</td><td>1/3</td><td>0.40</td><td>Rec 1 / code-hero pattern</td><td>brand inferred — verify; vision says CapCut</td></tr>
+      <tr><td>remove.bg (remove.bg)</td><td>[Lazyweb]</td><td>1/3</td><td>0.40</td><td>Rec 1 / code-hero pattern</td><td>"single API call" + sample code</td></tr>
+      <tr><td>Twilio SendGrid (twilio.com/email-api)</td><td>[Lazyweb]</td><td>1/3</td><td>0.47</td><td>Rec 1+3 / trust strip + direct competitor</td><td>brand inferred — verify; one image hash reused across 4 crawl seeds (twilio/sendgrid/bizzy/segment)</td></tr>
+      <tr><td>Ramp (ramp.com/developer-tools)</td><td>[Lazyweb]</td><td>2–3/3</td><td>0.46–0.54</td><td>Rec 2 / how-it-works</td><td>capability-by-capability walk</td></tr>
+      <tr><td>Wix Studio (wix.com/studio/developers)</td><td>[Lazyweb]</td><td>2–3/3</td><td>0.37–0.61</td><td>Rec 2 / how-it-works</td><td>stacked capability sections</td></tr>
+      <tr><td>SpotHero (spothero.com/developers)</td><td>[Lazyweb]</td><td>2/3</td><td>0.42–0.60</td><td>Rec 2 / how-it-works</td><td>explicit "how it works" nav</td></tr>
+      <tr><td>Shortcut (shortcut.com)</td><td>[Lazyweb]</td><td>1/3</td><td>0.44</td><td>Rec 3 / trust strip</td><td>"Trusted by teams" + ratings</td></tr>
+      <tr><td>Pendo (pendo.io)</td><td>[Lazyweb]</td><td>1/3</td><td>0.56</td><td>Rec 3 / trust strip</td><td>logos + 3-card benefits</td></tr>
+      <tr><td>ReadMe (readme.com)</td><td>[Lazyweb]</td><td>1/3</td><td>0.44</td><td>Rec 3 / trust strip</td><td>startups→Fortune 500 framing</td></tr>
+      <tr><td>Mode (mode.com/developer)</td><td>[Lazyweb]</td><td>1/3</td><td>0.44</td><td>Rec 4 / Unique angle (split console)</td><td>live curl console, right pane</td></tr>
+      <tr><td>Raycast (raycast.com)</td><td>[Lazyweb]</td><td>1/3</td><td>0.48</td><td>Unique angle (dark + code)</td><td>terminal shots per feature</td></tr>
+      <tr><td>Coinbase (coinbase.com/developer-platform)</td><td>[Lazyweb]</td><td>1/3</td><td>0.51–0.61</td><td>Anti-pattern (off-audience)</td><td>crypto-trading aesthetic</td></tr>
+      <tr><td>ClearBank (clear.bank)</td><td>[Lazyweb]</td><td>1/3</td><td>0.44</td><td>Anti-pattern (decorative hero)</td><td>brand inferred — verify; 3D art, no code</td></tr>
+    </tbody>
+  </table>
+</details>
+
+<!-- ============ SOURCES ============ -->
+<h2>Sources</h2>
+<p style="font-size:13.5px;color:var(--mut)">All references this run are Lazyweb desktop screenshots, cited inline above with their <code>pageUrl</code>. No external web articles or live captures were used. Brand names are derived from <code>pageUrl</code>; entries tagged "brand inferred — verify" had a crawl-seed or vision-text mismatch.</p>
+<ul class="src">
+  <li>Lazyweb desktop screenshot database — 5 searches, 2026-06-08 (PRO).</li>
+  <li>Direct-competitor reference in corpus: Twilio SendGrid email-API page (twilio.com/en-us/products/email-api).</li>
+  <li>Resend's own homepage appeared in results but its <code>visionDescription</code> was empty, so per the evidence bar it was <b>not</b> embedded.</li>
+</ul>
+
+</body>
+</html>

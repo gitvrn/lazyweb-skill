@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>A/B Test Research — Lifting Annual-Plan Share on a Hard Paywall (Language Learning)</title>
+<style>
+  :root{
+    --bg:#0d0f14; --panel:#151922; --panel-2:#1b212c; --line:#262d3a;
+    --ink:#e8ecf3; --muted:#9aa6b8; --faint:#6b7689;
+    --accent:#58c08a; --accent-2:#7aa2ff; --warn:#e0a458; --bad:#e06a6a;
+    --chip:#222a37;
+    --radius:14px;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.55;-webkit-font-smoothing:antialiased}
+  a{color:var(--accent-2);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:1080px;margin:0 auto;padding:48px 28px 96px}
+  header.hero{border-bottom:1px solid var(--line);padding-bottom:28px;margin-bottom:36px}
+  .kicker{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:14px}
+  h1{font-size:30px;line-height:1.2;margin:0 0 14px;font-weight:680;letter-spacing:-.01em}
+  h2{font-size:21px;margin:46px 0 16px;font-weight:660;letter-spacing:-.01em;padding-bottom:8px;border-bottom:1px solid var(--line)}
+  h3{font-size:16px;margin:24px 0 8px;font-weight:640}
+  p{margin:10px 0;color:var(--ink)}
+  .lede{font-size:16px;color:var(--muted);max-width:80ch}
+  .meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+  .pill{font-family:var(--mono);font-size:11.5px;background:var(--chip);border:1px solid var(--line);color:var(--muted);padding:5px 10px;border-radius:999px}
+  .pill b{color:var(--ink);font-weight:600}
+  .grid{display:grid;gap:18px}
+  .cols-2{grid-template-columns:repeat(2,1fr)}
+  .cols-3{grid-template-columns:repeat(3,1fr)}
+  @media(max-width:760px){.cols-2,.cols-3{grid-template-columns:1fr}}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px 18px 16px}
+  .card.tight{padding:14px}
+  .note{background:var(--panel-2);border:1px solid var(--line);border-left:3px solid var(--accent-2);border-radius:10px;padding:14px 16px;margin:16px 0;color:var(--muted)}
+  .note.warn{border-left-color:var(--warn)}
+  .note.bad{border-left-color:var(--bad)}
+  .note b{color:var(--ink)}
+  ul,ol{margin:10px 0;padding-left:22px}
+  li{margin:6px 0}
+  .muted{color:var(--muted)}
+  .faint{color:var(--faint)}
+  code{font-family:var(--mono);font-size:12.5px;background:#10141b;border:1px solid var(--line);padding:1px 6px;border-radius:6px;color:#cdd6e4}
+
+  /* experiment cards */
+  .exp{margin:18px 0}
+  .exp .head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+  .exp .co{font-weight:660;font-size:15px}
+  .exp .tags{display:flex;gap:6px;flex-wrap:wrap}
+  .tag{font-family:var(--mono);font-size:10.5px;padding:3px 8px;border-radius:999px;border:1px solid var(--line);color:var(--muted);background:var(--chip)}
+  .tag.edu{color:#9fe0bb;border-color:#2c5b43}
+  .tag.conf{color:#cfe0ff;border-color:#34507f}
+  .tag.plat{color:#e6d3a8;border-color:#5e5230}
+  .kv{margin-top:10px}
+  .kv .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin-top:10px}
+  .kv .v{color:var(--ink);margin-top:2px}
+  .kv .v.learn{color:var(--muted)}
+
+  /* reference figures */
+  figure{margin:0}
+  .ref{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column}
+  .ref .imgwrap{background:#0a0c11;display:flex;align-items:center;justify-content:center;border-bottom:1px solid var(--line);min-height:120px}
+  .ref img{width:100%;height:auto;max-height:420px;object-fit:contain;display:block}
+  .ref figcaption{padding:12px 14px}
+  .ref .co{font-weight:640;font-size:14px;display:flex;align-items:center;gap:8px}
+  .ref .src{font-family:var(--mono);font-size:10px;letter-spacing:.06em;color:var(--faint);border:1px solid var(--line);border-radius:999px;padding:2px 7px}
+  .ref .src.lw{color:#9fe0bb;border-color:#2c5b43}
+  .ref .cap{color:var(--muted);font-size:13px;margin-top:6px}
+  .ref .why{color:var(--accent-2);font-size:12.5px;margin-top:8px}
+
+  /* sequence */
+  .seq{counter-reset:step;margin-top:8px}
+  .step{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px 16px 56px;margin:12px 0}
+  .step::before{counter-increment:step;content:counter(step);position:absolute;left:16px;top:16px;width:26px;height:26px;border-radius:50%;background:var(--accent);color:#06241a;font-weight:760;font-family:var(--mono);font-size:13px;display:flex;align-items:center;justify-content:center}
+  .step h3{margin:0 0 4px}
+  .step .why{color:var(--muted);font-size:13.5px}
+  .step .read{font-family:var(--mono);font-size:11.5px;color:var(--faint);margin-top:8px}
+
+  /* metrics table */
+  table{width:100%;border-collapse:collapse;margin-top:10px;font-size:13.5px}
+  th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{font-family:var(--mono);font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--faint);font-weight:600}
+  td b{color:var(--ink)}
+  .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:7px;vertical-align:middle}
+  .dot.t{background:var(--accent)} .dot.g{background:var(--warn)} .dot.s{background:var(--accent-2)}
+
+  .legend{display:flex;gap:16px;flex-wrap:wrap;margin:10px 0 0;font-size:12.5px;color:var(--muted)}
+  footer{margin-top:64px;padding-top:22px;border-top:1px solid var(--line);color:var(--faint);font-size:12.5px}
+  .src-row{display:flex;gap:8px;align-items:baseline;margin:5px 0;font-size:12.5px;color:var(--muted)}
+  .src-row .id{font-family:var(--mono);color:var(--faint);min-width:140px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <div class="kicker">Lazyweb · A/B Test Research</div>
+  <h1>Lifting annual-plan share on a hard paywall — without tanking trial &amp; subscribe rate</h1>
+  <p class="lede">
+    A growth-PM research brief for a top-tier (Duolingo-class) language-learning app. Goal: shift the
+    <b>mix toward the annual plan</b> on a hard paywall, while the <b>overall trial-start / subscribe rate</b> holds as
+    a guardrail. Evidence is drawn from Lazyweb's <code>lazyweb_ab_test_research</code> experiment set (PRO) and paired
+    with real mobile paywall screenshots from the Lazyweb library.
+  </p>
+  <div class="meta">
+    <span class="pill"><b>Product</b> · Language-learning app (Duolingo-class)</span>
+    <span class="pill"><b>Category</b> · Education / Language Learning</span>
+    <span class="pill"><b>Surface</b> · Hard paywall, plan selection</span>
+    <span class="pill"><b>Platform</b> · Mobile</span>
+    <span class="pill"><b>Tier</b> · Popular / top-ranked</span>
+    <span class="pill"><b>Target</b> · Annual-plan share &uarr;</span>
+    <span class="pill"><b>Guardrail</b> · Trial-start / subscribe rate</span>
+    <span class="pill"><b>Date</b> · 2026-06-08</span>
+  </div>
+</header>
+
+<!-- ============================ TL;DR ============================ -->
+<section>
+  <h2>What the evidence says (TL;DR)</h2>
+  <div class="note">
+    Across 15 high-confidence paywall experiments, the apps that pushed users toward the annual plan rarely did it by
+    <em>removing</em> the monthly option. They did it by <b>changing the frame</b>: pre-selecting annual, anchoring it against a
+    visible monthly (or lifetime) price, and converting the free trial from a <em>separate decision</em> into a
+    <b>risk-reversal lever attached to the annual plan</b>. That last move is exactly what protects your guardrail — the trial
+    keeps the overall start rate up while annual becomes the default destination.
+  </div>
+  <div class="grid cols-3">
+    <div class="card tight">
+      <h3 style="margin-top:0">The lever that moves mix</h3>
+      <p class="muted">Default selection + savings framing (<code>BEST VALUE</code>, "Save 60%", per-month math). Steers attention to annual value before the user even taps.</p>
+    </div>
+    <div class="card tight">
+      <h3 style="margin-top:0">The lever that protects the guardrail</h3>
+      <p class="muted">Free trial as a <em>toggle on the annual plan</em>, not the headline choice. Keeps trial-start rate high while annual is pre-selected.</p>
+    </div>
+    <div class="card tight">
+      <h3 style="margin-top:0">The risk to watch</h3>
+      <p class="muted">Higher-ARPU anchors (lifetime) can boost annual <em>feel</em> — but watch downstream refunds/cancellation, not just the tap.</p>
+    </div>
+  </div>
+  <div class="note warn" style="margin-top:18px">
+    <b>Evidence honesty:</b> Lazyweb's <code>_experiments</code> is a <b>screenshot-diff</b> evidence set — it captures what shipped
+    between two captures and a reasoned hypothesis, <b>not a statistically measured lift readout</b>. There is <b>no quantified
+    win/loss or significance</b> in this data. Treat every "learning" below as a <em>directional hypothesis with a confidence label</em>,
+    and rank your own tests by your own readouts.
+  </div>
+</section>
+
+<!-- ============================ OBSERVED EXPERIMENTS ============================ -->
+<section>
+  <h2>Observed experiments &amp; the likely hypothesis behind each</h2>
+  <p class="muted">
+    From <code>lazyweb_ab_test_research</code> (PRO, <code>operation: research</code>) — 15 high-confidence experiments returned, all
+    plan-selection / paywall changes. Below are the most transferable to an annual-share goal. The most on-category match
+    (<b>Drops</b>, language learning, high-design-bar) leads. "What changed" and "Hypothesis" are taken verbatim from the
+    experiment record; framing is mine.
+  </p>
+
+  <!-- DROPS -->
+  <article class="exp card">
+    <div class="head">
+      <span class="co">Drops &nbsp;<span class="faint" style="font-weight:400;font-size:12px">— the closest analog</span></span>
+      <span class="tags">
+        <span class="tag edu">Education · Language Learning</span>
+        <span class="tag">high design bar</span>
+        <span class="tag conf">confidence: high</span>
+      </span>
+    </div>
+    <div class="kv">
+      <div class="k">What changed</div>
+      <div class="v">The plan selector changed from three comparable Yearly, Lifetime, and Monthly cards to two purchase choices that put a $199.99 one-time purchase above a discounted yearly trial, with <b>Yearly selected</b> and a prominent <b>Start Free Trial</b> CTA.</div>
+      <div class="k">Hypothesis (learning)</div>
+      <div class="v learn">Leading with a <b>lifetime anchor</b> while selecting a discounted yearly trial can make the annual trial feel cheaper and easier to start — likely improving trial starts <em>without removing the higher-ARPU option</em>.</div>
+      <div class="k">Why it matters for your goal</div>
+      <div class="v learn">This is the cleanest "annual-share &uarr; with the guardrail intact" pattern in the set: annual is the <em>default</em>, the trial protects start-rate, and the lifetime sits <em>above</em> annual purely as an anchor.</div>
+    </div>
+  </article>
+
+  <div class="grid cols-2">
+    <!-- FACEAPP -->
+    <article class="exp card">
+      <div class="head">
+        <span class="co">FaceApp</span>
+        <span class="tags"><span class="tag">Photo &amp; Video</span><span class="tag conf">high</span></span>
+      </div>
+      <div class="kv">
+        <div class="k">What changed</div>
+        <div class="v">Replaced the two trial-length cards with a standard <b>annual/monthly selector</b> and a separate <b>7-day trial toggle</b> on the annual plan.</div>
+        <div class="k">Hypothesis</div>
+        <div class="v learn">Putting billing duration back in the primary choice can steer attention to annual value while keeping the trial as a <b>risk-reversal lever instead of the main decision</b>.</div>
+      </div>
+    </article>
+
+    <!-- ACROBAT -->
+    <article class="exp card">
+      <div class="head">
+        <span class="co">Adobe Acrobat</span>
+        <span class="tags"><span class="tag">Business</span><span class="tag plat">mobile</span><span class="tag conf">high</span></span>
+      </div>
+      <div class="kv">
+        <div class="k">What changed</div>
+        <div class="v">The annual paywall kept the <b>annual package selected</b> while strengthening the <b>discount badge</b> and <b>monthly-price anchor</b>.</div>
+        <div class="k">Hypothesis</div>
+        <div class="v learn">A stronger monthly anchor can make the yearly package feel like a <b>clearer bargain</b> without changing the primary annual selection.</div>
+      </div>
+    </article>
+
+    <!-- SNAPCHAT -->
+    <article class="exp card">
+      <div class="head">
+        <span class="co">Snapchat+</span>
+        <span class="tags"><span class="tag">Photo &amp; Video</span><span class="tag plat">mobile</span><span class="tag conf">high</span></span>
+      </div>
+      <div class="kv">
+        <div class="k">What changed</div>
+        <div class="v">Headline moved from price-focused to <b>"Save 60% on Snapchat+"</b>; three plan cards (Monthly intro $1.99→$4.99, <b>Annual $1.99 "BEST VALUE"</b>, Friends &amp; Family) plus social-proof avatars and a "SPECIAL OFFER" badge.</div>
+        <div class="k">Hypothesis</div>
+        <div class="v learn">Percentage-savings framing + a "BEST VALUE" badge + tiered options increases perceived value and <b>guides users to the higher-ARPU annual plan</b>.</div>
+      </div>
+    </article>
+
+    <!-- MYFITNESSPAL -->
+    <article class="exp card">
+      <div class="head">
+        <span class="co">MyFitnessPal</span>
+        <span class="tags"><span class="tag">Health &amp; Fitness</span><span class="tag conf">high</span></span>
+      </div>
+      <div class="kv">
+        <div class="k">What changed</div>
+        <div class="v">Replaced a headline-led annual/monthly layout with a <b>branded Premium header</b>, side-by-side plan tiles, and explicit <b>benefit rows</b>.</div>
+        <div class="k">Hypothesis</div>
+        <div class="v learn">A branded header plus concrete benefit rows can make the <b>same annual offer feel more complete</b> before the user taps the trial CTA — value clarity, not a structural change.</div>
+      </div>
+    </article>
+
+    <!-- HABITS -->
+    <article class="exp card">
+      <div class="head">
+        <span class="co">Habits (tracker)</span>
+        <span class="tags"><span class="tag">Productivity</span><span class="tag">high design bar</span><span class="tag conf">high</span></span>
+      </div>
+      <div class="kv">
+        <div class="k">What changed</div>
+        <div class="v">All-plans selector shifted from a light trial sheet (monthly / yearly / habits-only) to a dark <b>Plus/Super selector with annual, lifetime, and bundle tiers</b>.</div>
+        <div class="k">Hypothesis</div>
+        <div class="v learn">Tiering around Plus, lifetime, and bundle options can <b>raise price anchoring</b> while giving power users a clearer path to higher-commitment plans.</div>
+      </div>
+    </article>
+
+    <!-- CLAUDE -->
+    <article class="exp card">
+      <div class="head">
+        <span class="co">Claude</span>
+        <span class="tags"><span class="tag">Productivity / AI</span><span class="tag conf">high</span></span>
+      </div>
+      <div class="kv">
+        <div class="k">What changed</div>
+        <div class="v">Pro selector trimmed the benefits list from four items to three, keeping the <b>same selected annual package and price</b>.</div>
+        <div class="k">Hypothesis</div>
+        <div class="v learn">Shorter benefit lists can <b>focus attention</b> on the most legible value props when plan structure is unchanged.</div>
+      </div>
+    </article>
+  </div>
+
+  <h3>Adjacent price-anchoring moves (lower transfer, same mechanic)</h3>
+  <div class="grid cols-2">
+    <article class="exp card tight">
+      <div class="head"><span class="co">Zeus (streaming)</span><span class="tag conf">high</span></div>
+      <p class="muted" style="margin:8px 0 0">Raised annual <b>$59.99→$69.99</b> and monthly <b>$5.99→$6.99</b> (~17%) with no structural change. <span class="faint">Hypothesis: higher anchor lifts revenue/subscriber.</span> Relevant to the price level you anchor annual against, not to mix directly.</p>
+    </article>
+    <article class="exp card tight">
+      <div class="head"><span class="co">LockWidget</span><span class="tag conf">high</span></div>
+      <p class="muted" style="margin:8px 0 0">Swapped <b>weekly → monthly</b> as the low-commitment option and raised yearly <b>$14.99→$19.99</b>. <span class="faint">Hypothesis: preserves choice while anchoring toward a higher annual price.</span></p>
+    </article>
+    <article class="exp card tight">
+      <div class="head"><span class="co">Hallow</span><span class="tag conf">high</span></div>
+      <p class="muted" style="margin:8px 0 0">Cut monthly <b>$3.99→$0.99</b>, returned annual to <b>$69.99</b>, added scholarship + testimonials. <span class="faint">Hypothesis: cheap monthly fallback captures price-sensitive users <em>without weakening the free-trial primary action</em>.</span> A counter-weight worth watching — a very cheap monthly can <em>pull mix away</em> from annual.</p>
+    </article>
+    <article class="exp card tight">
+      <div class="head"><span class="co">Facetune / onX Hunt</span><span class="tag conf">high</span></div>
+      <p class="muted" style="margin:8px 0 0">Both moved to <b>lower-duration / monthly-first</b> entry plans with benefit bullets defending the premium anchor. <span class="faint">Hypothesis: lower entry reduces commitment anxiety.</span> Directionally <em>opposite</em> to an annual-share goal — useful as a contrast case (see "where not to overgeneralize").</p>
+    </article>
+  </div>
+</section>
+
+<!-- ============================ VISUAL REFERENCES ============================ -->
+<section>
+  <h2>Visual references — how real apps frame the annual choice</h2>
+  <p class="muted">
+    Real mobile paywall screenshots from the Lazyweb library (<code>lazyweb_search</code>), chosen to match the experiment
+    mechanics above. Captions are written from each screenshot's <code>visionDescription</code>. Language-learning analogs lead,
+    followed by the strongest "annual-default / savings-framing / trial-timeline" patterns from adjacent categories.
+  </p>
+
+  <h3>In-category: language-learning paywalls</h3>
+  <div class="grid cols-2">
+    <figure class="ref">
+      <div class="imgwrap"><img loading="lazy" alt="Drops language-learning premium paywall with free-trial toggle and yearly/lifetime/monthly cards"
+        src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/uploaded_drops/paywall/compare/2026-05-28/1780021944177_00_Drops-20260529-023223-01.png"></div>
+      <figcaption>
+        <div class="co">Drops <span class="src lw">Lazyweb</span></div>
+        <div class="cap">Premium paywall for a language-learning app promoting faster progress, with a <b>free-trial toggle</b> and plan cards labeled <b>"most popular"</b>; pricing for yearly, lifetime, and monthly with "cancel anytime" messaging.</div>
+        <div class="why">→ The live analog of the Drops experiment: annual is the highlighted default, trial is a toggle, lifetime sits as the upper anchor.</div>
+      </figcaption>
+    </figure>
+
+    <figure class="ref">
+      <div class="imgwrap"><img loading="lazy" alt="Speak language-learning paywall with Annual/Monthly toggle and 7-day free trial"
+        src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/edu121_speak/compare/2025-04-25-00-12-44-.png"></div>
+      <figcaption>
+        <div class="co">Speak <span class="src lw">Lazyweb</span></div>
+        <div class="cap">Language-learning paywall with an <b>Annual/Monthly toggle</b>, a "most popular" highlight, a Premium vs Premium Plus comparison, and a <b>7-day free trial</b> → "Try Free and Subscribe" CTA.</div>
+        <div class="why">→ Toggle-style annual default with the trial framed as the start mechanic — directly mirrors the FaceApp hypothesis.</div>
+      </figcaption>
+    </figure>
+
+    <figure class="ref">
+      <div class="imgwrap"><img loading="lazy" alt="Babbel language-learning paywall with 12-month and 6-month discounted plans"
+        src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/uploaded_babbel/compare/2026-05-31/1780243269963_IMG_9601.png"></div>
+      <figcaption>
+        <div class="co">Babbel <span class="src lw">Lazyweb</span></div>
+        <div class="cap">Plan-selection paywall highlighting premium benefits (all languages, 100+ lessons, games/podcasts) with <b>selectable 12-month and 6-month plans at discounted pricing</b> and a prominent "Subscribe now" CTA.</div>
+        <div class="why">→ Shows a duration-led selector where the longer commitment carries the discount framing.</div>
+      </figcaption>
+    </figure>
+
+    <figure class="ref">
+      <div class="imgwrap"><img loading="lazy" alt="Memrise language-learning paywall with Monthly, discounted Annual, and Lifetime plans"
+        src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/uploaded_memrise/paywall/compare/2026-05-28/1780024280370_00_Memrise-20260529-031120-01.png"></div>
+      <figcaption>
+        <div class="co">Memrise <span class="src lw">Lazyweb</span></div>
+        <div class="cap">Language-learning paywall with benefits (unlocked lessons, all languages, native-speaker videos, ad removal); users choose <b>Monthly, discounted Annual, or Lifetime</b> with a "Subscribe now" CTA.</div>
+        <div class="why">→ The three-tier monthly / annual / lifetime layout you'd be testing <em>against</em> when collapsing to an annual-default two-choice.</div>
+      </figcaption>
+    </figure>
+
+    <figure class="ref">
+      <div class="imgwrap"><img loading="lazy" alt="Duolingo Super vs Max tier comparison paywall"
+        src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/131z_duolingo/compare/!super-cta-screen/2025_05_18_16-21-10_616EE0BC.png"></div>
+      <figcaption>
+        <div class="co">Duolingo <span class="src lw">Lazyweb</span></div>
+        <div class="cap">Upsell paywall promoting faster progress with <b>tier-comparison cards (Super vs Max)</b> — unlimited energy, no ads, video-call tutoring, personalized feedback — and a "Try Super for $0" trial CTA.</div>
+        <div class="why">→ The target-class app. Note it competes on <em>tier</em> (Super/Max), so your annual/monthly mechanic must live <em>inside</em> a chosen tier.</div>
+      </figcaption>
+    </figure>
+
+    <figure class="ref">
+      <div class="imgwrap"><img loading="lazy" alt="Mimo coding-education paywall with annual highlighted and 14-day trial badge"
+        src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/edu111_mimo/compare/2024-07-15-00-50-00-.png"></div>
+      <figcaption>
+        <div class="co">Mimo <span class="src lw">Lazyweb</span></div>
+        <div class="cap">Education paywall with monthly vs annual options, <b>annual highlighted</b> and carrying a <b>14-day trial badge</b>, plus a primary "try for free" CTA and cancellation note.</div>
+        <div class="why">→ Annual-as-default with the trial attached to it — the guardrail-safe pattern, in an education app.</div>
+      </figcaption>
+    </figure>
+  </div>
+
+  <h3>Cross-category: the mechanics worth borrowing</h3>
+  <div class="grid cols-2">
+    <figure class="ref">
+      <div class="imgwrap"><img loading="lazy" alt="Quizlet paywall, annual best-value with 7-day trial and a how-the-trial-works timeline"
+        src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/edu14_quizlet/lazyscreenshots/2024_09_01_23-47-24_AED6B71A.png"></div>
+      <figcaption>
+        <div class="co">Quizlet <span class="src lw">Lazyweb</span></div>
+        <div class="cap">Plan selection comparing <b>annual ("best value") with a 7-day free trial</b> vs monthly, plus an <b>explainer timeline of how the trial works</b> and a "start free trial and subscribe" CTA.</div>
+        <div class="why">→ The trial-timeline (reminder → bill date) is the guardrail mechanic: it sustains trial-start confidence while annual stays the default.</div>
+      </figcaption>
+    </figure>
+
+    <figure class="ref">
+      <div class="imgwrap"><img loading="lazy" alt="Epic family reading app paywall, best-value annual with 7-day trial timeline and reminder"
+        src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/uploaded_epic/compare/2025-11-23/1771270987316_t__-_10954.PNG"></div>
+      <figcaption>
+        <div class="co">Epic <span class="src lw">Lazyweb</span></div>
+        <div class="cap">Plan selection highlighting the <b>"best value" annual</b> with a price-per-month breakdown and a <b>7-day trial timeline explaining reminders and when billing starts</b>, with a monthly preview alongside.</div>
+        <div class="why">→ Combines annual-default + per-month math + reminder timeline — a strong template for the variant you'd ship first.</div>
+      </figcaption>
+    </figure>
+
+    <figure class="ref">
+      <div class="imgwrap"><img loading="lazy" alt="Instacart membership plan selection with annual pre-selected as best value and per-month cost"
+        src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/food7_instacart/compare/2024-07-15-00-51-00-.png"></div>
+      <figcaption>
+        <div class="co">Instacart <span class="src lw">Lazyweb</span></div>
+        <div class="cap">Membership plan selection comparing annual vs monthly with the <b>annual plan highlighted as "best value"</b> and a <b>cost-per-month breakdown</b>, plus a CTA that confirms the annual plan.</div>
+        <div class="why">→ Clean "annual pre-selected + monthly anchor + per-month math" — the Acrobat hypothesis made visual.</div>
+      </figcaption>
+    </figure>
+
+    <figure class="ref">
+      <div class="imgwrap"><img loading="lazy" alt="Night Sky paywall, 50% off premium annual plan framing"
+        src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/ref8_night-sky/lazyscreenshots/2023_07_24_16-33-15_22895E53.png"></div>
+      <figcaption>
+        <div class="co">Night Sky <span class="src lw">Lazyweb</span></div>
+        <div class="cap">Limited-time paywall offering <b>50% off a premium annual plan</b>, with annual vs monthly options, upfront/renewal pricing, "cancel anytime," and a "Subscribe now" CTA.</div>
+        <div class="why">→ The "% off annual, frame unchanged" lever (mirrors FaceApp's price-halving experiment) — discount strength as a mix dial.</div>
+      </figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ============================ METRICS ============================ -->
+<section>
+  <h2>Target metric, guardrail metric &amp; the supporting set</h2>
+  <p class="muted">Per the brief — annual-plan mix is the win condition; trial/subscribe rate must not regress. The experiment
+  records themselves flagged <em>"increase annual plan share"</em> as the target and <em>downstream retention / refund-and-support signal</em>
+  as the guardrail, which aligns with the brief and is worth instrumenting from day one.</p>
+  <table>
+    <thead>
+      <tr><th style="width:120px">Role</th><th style="width:230px">Metric</th><th>Definition &amp; why</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="dot t"></span><b>Target</b></td>
+        <td><b>Annual-plan share of new subscriptions</b></td>
+        <td>Annual purchases ÷ all new paid conversions (incl. trial-starts that convert). The single number this work is trying to move.</td>
+      </tr>
+      <tr>
+        <td><span class="dot g"></span><b>Guardrail</b></td>
+        <td><b>Overall trial-start / subscribe rate</b> (paywall → any paid intent)</td>
+        <td>Hard stop. If a variant lifts annual share but drops total conversions, mix is "won" on a smaller base — net-negative. Ship only if this is flat or up.</td>
+      </tr>
+      <tr>
+        <td><span class="dot g"></span><b>Guardrail (downstream)</b></td>
+        <td><b>Trial→paid conversion &amp; D30 refund / cancellation rate</b></td>
+        <td>The experiment data explicitly warns higher-ARPU anchors can win the tap but cost you later. Watch refunds and early cancels on annual cohorts.</td>
+      </tr>
+      <tr>
+        <td><span class="dot s"></span><b>Supporting</b></td>
+        <td><b>Net revenue per paywall view (ARPU-PV)</b></td>
+        <td>The honest scoreboard. Combines mix + conversion + price into one number so a mix win that quietly lowers total revenue can't hide.</td>
+      </tr>
+      <tr>
+        <td><span class="dot s"></span><b>Supporting</b></td>
+        <td><b>Monthly-plan selection rate &amp; "no thanks" / dismiss rate</b></td>
+        <td>Diagnostic. Tells you <em>where</em> the mix shifted from (monthly cannibalization vs. net-new annual) and whether friction pushed users out.</td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="legend">
+    <span><span class="dot t"></span> Target</span>
+    <span><span class="dot g"></span> Guardrail</span>
+    <span><span class="dot s"></span> Supporting / diagnostic</span>
+  </div>
+</section>
+
+<!-- ============================ SEQUENCE ============================ -->
+<section>
+  <h2>Recommended test sequence</h2>
+  <p class="muted">Ordered by <b>expected mix impact ÷ guardrail risk</b>. Run sequentially (or in a shared holdout) so learnings
+  compound; do not bundle Steps 1–3 into one variant or you won't know which lever moved the number. Each step names the
+  experiment/reference it leans on.</p>
+
+  <div class="seq">
+    <div class="step">
+      <h3>Pre-select annual + add a strong monthly anchor &amp; per-month math</h3>
+      <div class="why">Keep all current plans, but make <b>annual the default selection</b>, show the <b>monthly price as the explicit anchor</b>, and surface the <b>annual "per-month" equivalent</b> with a savings badge. Lowest-risk, highest-evidence move — it changes framing, not the offer.</div>
+      <div class="read">Leans on: Acrobat (annual selected + stronger monthly anchor) · Instacart / Quizlet (per-month math, "best value"). Guardrail risk: low.</div>
+    </div>
+    <div class="step">
+      <h3>Convert the free trial into a toggle on the annual plan (not a separate choice)</h3>
+      <div class="why">Make the trial a <b>risk-reversal lever attached to annual</b> with a visible <b>reminder→bill-date timeline</b>, instead of "trial vs paid" being the headline decision. This is the move that <b>protects the guardrail</b>: trial-start stays easy while annual is the destination.</div>
+      <div class="read">Leans on: FaceApp (trial toggle on annual) · Quizlet / Epic (trial-works timeline + reminder). Guardrail risk: low–medium (watch trial-start rate directly).</div>
+    </div>
+    <div class="step">
+      <h3>Reframe the headline to percentage savings + "BEST VALUE" badge on annual</h3>
+      <div class="why">Move from price-led to <b>savings-led</b> ("Save 60%", "2 months free") with a <b>BEST VALUE</b> badge on annual and light social proof. Shifts perceived value toward the longer plan.</div>
+      <div class="read">Leans on: Snapchat+ ("Save 60%" + BEST VALUE + tiers + social proof) · Night Sky (% off annual). Guardrail risk: medium — savings framing can occasionally suppress monthly-only buyers; watch total conversion.</div>
+    </div>
+    <div class="step">
+      <h3>Add a higher-ARPU anchor <em>above</em> annual (lifetime) — only if Steps 1–3 hold the guardrail</h3>
+      <div class="why">Introduce a <b>lifetime (or top-tier) anchor priced above annual</b> so the annual trial "feels cheaper and easier to start." Powerful for mix, but the experiment data warns it can trade short-term mix for downstream refunds.</div>
+      <div class="read">Leans on: Drops (lifetime anchor + selected discounted yearly — the closest in-category analog) · Habits (Plus/lifetime/bundle tiering). Guardrail risk: medium–high — instrument refunds &amp; early cancels, not just the tap.</div>
+    </div>
+    <div class="step">
+      <h3>Tighten value clarity on the annual offer (benefit rows / branded header / trimmed bullets)</h3>
+      <div class="why">A polish pass on the <em>same</em> annual offer: a branded header, concrete benefit rows, and a <b>shorter, more legible bullet list</b>. Low-risk reinforcement that helps the trial CTA convert once mix is shifted.</div>
+      <div class="read">Leans on: MyFitnessPal (branded header + benefit rows) · Claude (trimmed bullets, same annual price). Guardrail risk: low.</div>
+    </div>
+  </div>
+
+  <div class="note">
+    <b>Anti-pattern to test against, not toward:</b> Facetune / onX Hunt / Hallow shipped <em>lower-duration / cheaper-monthly</em>
+    entry plans to reduce commitment anxiety and capture price-sensitive users. That lifts <em>start rate</em> but works <em>against</em>
+    annual share. If your guardrail is wobbling, these are the levers you'd <em>pull back</em>, not add — e.g. a $0.99 monthly
+    (Hallow) is exactly the kind of cheap fallback that can quietly cannibalize annual mix.
+  </div>
+</section>
+
+<!-- ============================ EVIDENCE STRENGTH ============================ -->
+<section>
+  <h2>Evidence strength &amp; gaps</h2>
+  <div class="grid cols-2">
+    <div class="card">
+      <h3 style="margin-top:0">What's strong</h3>
+      <ul class="muted">
+        <li><b>Volume &amp; consistency.</b> 15 high-confidence experiments, and the annual-default / monthly-anchor / trial-as-toggle pattern recurs across unrelated categories — that convergence is the real signal.</li>
+        <li><b>An in-category, high-design-bar analog.</b> Drops is language-learning <em>and</em> flagged high-design-bar, doing almost exactly the move your goal implies.</li>
+        <li><b>Mechanics, not just looks.</b> Each record names the structural change (selection default, anchor, trial placement), so the hypotheses are transferable rather than cosmetic.</li>
+        <li><b>Matched visual references.</b> Every recommended lever has a real mobile screenshot showing it in production (Drops, Speak, Quizlet, Epic, Instacart, Snapchat-style savings).</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0">What's weak / missing</h3>
+      <ul class="muted">
+        <li><b>No measured lift.</b> <code>_experiments</code> is screenshot-diff evidence — "what shipped" + a reasoned hypothesis, <b>not a win/loss readout with significance</b>. Confidence labels describe the <em>detection</em>, not an outcome.</li>
+        <li><b>No mix numbers.</b> Nothing here quantifies how much annual share moved, or whether the guardrail held, in any of these apps. You must measure that yourself.</li>
+        <li><b>Few exact-category matches.</b> Most transferable mechanics come from Photo/Health/Productivity/News apps; only Drops (and adjacent education apps) are truly in-category.</li>
+        <li><b>Platform field is sparse.</b> Several records have <code>platform: null</code>; treat all as mobile-plausible given the corpus, but it's inferred.</li>
+        <li><b>Tier mechanic unmodeled.</b> Duolingo-class apps often sell <em>tiers</em> (Super/Max) on top of duration. The evidence is about duration selection; your annual/monthly test must sit <em>inside</em> a tier, which these examples don't fully address.</li>
+        <li><b>Empty narrow query.</b> A tightly-filtered first query (<code>company="Duolingo-class…"</code>, <code>category=Education</code>) returned <b>0 rows</b>; the useful set came from a broad query — a reminder that this corpus rewards loose retrieval.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="note warn">
+    <b>Where not to overgeneralize.</b>
+    (1) These are <em>hypotheses</em> — pick your sequence by your own readouts, not by the count of apps that did a thing.
+    (2) A move that raised <em>revenue/subscriber</em> elsewhere (Zeus price hike, LockWidget) is not the same as raising <em>annual share</em>, and can hurt your conversion guardrail.
+    (3) The lifetime-anchor and savings-headline levers are the highest-mix-impact <em>and</em> highest-risk — they're sequenced last for a reason; do not ship them before the safe framing moves prove the guardrail holds.
+    (4) Cheaper/shorter-duration entry plans (Facetune, Hallow $0.99 monthly) optimize a <em>different</em> objective (start rate / price-sensitivity) and will pull <em>against</em> annual mix.
+  </div>
+</section>
+
+<!-- ============================ SOURCES ============================ -->
+<section>
+  <h2>Sources &amp; method</h2>
+  <p class="muted">All evidence is from Lazyweb (PRO). No external web sources were used.</p>
+  <h3>Experiment evidence — <code>lazyweb_ab_test_research</code> (PRO, <code>operation: research</code>)</h3>
+  <div class="card tight">
+    <div class="src-row"><span class="id">Drops</span><span>Education / Language Learning · high design bar · conf: high · exp fae32674</span></div>
+    <div class="src-row"><span class="id">FaceApp</span><span>Photo &amp; Video · conf: high · exp 030b87ce</span></div>
+    <div class="src-row"><span class="id">Adobe Acrobat</span><span>Business · mobile · conf: high · exp e5e020d0</span></div>
+    <div class="src-row"><span class="id">Snapchat+</span><span>Photo &amp; Video · mobile · conf: high · exp 9aa981cc</span></div>
+    <div class="src-row"><span class="id">MyFitnessPal</span><span>Health &amp; Fitness · conf: high · exp 6f1c3134</span></div>
+    <div class="src-row"><span class="id">Habits</span><span>Productivity · high design bar · conf: high · exp b4a053d5</span></div>
+    <div class="src-row"><span class="id">Claude</span><span>Productivity / AI · conf: high · exp ee9f726e</span></div>
+    <div class="src-row"><span class="id">Zeus</span><span>Entertainment · conf: high · exp 9b52be77</span></div>
+    <div class="src-row"><span class="id">LockWidget</span><span>Graphics &amp; Design · conf: high · exp c8c7b92c</span></div>
+    <div class="src-row"><span class="id">Hallow</span><span>Reference · conf: high · exp 4f31927b</span></div>
+    <div class="src-row"><span class="id">Facetune / onX Hunt</span><span>Photo &amp; Video / Navigation · conf: high · exp bfa5dc30, 12bd02fb</span></div>
+    <div class="src-row"><span class="id faint">+ PictureThis, VPN</span><span class="faint">Education / Productivity · additional rows in the returned set</span></div>
+  </div>
+  <h3>Visual references — <code>lazyweb_search</code> (embedded by storage URL)</h3>
+  <div class="card tight">
+    <div class="src-row"><span class="id">Drops · 90553</span><span>Language-learning paywall, trial toggle + yearly/lifetime/monthly</span></div>
+    <div class="src-row"><span class="id">Speak · 3921</span><span>Language-learning, Annual/Monthly toggle + 7-day trial</span></div>
+    <div class="src-row"><span class="id">Babbel · 90831</span><span>Language-learning, 12-/6-month discounted plans</span></div>
+    <div class="src-row"><span class="id">Memrise · 90574</span><span>Language-learning, Monthly / discounted Annual / Lifetime</span></div>
+    <div class="src-row"><span class="id">Duolingo · 15302</span><span>Super vs Max tier comparison, "Try Super for $0"</span></div>
+    <div class="src-row"><span class="id">Mimo · 3369</span><span>Education, annual highlighted + 14-day trial badge</span></div>
+    <div class="src-row"><span class="id">Quizlet · 76861</span><span>Annual "best value" + 7-day trial + trial-works timeline</span></div>
+    <div class="src-row"><span class="id">Epic · 74071</span><span>Best-value annual + trial timeline with reminders</span></div>
+    <div class="src-row"><span class="id">Instacart · 6053</span><span>Annual pre-selected "best value" + per-month math</span></div>
+    <div class="src-row"><span class="id">Night Sky · 85799</span><span>50% off annual framing</span></div>
+  </div>
+  <p class="faint" style="margin-top:14px">
+    Method: one broad <code>lazyweb_ab_test_research</code> retrieval (15 experiments, 8 structured recommendations) after a
+    narrow query returned zero rows; four <code>lazyweb_search</code> queries for matched mobile references; every embedded
+    image HTTP-verified (200, image/png) before inclusion; captions written from each result's <code>visionDescription</code>.
+    Caveat carried from the tool: <em>"_experiments is a limited screenshot-diff evidence set. Treat learnings as hypotheses,
+    not statistically measured lift."</em>
+  </p>
+</section>
+
+<footer>
+  Generated by the Lazyweb <code>lazyweb-ab-test-research</code> skill · 2026-06-08 · Education / Language Learning · mobile, hard paywall.
+  Evidence: Lazyweb PRO A/B Test Agent + screenshot library. Hypotheses are directional, not measured lift — validate with your own readouts.
+</footer>
+
+</div>
+</body>
+</html>

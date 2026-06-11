@@ -1,5 +1,6 @@
 ---
 name: lazyweb-paywall-optimization
+route: 'Paywall redesign or paywall conversion optimization'
 description: |
   Optimize a mobile or web paywall by reading the target screen, diagnosing
   conversion friction, and producing 2-4 falsifiable redesign hypotheses backed

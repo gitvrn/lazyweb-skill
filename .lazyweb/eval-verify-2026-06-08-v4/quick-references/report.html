@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quick References: Streak-Loss &amp; Streak-Recovery (Mobile)</title>
+<style>
+  :root{--ink:#1f2328;--mut:#57606a;--line:#d0d7de;--soft:#eef4fb;--accent:#0969da}
+  *{box-sizing:border-box}
+  body{font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--ink);max-width:900px;margin:0 auto;padding:28px 20px 80px}
+  h1{font-size:26px;line-height:1.25;margin:0 0 6px}
+  .sub{color:var(--mut);font-size:14.5px;margin:0 0 8px}
+  h2{font-size:19px;margin:34px 0 6px;padding-bottom:6px;border-bottom:1px solid var(--line)}
+  a{color:var(--accent)}
+
+  /* ---- Agent Instructions ---- */
+  .agent-instructions{background:var(--soft);border-left:4px solid var(--accent);border-radius:8px;padding:14px 16px;margin:18px 0}
+  .ai-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:8px}
+  .ai-badge{font-size:11px;font-weight:700;letter-spacing:.04em;color:#0a3b78}
+  .ai-copy{font:600 12px/1 inherit;cursor:pointer;border:1px solid var(--accent);color:var(--accent);background:#fff;border-radius:6px;padding:5px 11px}
+  .ai-copy:hover{background:var(--accent);color:#fff}
+  .ai-human{margin:0 0 10px;font-size:15px}
+  .ai-block{white-space:pre-wrap;word-break:break-word;background:#fff;border:1px solid var(--line);border-radius:6px;padding:12px 13px;margin:0;font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--ink);user-select:all}
+
+  /* ---- Mockups (unused here but kept per skill) ---- */
+  .mock{margin:14px 0;font-family:inherit}
+  .mock .frame{border:1px solid var(--line);border-radius:14px;background:#fff;box-shadow:0 1px 4px rgba(31,35,40,.06);overflow:hidden}
+  .mock.mobile .frame{max-width:300px;border-radius:26px;border:8px solid #1f2328}
+  .mock.desktop .frame{max-width:760px}
+  .mock .bar{display:flex;align-items:center;gap:6px;padding:7px 10px;background:#f6f8fa;border-bottom:1px solid var(--line);font-size:12px;color:var(--mut)}
+  .mock .dot{width:9px;height:9px;border-radius:50%;background:#d0d7de}
+  .mock .url{flex:1;text-align:center;background:#fff;border:1px solid var(--line);border-radius:5px;padding:2px 8px;font-size:11px;color:var(--mut)}
+  .mock .notch{width:46%;height:16px;margin:6px auto 0;background:#1f2328;border-radius:0 0 12px 12px}
+  .mock .body{padding:14px;display:flex;flex-direction:column;gap:10px}
+  .mock .box{background:var(--soft);border:1px dashed #b9c7d6;border-radius:8px;min-height:34px;display:flex;align-items:center;justify-content:center;color:#4a5a6a;font-size:12px;text-align:center;padding:8px}
+  .mock .box.tall{min-height:120px}.mock .box.cta{background:var(--accent);border:0;color:#fff;font-weight:600;min-height:40px}
+  .mock .row{display:flex;gap:10px}.mock .row>.box{flex:1}
+  .mock .cap{font-size:12px;color:var(--mut);margin-top:6px;text-align:center}
+
+  /* ---- Evidence components ---- */
+  .deck{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px;padding:4px 0 8px}
+  .deck.web{grid-template-columns:repeat(auto-fill,minmax(380px,1fr))}
+  .deck>figure{margin:0;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff}
+  .deck>figure>img{display:block;width:100%;height:auto;max-height:620px;object-fit:contain;background:#fafbfc}
+  .deck>figure.shot-web>img{aspect-ratio:16/10;max-height:none;object-fit:cover;object-position:top}
+  .deck>figure.tall>img{object-fit:contain}
+  .deck>figure.img-missing>img{display:none}
+  .deck>figure.img-missing figcaption::after{content:' — image unavailable; see description';color:#cf222e}
+  .deck .cap{font-size:12px;color:var(--mut);padding:7px 9px;line-height:1.4}
+  .deck .cap b{color:var(--ink)}
+  .deck .src{font-size:10.5px;font-weight:700;letter-spacing:.03em;color:var(--accent)}
+  .deck-hint{font-size:11.5px;color:var(--mut);margin:-2px 0 6px}
+  .pat{border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin:14px 0;background:#fff}
+  .pat-h{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px;margin-bottom:4px}
+  .pat-h h3{margin:0;font-size:16px}
+  .pat-claim{color:var(--mut);font-size:14px;margin:2px 0 10px}
+  .prev{font:600 11.5px/1 inherit;color:#0a3b78;background:var(--soft);border-radius:20px;padding:4px 10px}
+  .tag{font:700 10.5px/1 inherit;letter-spacing:.03em;border-radius:5px;padding:3px 7px}
+  .tag.strong{color:#0a5d2a;background:#e6f4ea;border:1px solid #b7e0c4}
+  .tag.directional{color:#8a5a00;background:#fff8e6;border:1px solid #f0e0b0}
+  .tag.weak{color:#6e7781;background:#f6f8fa;border:1px solid var(--line)}
+  .tag.avoid{color:#a40e26;background:#fdeef0;border:1px solid #f5c2c7}
+  .lead{border:2px solid var(--accent);border-radius:12px;padding:14px 16px 14px 18px;margin:16px 0;background:linear-gradient(0deg,#fff,var(--soft));position:relative}
+  .lead::before{content:'RECOMMENDED PATH — START HERE';position:absolute;top:-10px;left:14px;background:var(--accent);color:#fff;font:700 10px/1 inherit;letter-spacing:.05em;border-radius:10px;padding:4px 9px}
+  .lead h3{margin:6px 0 4px;font-size:17px}
+  .lead .why{font-size:14px;color:var(--mut);margin:0}
+  table.ranked{width:100%;border-collapse:collapse;margin:12px 0;font-size:14px}
+  table.ranked th,table.ranked td{border-bottom:1px solid var(--line);padding:9px 8px;text-align:left}
+  table.ranked td,table.ranked th{vertical-align:middle}
+  table.ranked .rank{font-weight:700;text-align:center;width:34px}
+  table.ranked tr.is-lead{background:var(--soft)}
+  table.ranked .thumb{width:64px}
+  table.ranked .thumb img{width:56px;height:56px;object-fit:cover;border:1px solid var(--line);border-radius:6px;display:block}
+  table.ranked .verdict{font:700 11px/1 inherit;border-radius:5px;padding:3px 7px;white-space:nowrap}
+  table.ranked .verdict.do{color:#0a5d2a;background:#e6f4ea}
+  table.ranked .verdict.explore{color:#8a5a00;background:#fff8e6}
+  table.ranked .verdict.skip{color:#6e7781;background:#f6f8fa}
+  table.ranked .skipif{color:var(--mut);font-size:12.5px}
+  .corpus{display:flex;gap:8px;align-items:flex-start;font-size:13px;color:#8a5a00;background:#fff8e6;border:1px solid #f0e0b0;border-radius:8px;padding:9px 12px;margin:14px 0}
+  .corpus b{color:var(--ink)}
+  .ebadge{font:700 10.5px/1 inherit;letter-spacing:.02em;border-radius:20px;padding:4px 9px;display:inline-block}
+  .ebadge.measured{color:#0a5d2a;background:#e6f4ea;border:1px solid #b7e0c4}
+  .ebadge.directional{color:#8a5a00;background:#fff8e6;border:1px solid #f0e0b0}
+  .ebadge.single{color:#a40e26;background:#fdeef0;border:1px solid #f5c2c7}
+  .caveat-inline{font:700 10px/1 inherit;color:#8a5a00;background:#fff8e6;border:1px solid #f0e0b0;border-radius:5px;padding:2px 6px;margin-left:6px}
+  .flip{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding-bottom:8px}
+  @media(max-width:560px){.flip{grid-template-columns:1fr}}
+  .flip>figure{margin:0}
+  .flip>figure>img{width:100%;height:auto;max-height:580px;object-fit:contain;border:1px solid var(--line);border-radius:8px;background:#fafbfc}
+  .flip figcaption{font:600 12px/1.4 inherit;margin-top:5px}
+  .flip .side{display:inline-block;font:700 10px/1 inherit;letter-spacing:.04em;border-radius:5px;padding:3px 7px;margin-right:6px}
+  .flip .side.c{color:#6e7781;background:#f6f8fa}
+  .flip .side.v{color:#0a5d2a;background:#e6f4ea}
+  .flip .vd{display:block;font-weight:400;color:var(--mut);font-size:11.5px;margin-top:3px}
+  .flip figure.img-missing>img{display:none}
+  .flip figure.img-missing figcaption::after{content:' — image unavailable; see description';color:#cf222e;font-weight:400}
+  .rec-thumb{display:flex;gap:6px}
+  .rec-thumb img{height:64px;width:auto;border:1px solid var(--line);border-radius:6px}
+</style>
+</head>
+<body>
+
+<h1>Quick References: Streak-Loss &amp; Streak-Recovery moments</h1>
+<p class="sub">Mobile UI references for habit / self-care / learning apps — "you lost your streak", streak-freeze / streak-repair / streak-save mechanics, and streak-milestone celebrations. Grouped by pattern, every screen shown whole.</p>
+
+<!-- ============ A. AGENT INSTRUCTIONS (section #1) ============ -->
+<section id="agent-instructions" class="agent-instructions">
+  <div class="ai-head"><span class="ai-badge">FOR THE CODING AGENT</span>
+    <button class="ai-copy" type="button" onclick="
+      var sec=this.closest('.agent-instructions'); var txt=sec.querySelector('.ai-block').innerText;
+      var done=function(ok){this.textContent=ok?'Copied':'Press Cmd/Ctrl+C';setTimeout(function(){this.textContent='Copy';}.bind(this),1500);}.bind(this);
+      if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(function(){done(true);},function(){done(false);});}
+      else{var r=document.createRange();r.selectNodeContents(sec.querySelector('.ai-block'));var s=getSelection();s.removeAllRanges();s.addRange(r);try{document.execCommand('copy');done(true);}catch(e){done(false);}}">Copy</button>
+  </div>
+  <p class="ai-human">Build the streak loss screen as a soft landing — a supportive "your streak reset" message paired with a one-tap freeze/repair recovery action — not a punitive red error.</p>
+  <pre class="ai-block">LAZYWEB REPORT — AGENT HANDOFF
+Use this report as a starting point for building the streak-loss and streak-recovery screens using these grouped real-app references as a visual baseline.
+
+TOP RECOMMENDATIONS (do first):
+1. Frame streak loss as a supportive reset, not a failure: empathetic copy + an immediate restart CTA in the same view (see Gentler "you lost your streak" screens).
+2. Offer a concrete recovery mechanic next to the loss message — Streak Freeze / Streak Repair / Streak Save / Rescue — gated on coins or PRO (see Mimo rewards store, Drops Rescues, Alma Streak saves, Duolingo freezes).
+3. Celebrate milestones with a full-screen confetti/mascot moment that fires at day 1 AND at round milestones (28/100), with a single forward CTA (see Duolingo, Flo, me+, Finch, Storia).
+
+INDEX ON: supportive-reset loss framing; an inline recovery mechanic (freeze/repair/save) attached to the loss state; full-screen milestone celebration with one CTA.
+DO NOT OVER-INDEX ON: the exact "lost your streak" wording — only 1 app (Gentler, 2 screens) showed explicit loss copy in this corpus, so treat that specific phrasing as single-source. Avoid red/error styling and avoid burying recovery behind a separate store tab.
+DIVE FURTHER: /lazyweb-design-research for full competitive analysis + recommendations, or lazyweb_find_similar on screenshot 81158 (Gentler loss) / 88809 (Duolingo milestone) for the closest neighbors.
+
+Evidence basis: Lazyweb screenshots (mobile), no live web captures, no A/B experiment data · 2026-06-08</pre>
+</section>
+
+<!-- ============ Honesty: corpus banner ============ -->
+<div class="corpus"><span>&#9888;</span><p style="margin:0"><b>Evidence basis:</b> ~70 unique mobile screens reviewed across 4 Lazyweb queries (streak-loss, streak-freeze/repair, milestone, daily-streak); similarity 0.43&ndash;0.68. <b>Explicit "you lost your streak" copy appeared in only 1 app (Gentler, 2 screens)</b> — treat that exact framing as <b>single-source</b>. Recovery mechanics and milestone celebrations are well-represented. No A/B experiment data was pulled this run, so all prevalence claims are <b>Directional</b> (visual prevalence), not measured lift.</p></div>
+
+<!-- ============ Patterns ============ -->
+<h2>Patterns</h2>
+
+<!-- LEAD pick (human-visible body) -->
+<div class="lead">
+  <h3>1 &middot; Treat streak loss as a supportive reset with recovery in the same view</h3>
+  <p class="why">Highest leverage for retention at the riskiest moment. The only two real "you lost your streak" screens in the corpus (Gentler) both pair empathetic copy with an immediate restart action and a visible streak/progress bar — no red error state. Recovery mechanics (freeze/repair/save) are common enough across Mimo, Drops, Alma and Duolingo to attach directly to this moment. <span class="ebadge directional">Directional &middot; loss framing 2/2 loss screens &middot; recovery 5/~70 refs &middot; no outcome data</span></p>
+</div>
+
+<!-- Ranked decision table -->
+<table class="ranked">
+  <thead><tr><th class="rank">#</th><th>Approach</th><th class="thumb">Proof</th><th>Evidence</th><th>Verdict</th><th>Skip if</th></tr></thead>
+  <tbody>
+    <tr class="is-lead"><td class="rank">1</td><td>Supportive "streak reset" screen + inline restart CTA</td>
+      <td class="thumb"><a href="#pat-loss"><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/health121_gentler/lazyscreenshots/2024_11_17_18-36-08_D6D1E7F1.png" alt="Gentler loss"></a></td>
+      <td><span class="tag directional">Directional</span> 2/2 loss screens</td><td><span class="verdict do">Do first</span></td><td class="skipif">&mdash;</td></tr>
+    <tr><td class="rank">2</td><td>Recovery mechanic: Freeze / Repair / Save / Rescue</td>
+      <td class="thumb"><a href="#pat-recover"><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/edu111_mimo/lazyscreenshots/2024_07_06_13-47-46_4050B0BD.png" alt="Mimo store"></a></td>
+      <td><span class="tag directional">Directional</span> 5/~70 refs</td><td><span class="verdict do">Do</span></td><td class="skipif">no economy (coins/PRO) to gate it on yet</td></tr>
+    <tr><td class="rank">3</td><td>Full-screen milestone celebration (confetti / mascot)</td>
+      <td class="thumb"><a href="#pat-milestone"><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/uploaded_duolingo/compare/2026-02-20/1771692135470_E73578C3-D2C6-4FAA-B6F8-1EA2BF7DCC91_1_105_c.jpeg" alt="Duolingo milestone"></a></td>
+      <td><span class="tag strong">Strong</span> 7/~70 refs</td><td><span class="verdict do">Do</span></td><td class="skipif">&mdash; (cheap, high delight)</td></tr>
+    <tr><td class="rank">4</td><td>Calendar / records view of the streak history</td>
+      <td class="thumb"><a href="#pat-calendar"><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/uploaded_duolingo/compare/2026-02-20/1771692140945_E49693E6-D53F-4D73-B7BC-70DD92E7C37C_1_105_c.jpeg" alt="Duolingo calendar"></a></td>
+      <td><span class="tag directional">Directional</span> 6/~70 refs</td><td><span class="verdict explore">Explore</span></td><td class="skipif">streak is brand-new — empty calendar adds little</td></tr>
+    <tr><td class="rank">5</td><td>Lock the streak behind a 3-day "unlock" gate</td>
+      <td class="thumb"><a href="#pat-lockgate"><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/189z_halo-habits/compare/!main-flow_step-1/2025_10_19_22-57-10_7C1D243E.png" alt="Halo Habits lock"></a></td>
+      <td><span class="tag weak">Weak</span> 1/~70 refs</td><td><span class="verdict skip">Skip</span></td><td class="skipif">always for a loss/recovery flow — gating progress after a loss adds friction at the worst moment</td></tr>
+  </tbody>
+</table>
+
+<!-- ---- PATTERN 1: Streak loss = supportive reset ---- -->
+<div class="pat" id="pat-loss">
+  <div class="pat-h">
+    <h3>Streak loss framed as a supportive reset</h3>
+    <span class="tag directional">Directional</span>
+    <span class="prev">seen in 2 of 2 explicit-loss screens</span>
+    <span class="ebadge single">Single-source &middot; Gentler only</span>
+  </div>
+  <p class="pat-claim">The only real "you lost your streak" screens in the corpus both soften the blow: supportive guidance to update status or start a short session, a visible streak/progress bar, and a restart path in the same view — never a red error. Both come from one app (Gentler), so treat the exact pattern as single-source and validate the copy.</p>
+  <div class="deck">
+    <figure><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/health121_gentler/lazyscreenshots/2024_11_17_18-36-08_D6D1E7F1.png" alt="Gentler streak lost" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+      <figcaption class="cap"><span class="src">[Lazyweb]</span> <b>Gentler</b> &mdash; "you've lost your streak" screen: supportive guidance to update status or start a "Go Gentler" session, with a streak progress bar and a Go Premium trial card.</figcaption></figure>
+    <figure><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/health121_gentler/lazyscreenshots/2024_10_06_19-10-59_9943D94D.png" alt="Gentler streak lost home" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+      <figcaption class="cap"><span class="src">[Lazyweb]</span> <b>Gentler</b> &mdash; home variant of the lost-streak notice: same supportive recovery prompt plus "For You" content cards and bottom nav (Streak / Wellbeing / Activities / Insights).</figcaption></figure>
+  </div>
+</div>
+
+<!-- ---- PATTERN 2: Recovery mechanic ---- -->
+<div class="pat" id="pat-recover">
+  <div class="pat-h">
+    <h3>Recovery mechanic: Freeze / Repair / Save / Rescue</h3>
+    <span class="tag directional">Directional</span>
+    <span class="prev">seen in 5 of ~70 references</span>
+    <span class="ebadge directional">Directional &middot; 5/~70 refs &middot; no outcome data</span>
+  </div>
+  <p class="pat-claim">The recovery counterpart to a loss: a way to protect or repair the streak, usually gated on an in-app economy (coins) or a PRO tier. Naming varies — Freeze, Repair, Save, Rescue, Vacation mode — but the mechanic is the same. Attach it directly to the loss/at-risk moment rather than burying it in a store.</p>
+  <div class="deck">
+    <figure><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/edu111_mimo/lazyscreenshots/2024_07_06_13-47-46_4050B0BD.png" alt="Mimo streak store" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+      <figcaption class="cap"><span class="src">[Lazyweb]</span> <b>Mimo</b> &mdash; rewards store selling <b>Streak Freeze</b>, <b>Streak Repair</b> and a 7-Day Challenge by coin price, with a free monthly streak repair as a PRO-only perk.</figcaption></figure>
+    <figure><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/edu119_drops/compare/2025-04-25-00-20-32-.png" alt="Drops rescues" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+      <figcaption class="cap"><span class="src">[Lazyweb]</span> <b>Drops</b> &mdash; streak screen with a <b>"Rescues"</b> section of locked reward icons next to current streak and best record, plus a Share CTA.</figcaption></figure>
+    <figure><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/uploaded_alma/compare/2025-12-17/1771177720314_t__-_13053.PNG" alt="Alma streak saves" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+      <figcaption class="cap"><span class="src">[Lazyweb]</span> <b>Alma</b> &mdash; streak screen with shortcuts for <b>Vacation mode</b> and <b>Streak saves</b> alongside today's progress bar and a record-the-day action.</figcaption></figure>
+    <figure><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/uploaded_duolingo/compare/2026-02-20/1771692140945_E49693E6-D53F-4D73-B7BC-70DD92E7C37C_1_105_c.jpeg" alt="Duolingo freeze" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+      <figcaption class="cap"><span class="src">[Lazyweb]</span> <b>Duolingo</b> &mdash; streak screen rewarding the user with <b>streak freezes</b>; calendar stat row tracks "freeze usage" so the safety net is visible.</figcaption></figure>
+    <figure><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/131z_duolingo/compare/!home-bugreport-flow_step-4/2025_05_18_16-20-53_E76864DA.png" alt="Duolingo extend streak" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+      <figcaption class="cap"><span class="src">[Lazyweb]</span> <b>Duolingo</b> &mdash; streak dashboard with an <b>"Extend streak"</b> action plus a "streak freezes used" summary stat under the calendar.</figcaption></figure>
+  </div>
+</div>
+
+<!-- ---- PATTERN 3: Milestone celebration ---- -->
+<div class="pat" id="pat-milestone">
+  <div class="pat-h">
+    <h3>Full-screen milestone celebration (confetti / mascot)</h3>
+    <span class="tag strong">Strong</span>
+    <span class="prev">seen in 7 of ~70 references</span>
+    <span class="ebadge directional">Directional &middot; 7/~70 refs &middot; no outcome data</span>
+  </div>
+  <p class="pat-claim">The positive bookend to streak loss. A dedicated celebratory screen fires both at the very first day (to hook the habit) and at round milestones (28, 100 days). Pattern: big number + flame/confetti/mascot art + one short congratulatory line + a single forward CTA. This is the most consistently repeated pattern in the corpus.</p>
+  <div class="deck">
+    <figure><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/uploaded_duolingo/compare/2026-02-20/1771692135470_E73578C3-D2C6-4FAA-B6F8-1EA2BF7DCC91_1_105_c.jpeg" alt="Duolingo 1 day streak" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+      <figcaption class="cap"><span class="src">[Lazyweb]</span> <b>Duolingo</b> &mdash; celebratory "1 day streak" milestone with mascot illustration, reinforcing the habit right after the first completed day.</figcaption></figure>
+    <figure><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/health8_flo/compare/2024-04-15-22-19-07-.png" alt="Flo 100 days" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+      <figcaption class="cap"><span class="src">[Lazyweb]</span> <b>Flo</b> &mdash; "100 days with the app" milestone with confetti graphics and a single "Next" CTA to continue.</figcaption></figure>
+    <figure><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/health6_me+/lazyscreenshots/2024_07_20_12-28-58_F386835C.png" alt="me+ 28 days" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+      <figcaption class="cap"><span class="src">[Lazyweb]</span> <b>me+</b> &mdash; "completed 28 days" celebration overlay that asks for a short reflection, with a single "Better!" confirmation button.</figcaption></figure>
+    <figure><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/uploaded_finch/onboarding/compare/2026-05-31/1780206522932_07_08_Onboarding_info-streak.png" alt="Finch 1 day streak" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+      <figcaption class="cap"><span class="src">[Lazyweb]</span> <b>Finch</b> &mdash; gamified "1 Day Streak" celebration with a weekly calendar tracker of completed days and a "Let's go!" CTA.</figcaption></figure>
+    <figure><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/135z_storia/compare/!screen/2025_05_18_16-17-47_CE86A86E.png" alt="Storia 1 day streak" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+      <figcaption class="cap"><span class="src">[Lazyweb]</span> <b>Storia</b> &mdash; celebratory 1-day milestone with motivational copy, a weekly progress indicator, and one primary acknowledge CTA.</figcaption></figure>
+    <figure><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/edu122_falou/compare/2025-05-03-15-46-16-.png" alt="Falou 1 day streak" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+      <figcaption class="cap"><span class="src">[Lazyweb]</span> <b>Falou</b> &mdash; "1 Day Streak" achievement with a weekly day tracker, plus actions to continue the lesson and to share the achievement.</figcaption></figure>
+    <figure><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/uploaded_couple_joy/compare/2025-12-17/1771177896451_t__-_14340.PNG" alt="Couple Joy 1 day streak" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+      <figcaption class="cap"><span class="src">[Lazyweb]</span> <b>Couple Joy</b> &mdash; gamified "1 day streak" confirmation with a flame icon, weekly tracker marking today done, and an "I'm committed" CTA.</figcaption></figure>
+  </div>
+</div>
+
+<!-- ---- PATTERN 4: Calendar / records view ---- -->
+<div class="pat" id="pat-calendar">
+  <div class="pat-h">
+    <h3>Calendar + records view of the streak</h3>
+    <span class="tag directional">Directional</span>
+    <span class="prev">seen in 6 of ~70 references</span>
+    <span class="ebadge directional">Directional &middot; 6/~70 refs &middot; no outcome data</span>
+  </div>
+  <p class="pat-claim">The persistent "home" for the streak: a monthly calendar of practiced days plus current/best records. After a loss this view shows the gap honestly while keeping prior records visible — useful context, but lower priority than the loss and celebration moments and not worth showing for a brand-new streak.</p>
+  <div class="deck">
+    <figure><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/uploaded_duolingo/compare/2026-02-20/1771692140945_E49693E6-D53F-4D73-B7BC-70DD92E7C37C_1_105_c.jpeg" alt="Duolingo streak calendar" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+      <figcaption class="cap"><span class="src">[Lazyweb]</span> <b>Duolingo</b> &mdash; day-streak screen with a monthly calendar, Personal/Friends tabs, and stats for days practiced, freeze usage, and a progress rating.</figcaption></figure>
+    <figure><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/edu119_drops/compare/2025-04-25-00-20-32-.png" alt="Drops calendar records" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+      <figcaption class="cap"><span class="src">[Lazyweb]</span> <b>Drops</b> &mdash; current streak vs previous record over a monthly calendar of activity days (also surfaces the Rescues recovery mechanic).</figcaption></figure>
+    <figure><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/uploaded_unwind/compare/2025-12-19/1771101983421_t__-_18557.PNG" alt="Unwind streak stats" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+      <figcaption class="cap"><span class="src">[Lazyweb]</span> <b>Unwind</b> &mdash; mindfulness stats dashboard with current and longest streak plus a 7-day minutes chart and a daily-target CTA.</figcaption></figure>
+  </div>
+</div>
+
+<!-- ---- ANTI-PATTERN: lock gate ---- -->
+<div class="pat" id="pat-lockgate">
+  <div class="pat-h">
+    <h3>Anti-pattern: gating progress behind a "hit a 3-day streak to unlock"</h3>
+    <span class="tag avoid">Avoid (for loss/recovery)</span>
+    <span class="prev">seen in 1 of ~70 references</span>
+    <span class="ebadge single">Single-source &middot; off-moment</span>
+  </div>
+  <p class="pat-claim">Locking the dashboard behind a streak threshold is fine as a cold-start hook, but applied to a <em>loss/recovery</em> flow it punishes the user at the exact moment they're most likely to churn. Shown here so the skip decision is evidenced, not just asserted — use the supportive-reset pattern instead.</p>
+  <div class="deck">
+    <figure><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/189z_halo-habits/compare/!main-flow_step-1/2025_10_19_22-57-10_7C1D243E.png" alt="Halo Habits lock gate" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+      <figcaption class="cap"><span class="src">[Lazyweb]</span> <b>Halo Habits</b> &mdash; dark-mode dashboard with a centered locked overlay: "Hit a 3-day streak to unlock" with a 1&ndash;3 day progress indicator. Fine for cold start, wrong for a post-loss moment.</figcaption></figure>
+  </div>
+</div>
+
+<!-- ============ More references ============ -->
+<h2>More references (optional)</h2>
+<p class="deck-hint">Strong streak screens that reinforce the patterns above but don't add a new one — shown as whole-screen mobile thumbnails for visual range.</p>
+<div class="deck">
+  <figure><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/uploaded_duolingo/compare/2026-02-20/1771692135470_E73578C3-D2C6-4FAA-B6F8-1EA2BF7DCC91_1_105_c.jpeg" alt="Duolingo milestone" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+    <figcaption class="cap"><span class="src">[Lazyweb]</span> <b>Duolingo</b> &mdash; benchmark for the day-1 celebration: large number, mascot, single forward action.</figcaption></figure>
+  <figure><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/135z_storia/compare/!screen/2025_05_18_16-17-47_CE86A86E.png" alt="Storia milestone" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+    <figcaption class="cap"><span class="src">[Lazyweb]</span> <b>Storia</b> &mdash; clean minimal milestone variant; weekly dots instead of a full calendar.</figcaption></figure>
+  <figure><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/uploaded_finch/onboarding/compare/2026-05-31/1780206522932_07_08_Onboarding_info-streak.png" alt="Finch milestone" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+    <figcaption class="cap"><span class="src">[Lazyweb]</span> <b>Finch</b> &mdash; soft self-care take on the celebration; gentle palette, weekly tracker.</figcaption></figure>
+  <figure><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/uploaded_alma/compare/2025-12-17/1771177720314_t__-_13053.PNG" alt="Alma streak saves" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+    <figcaption class="cap"><span class="src">[Lazyweb]</span> <b>Alma</b> &mdash; recovery affordances (Vacation mode, Streak saves) co-located with the daily completion action.</figcaption></figure>
+  <figure><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/edu111_mimo/lazyscreenshots/2024_07_06_13-47-46_4050B0BD.png" alt="Mimo store" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+    <figcaption class="cap"><span class="src">[Lazyweb]</span> <b>Mimo</b> &mdash; clearest example of monetizing recovery: Freeze + Repair priced in coins, free repair as a PRO perk.</figcaption></figure>
+  <figure><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/uploaded_couple_joy/compare/2025-12-17/1771177896451_t__-_14340.PNG" alt="Couple Joy streak" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+    <figcaption class="cap"><span class="src">[Lazyweb]</span> <b>Couple Joy</b> &mdash; commitment-framed day-1 confirmation ("I'm committed") — a softer alternative CTA label.</figcaption></figure>
+  <figure><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/health6_me+/lazyscreenshots/2024_07_20_12-28-58_F386835C.png" alt="me+ milestone" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+    <figcaption class="cap"><span class="src">[Lazyweb]</span> <b>me+</b> &mdash; pairs the 28-day milestone with a reflection prompt — celebration plus retention hook.</figcaption></figure>
+  <figure><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/health8_flo/compare/2024-04-15-22-19-07-.png" alt="Flo 100 days" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+    <figcaption class="cap"><span class="src">[Lazyweb]</span> <b>Flo</b> &mdash; round-number (100-day) milestone; confetti + unlock-more-features hook.</figcaption></figure>
+</div>
+
+<p class="sub" style="margin-top:34px">References embedded by storage-backed Lazyweb <code>imageUrl</code> (mobile platform). Captions drawn from each screenshot's <code>visionDescription</code>. No live web captures and no A/B experiment data this run.</p>
+
+</body>
+</html>

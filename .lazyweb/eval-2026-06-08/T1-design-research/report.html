@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Design Research — Transactional Email API Marketing Site</title>
+<style>
+  :root{
+    --ink:#0f1419; --muted:#5b6573; --line:#e6e8ec; --bg:#ffffff;
+    --accent:#1a56db; --accent-soft:#eef4ff; --chip:#f3f5f8;
+    --code:#0b1020; --good:#0f7b4a; --bad:#b42318; --warn:#9a6700;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0; background:#f7f8fa; color:var(--ink);
+    font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  .wrap{max-width:900px; margin:0 auto; padding:48px 22px 96px; background:var(--bg);
+    box-shadow:0 1px 0 var(--line);}
+  header.masthead{border-bottom:1px solid var(--line); padding-bottom:20px; margin-bottom:8px}
+  .eyebrow{font-size:12px; letter-spacing:.10em; text-transform:uppercase; color:var(--muted); font-weight:700}
+  h1{font-size:33px; line-height:1.15; letter-spacing:-0.02em; margin:.35em 0 .1em}
+  h2{font-size:23px; letter-spacing:-0.01em; margin:2.2em 0 .5em; padding-top:.4em; border-top:1px solid var(--line)}
+  h2:first-of-type{border-top:none}
+  h3{font-size:17px; margin:1.5em 0 .35em}
+  p{margin:.6em 0}
+  a{color:var(--accent); text-decoration:none}
+  a:hover{text-decoration:underline}
+  small,.meta{color:var(--muted); font-size:13.5px}
+  ul,ol{padding-left:1.25em}
+  li{margin:.35em 0}
+  code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:13px;
+    background:var(--chip); padding:1px 5px; border-radius:5px}
+
+  /* TL;DR callout */
+  .tldr{background:var(--accent-soft); border:1px solid #d4e2ff; border-left:4px solid var(--accent);
+    border-radius:10px; padding:18px 20px; margin:18px 0 6px}
+  .tldr h2{border:none; margin:0 0 .3em; padding:0; font-size:15px; letter-spacing:.06em; text-transform:uppercase; color:var(--accent)}
+  .tldr p{margin:.35em 0; font-size:16.5px; line-height:1.55}
+
+  /* source labels */
+  .lbl{display:inline-block; font-size:11px; font-weight:700; letter-spacing:.04em; padding:2px 7px; border-radius:999px; vertical-align:middle}
+  .lbl.lw{background:#eafaf1; color:#0f7b4a; border:1px solid #bfe9d2}
+  .lbl.web{background:#fdf0ff; color:#9326a9; border:1px solid #f0cdf7}
+  .lbl.ab{background:#fff6e6; color:#9a6700; border:1px solid #f3dca0}
+
+  /* recommendation blocks */
+  .rec{border:1px solid var(--line); border-radius:12px; padding:16px 18px; margin:14px 0; background:#fcfdff}
+  .rec h3{margin-top:0; display:flex; gap:10px; align-items:baseline}
+  .rec .num{background:var(--accent); color:#fff; font-size:13px; font-weight:700; min-width:24px; height:24px;
+    display:inline-flex; align-items:center; justify-content:center; border-radius:7px; flex:none}
+  pre.ascii{background:var(--code); color:#cdd6e4; border-radius:10px; padding:14px 16px; overflow:auto;
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:12px; line-height:1.45; margin:.8em 0 .2em}
+  pre.ascii .c{color:#7d8aa3}
+
+  /* carousel / scroll-snap deck */
+  .deckhint{font-size:13px; color:var(--muted); margin:.2em 0 .6em}
+  .deck{display:flex; gap:16px; overflow-x:auto; scroll-snap-type:x mandatory; padding:6px 2px 16px; margin:0 -2px;
+    scrollbar-width:thin}
+  .deck::-webkit-scrollbar{height:9px}
+  .deck::-webkit-scrollbar-thumb{background:#d4d8df; border-radius:999px}
+  .card{scroll-snap-align:start; flex:0 0 86%; max-width:520px; border:1px solid var(--line); border-radius:12px;
+    overflow:hidden; background:#fff; display:flex; flex-direction:column}
+  @media(min-width:640px){.card{flex-basis:60%}}
+  .shot{position:relative; width:100%; aspect-ratio:16/10; overflow:hidden; background:#f0f1f4; border-bottom:1px solid var(--line)}
+  .shot img{width:100%; height:100%; object-fit:cover; object-position:top; display:block}
+  /* portrait/narrow web capture: contain so we don't crop weirdly */
+  .shot.tall img{object-fit:cover; object-position:top}
+  .card .body{padding:12px 14px 14px}
+  .card .head{display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:4px}
+  .card .co{font-weight:700; font-size:15px}
+  .card .why{font-size:13.5px; color:var(--ink); margin:.3em 0}
+  .card .detail{font-size:12.5px; color:var(--muted); margin:.3em 0 0}
+  .card .detail b{color:var(--ink); font-weight:600}
+  .card .src{font-size:12px}
+
+  /* standalone framed figure (north-star) */
+  figure{margin:18px 0}
+  .frame{border:1px solid var(--line); border-radius:12px; overflow:hidden; background:#fff}
+  .frame .bar{height:30px; background:#f3f5f8; border-bottom:1px solid var(--line); display:flex; align-items:center; gap:6px; padding:0 12px}
+  .frame .bar i{width:10px; height:10px; border-radius:50%; background:#d4d8df; display:inline-block}
+  .frame .vp{width:100%; aspect-ratio:16/10; overflow:hidden}
+  .frame .vp img{width:100%; height:100%; object-fit:cover; object-position:top; display:block}
+  figcaption{font-size:13px; color:var(--muted); margin-top:8px}
+
+  table{border-collapse:collapse; width:100%; margin:1em 0; font-size:14.5px}
+  th,td{border:1px solid var(--line); padding:9px 11px; text-align:left; vertical-align:top}
+  th{background:var(--chip); font-weight:700; font-size:13px; letter-spacing:.02em}
+  td b{font-weight:600}
+
+  .pillrow{display:flex; flex-wrap:wrap; gap:7px; margin:.5em 0}
+  .pill{background:var(--chip); border:1px solid var(--line); border-radius:999px; padding:3px 11px; font-size:12.5px; color:var(--muted)}
+
+  .note{background:#fffdf5; border:1px solid #f3e6b8; border-radius:10px; padding:14px 16px; margin:14px 0; font-size:14px}
+  .note b{color:var(--warn)}
+
+  .sources li{font-size:13.5px}
+  .foot{margin-top:42px; padding-top:16px; border-top:1px solid var(--line); color:var(--muted); font-size:12.5px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="masthead">
+  <div class="eyebrow">Lazyweb Design Research · Web / Marketing</div>
+  <h1>Designing the marketing site for a developer-first transactional email API</h1>
+  <p class="meta">Competitive design research for a Resend / Postmark / Loops competitor &mdash; focused on the hero (code-first proof + deliverability stats), the &ldquo;how it works&rdquo; / feature section, and developer social proof. Desktop / web marketing pages only. &nbsp;·&nbsp; 8 Jun 2026</p>
+</header>
+
+<!-- ============ TL;DR ============ -->
+<div class="tldr">
+  <h2>TL;DR</h2>
+  <p>In this category the winning hero is <b>dark, typographically confident, and code-first</b>: a 3&ndash;5 word &ldquo;X for developers&rdquo; headline, one line of subcopy that names <i>deliverability + scale</i>, a real <b>copy-pasteable code/cURL sample</b> as the hero visual, and a <b>dual CTA</b> (&ldquo;Start building&rdquo; + &ldquo;Documentation&rdquo;). Resend and Postmark are the reference points to beat.</p>
+  <p>Back the promise with <b>hard numbers presented as product UI</b> (delivery rate, send latency, volume &mdash; e.g. Mailchimp&rsquo;s 99.99% / &lt;1s / 157B strip), explain the product as a <b>scannable 4&ndash;6 cell feature grid</b> (not prose), and prove credibility with a <b>logo wall + curated developer quotes placed next to the feature they praise</b> &mdash; never a generic testimonial dump.</p>
+</div>
+
+<p class="meta">This report leads with what to build, then backs into the evidence. References are labelled
+  <span class="lbl lw">Lazyweb</span> (real captured screenshots) or
+  <span class="lbl web">Web</span> (live capture / expert source). Captions describe what is actually visible in each screenshot.</p>
+
+<!-- ============ RECOMMENDATIONS ============ -->
+<h2>Recommendations &mdash; in priority order</h2>
+
+<div class="rec">
+  <h3><span class="num">1</span> Hero = headline + live code sample + dual CTA, on a dark canvas</h3>
+  <p>Lead with a short ICP headline (&ldquo;<i>Email for developers</i>&rdquo; / &ldquo;<i>The email API that lets you move blazing fast</i>&rdquo;) and one line of subcopy that explicitly promises <b>deliverability &amp; scale</b>. The hero visual should be a <b>real, copy-pasteable code block</b> &mdash; a 3-line cURL or SDK <code>send()</code> call &mdash; not an abstract illustration. Give two CTAs: a bold primary (<code>Start building</code> / <code>Get started</code>, no &ldquo;Book a demo&rdquo;) and a quieter <code>Documentation</code> link. Evidence: Resend, Postmark, Twilio SendGrid below.</p>
+  <pre class="ascii"><span class="c">┌──────────────────────────────────────────────────────────┐</span>
+ ⬢ YourAPI   Features  Docs  Pricing            Log in [Sign up]
+<span class="c">├──────────────────────────────────────────────────────────┤</span>
+
+      Email for developers
+      Reach inboxes, not spam folders. Send transactional
+      &amp; marketing email at scale.
+
+      [ Start building ]   Documentation →
+
+      <span class="c">┌── send.ts ───────────────────────  [copy] ─┐</span>
+      <span class="c">│</span> await resend.emails.send({              <span class="c">│</span>
+      <span class="c">│</span>   from: 'you@acme.dev',                  <span class="c">│</span>
+      <span class="c">│</span>   to: 'user@example.com',                <span class="c">│</span>
+      <span class="c">│</span>   subject: 'Hello', html: '&lt;p&gt;Hi&lt;/p&gt;'      <span class="c">│</span>
+      <span class="c">│</span> })  <span class="c">→ 200 OK  { id: "re_8f2…" }</span>            <span class="c">│</span>
+      <span class="c">└────────────────────────────────────────────┘</span>
+<span class="c">└──────────────────────────────────────────────────────────┘</span></pre>
+</div>
+
+<div class="rec">
+  <h3><span class="num">2</span> Put deliverability proof in the hero/upper fold &mdash; as numbers, rendered like product UI</h3>
+  <p>Trust in this category <i>is</i> deliverability. Surface 3&ndash;4 hard metrics high on the page: <b>inbox delivery rate, send latency/time-to-inbox, monthly volume, uptime</b>. The best pages don&rsquo;t just state them &mdash; they render them as live-looking dashboard cards/charts (DatoCMS&rsquo;s &ldquo;44ms&rdquo; / &ldquo;100% success&rdquo; cards; Postmark&rsquo;s &ldquo;95% delivered&rdquo; chart; Mailchimp&rsquo;s stat strip). This converts a marketing claim into apparent evidence.</p>
+  <pre class="ascii"><span class="c">┌──────────────┬──────────────┬──────────────┬──────────────┐</span>
+ <span class="c">│</span>   99.99%      <span class="c">│</span>   &lt; 1 sec      <span class="c">│</span>  99.4% inbox   <span class="c">│</span>  157B / mo     <span class="c">│</span>
+ <span class="c">│</span>   uptime      <span class="c">│</span>   to inbox     <span class="c">│</span>  delivery      <span class="c">│</span>  sent          <span class="c">│</span>
+<span class="c">└──────────────┴──────────────┴──────────────┴──────────────┘</span>
+   ▁▂▃▅▇▇▆▇▇  Placement test · Gmail 96% · Outlook 94% · Yahoo 92%</pre>
+</div>
+
+<div class="rec">
+  <h3><span class="num">3</span> Explain the product as a scannable feature grid, not paragraphs</h3>
+  <p>For the feature / &ldquo;how it works&rdquo; section, use a <b>4&ndash;6 cell icon grid</b> (MagicBell&rsquo;s provider cards; Brevo&rsquo;s 6-cell grid) or a tight <b>3-step flow</b> (ActiveCampaign&rsquo;s &ldquo;customer makes a purchase → send transactional email&rdquo;). Each cell = icon + 2&ndash;4 word label + one benefit line. Per the Evil Martians study of 100 dev-tool pages, <i>problem-oriented</i> framing beats a bare function list. Name the dev-specific wins: SDKs &amp; code recipes, webhooks/inbound parsing, log retention, idempotent sends.</p>
+  <pre class="ascii"><span class="c">  How it works                                </span>
+  <span class="c">┌────────────┐ ┌────────────┐ ┌────────────┐</span>
+  <span class="c">│</span> { }          <span class="c">│ │</span> (~)          <span class="c">│ │</span> (o)          <span class="c">│</span>
+  <span class="c">│</span> SDKs + code  <span class="c">│ │</span> &lt;100ms send  <span class="c">│ │</span> Webhooks +   <span class="c">│</span>
+  <span class="c">│</span> recipes      <span class="c">│ │</span> latency      <span class="c">│ │</span> inbound      <span class="c">│</span>
+  <span class="c">└────────────┘ └────────────┘ └────────────┘</span>
+  <span class="c">┌────────────┐ ┌────────────┐ ┌────────────┐</span>
+  <span class="c">│</span> 📊 Logs &amp;    <span class="c">│ │</span> 🛡 Deliver-  <span class="c">│ │</span> 🧩 React     <span class="c">│</span>
+  <span class="c">│</span> retention    <span class="c">│ │</span> ability      <span class="c">│ │</span> Email tmpl.  <span class="c">│</span>
+  <span class="c">└────────────┘ └────────────┘ └────────────┘</span></pre>
+</div>
+
+<div class="rec">
+  <h3><span class="num">4</span> Developer social proof: logo wall + contextual quotes + named case studies</h3>
+  <p>Stack three layers: (1) an <b>auto-scrolling customer logo wall</b> directly under the hero (~half of B2B dev pages do this); (2) <b>curated developer testimonials placed next to the feature they praise</b>, not in an isolated block; (3) <b>named case studies</b> tagged by vertical (ReadMe&rsquo;s &ldquo;Customer stories&rdquo; with Socure / OneTrust). If you ship open-source SDKs (React Email is the obvious play here), a <b>GitHub stars badge</b> is high-credibility individual-dev proof.</p>
+  <pre class="ascii"><span class="c">   Trusted by teams shipping at scale</span>
+   ▢ zendesk   ▢ realtor   ▢ QVC   ▢ M&amp;S   ▢ Vercel  →(auto-scroll)
+   <span class="c">┌─────────────────────────┐  ┌─────────────────────────┐</span>
+   <span class="c">│</span> "Best DX of any email     <span class="c">│  │</span> ★ 12.3k on GitHub         <span class="c">│</span>
+   <span class="c">│</span>  API." — @dev, Acme       <span class="c">│  │</span> react-email               <span class="c">│</span>
+   <span class="c">└─────────────────────────┘  └─────────────────────────┘</span></pre>
+</div>
+
+<div class="rec">
+  <h3><span class="num">5</span> Hold a premium visual bar &mdash; restrained motion, generous whitespace, real product</h3>
+  <p>Across the category the &ldquo;table-stakes&rdquo; aesthetic is <b>clean typography, lots of breathing room, and no salesy flash</b>. Stripe is the cross-category north-star for polish (gradient hero, real product mosaic, logo wall, testimonials). Match that restraint; differentiate on the <i>code experience</i>, not on louder animation.</p>
+</div>
+
+<!-- ============ KEY EXAMPLES ============ -->
+<h2>Key examples</h2>
+<p class="deckhint">→ Scroll the deck sideways. Each card: company, source, why it&rsquo;s here, and the specific detail to borrow.</p>
+
+<div class="deck" aria-label="Reference carousel">
+
+  <!-- Resend -->
+  <div class="card">
+    <div class="shot"><img loading="lazy" src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/sites/resend/resend_173cbb45d414ad3cacf6.png" alt="Resend homepage hero"></div>
+    <div class="body">
+      <div class="head"><span class="co">Resend</span><span class="lbl lw">Lazyweb</span></div>
+      <div class="src"><a href="https://resend.com" target="_blank" rel="noopener">resend.com</a> · direct competitor</div>
+      <p class="why">The category&rsquo;s benchmark hero, and the model for Rec&nbsp;1: near-black canvas, a confident serif headline <b>&ldquo;Email for developers&rdquo;</b>, one subline that names <i>spam folders / transactional &amp; marketing at scale</i>, and a dual CTA <b>Get Started + Documentation</b>.</p>
+      <p class="detail"><b>Borrow:</b> the 3-word ICP headline + &ldquo;Documentation&rdquo; as the secondary CTA, and the ruthless dark minimalism.</p>
+    </div>
+  </div>
+
+  <!-- Postmark (live web) -->
+  <div class="card">
+    <div class="shot tall"><img loading="lazy" src="references/postmark-home.png" alt="Postmark homepage with curl sample and testimonials"></div>
+    <div class="body">
+      <div class="head"><span class="co">Postmark</span><span class="lbl web">Web · live capture</span></div>
+      <div class="src"><a href="https://postmarkapp.com" target="_blank" rel="noopener">postmarkapp.com</a> · direct competitor</div>
+      <p class="why">The single best all-in-one reference: hero <b>&ldquo;The email delivery service that people actually like&rdquo;</b> + <b>Start free trial / API Documentation</b>, a developer <b>testimonial wall inside the hero</b>, a copy-paste <b>cURL sample</b> (&ldquo;paste this into Terminal&rdquo;) under an SDK-language logo row, and a green <b>&ldquo;95% delivered&rdquo;</b> chart lower down. Hits all three brief focus areas on one page.</p>
+      <p class="detail"><b>Borrow:</b> the literal cURL-in-hero proof + the &ldquo;delivered %&rdquo; chart as deliverability evidence.</p>
+    </div>
+  </div>
+
+  <!-- Twilio SendGrid -->
+  <div class="card">
+    <div class="shot"><img loading="lazy" src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/sites/twilio/twilio_83ce2bb7095e45dcf759.png" alt="Twilio SendGrid Email API page"></div>
+    <div class="body">
+      <div class="head"><span class="co">Twilio SendGrid</span><span class="lbl lw">Lazyweb</span></div>
+      <div class="src"><a href="https://www.twilio.com/en-us/products/email-api" target="_blank" rel="noopener">twilio.com/&hellip;/email-api</a> · direct competitor</div>
+      <p class="why">Headline <b>&ldquo;The Email API that lets you move blazing fast&rdquo;</b> with the trust-stat baked into subcopy: <b>&ldquo;delivering 190+ billion emails monthly.&rdquo;</b> The hero visual animates the lifecycle (<i>Sending emails… → Emails sent ✓</i>), and a <b>recognizable logo wall</b> (Zendesk, ServiceNow, realtor.com, QVC, M&amp;S) sits right below.</p>
+      <p class="detail"><b>Borrow:</b> volume claim in the subcopy + immediate logo wall (Recs 2 &amp; 4).</p>
+    </div>
+  </div>
+
+  <!-- Mailchimp Transactional -->
+  <div class="card">
+    <div class="shot"><img loading="lazy" src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/sites/mailchimp/mailchimp_acaacf6fab36e2b5ee8a.png" alt="Mailchimp transactional email page with stat strip"></div>
+    <div class="body">
+      <div class="head"><span class="co">Mailchimp</span><span class="lbl lw">Lazyweb</span></div>
+      <div class="src"><a href="https://mailchimp.com/en/features/transactional-email/" target="_blank" rel="noopener">mailchimp.com/&hellip;/transactional-email</a></div>
+      <p class="why">The textbook deliverability stat strip for Rec&nbsp;2. Headline <b>&ldquo;Billions of transactional messages. One API.&rdquo;</b> and a dark band of four hard numbers: <b>99.99% uptime · &lt;1 second delivery · 157 billion sends/mo · &gt;99% delivery rate.</b></p>
+      <p class="detail"><b>Borrow:</b> the exact 4-metric layout (uptime / latency / volume / delivery rate).</p>
+    </div>
+  </div>
+
+  <!-- DatoCMS -->
+  <div class="card">
+    <div class="shot"><img loading="lazy" src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/sites/datocms/datocms_236a7dc92a2e15dc7d4f.png" alt="DatoCMS developer experience page with metric cards"></div>
+    <div class="body">
+      <div class="head"><span class="co">DatoCMS</span><span class="lbl lw">Lazyweb</span></div>
+      <div class="src"><a href="https://www.datocms.com/features/developer-experience" target="_blank" rel="noopener">datocms.com/features/developer-experience</a> · adjacent dev-API</div>
+      <p class="why">Best demonstration of &ldquo;stats as product UI&rdquo; (Rec&nbsp;2). DX headline <b>&ldquo;Build Fast. Ship Faster.&rdquo;</b> + <b>&ldquo;Launch docs and start building →&rdquo;</b>, then two live-looking metric cards: <b>&ldquo;API response time 44ms&rdquo;</b> and <b>&ldquo;API success rate 100%&rdquo;</b> as charts under the line &ldquo;Low latency, high availability, zero surprises.&rdquo;</p>
+      <p class="detail"><b>Borrow:</b> render latency &amp; success-rate as small dashboard cards, not plain text.</p>
+    </div>
+  </div>
+
+  <!-- MagicBell -->
+  <div class="card">
+    <div class="shot"><img loading="lazy" src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/sites/magicbell/magicbell_494076ae786f4b73f9de.png" alt="MagicBell transactional email notifications API page"></div>
+    <div class="body">
+      <div class="head"><span class="co">MagicBell</span><span class="lbl lw">Lazyweb</span></div>
+      <div class="src"><a href="https://www.magicbell.com/email" target="_blank" rel="noopener">magicbell.com/email</a> · direct competitor</div>
+      <p class="why">Feature-grid model for Rec&nbsp;3. Dark hero <b>&ldquo;Provider agnostic Transactional Email Notifications API for Developers&rdquo;</b>, then a clean <b>4-card &ldquo;Delivery Providers&rdquo; row</b> (SendGrid, Mailgun, Amazon SES, Ping) &mdash; each icon + one benefit line.</p>
+      <p class="detail"><b>Borrow:</b> the 4-card capability grid with provider/feature icons.</p>
+    </div>
+  </div>
+
+  <!-- Brevo -->
+  <div class="card">
+    <div class="shot"><img loading="lazy" src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/sites/sendinblue/sendinblue_7a4b75aad5b0d3884d65.png" alt="Brevo transactional email page with 6-cell feature grid"></div>
+    <div class="body">
+      <div class="head"><span class="co">Brevo</span><span class="lbl lw">Lazyweb</span></div>
+      <div class="src"><a href="https://www.brevo.com/products/transactional-email/" target="_blank" rel="noopener">brevo.com/products/transactional-email</a> · direct competitor</div>
+      <p class="why">A complete <b>6-cell feature grid</b> for Rec&nbsp;3: <i>Email deliverability (&ldquo;99% delivery rate&rdquo;), Personalization, Fast setup (&ldquo;SDKs, API libraries &amp; code recipes&rdquo;), Easy CMS integration, Inbound parsing, Extended log retention.</i> Each is a short title + one benefit line.</p>
+      <p class="detail"><b>Borrow:</b> the exact dev-relevant feature taxonomy &mdash; deliverability, SDKs, inbound parsing, log retention.</p>
+    </div>
+  </div>
+
+  <!-- ActiveCampaign -->
+  <div class="card">
+    <div class="shot"><img loading="lazy" src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/sites/activecampaign/activecampaign_34398e7e77ea26d26cfe.png" alt="ActiveCampaign transactional email page with how-it-works flow"></div>
+    <div class="body">
+      <div class="head"><span class="co">ActiveCampaign</span><span class="lbl lw">Lazyweb</span></div>
+      <div class="src"><a href="https://www.activecampaign.com/platform/transactional-email" target="_blank" rel="noopener">activecampaign.com/&hellip;/transactional-email</a></div>
+      <p class="why">A literal &ldquo;how it works&rdquo; mini-flow for Rec&nbsp;3. Headline <b>&ldquo;Transactional email, your way&rdquo;</b>, then an annotated 2-step diagram over the imagery: <b>&ldquo;Customer makes a purchase&rdquo; → &ldquo;Send transactional email · Your order has been confirmed.&rdquo;</b></p>
+      <p class="detail"><b>Borrow:</b> the trigger→email step diagram to explain transactional flows visually.</p>
+    </div>
+  </div>
+
+  <!-- ReadMe -->
+  <div class="card">
+    <div class="shot"><img loading="lazy" src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/sites/readme/readme_20c0fcec959b2441dac7.png" alt="ReadMe customers page with logo wall and case studies"></div>
+    <div class="body">
+      <div class="head"><span class="co">ReadMe</span><span class="lbl lw">Lazyweb</span></div>
+      <div class="src"><a href="https://readme.com/customers" target="_blank" rel="noopener">readme.com/customers</a> · adjacent dev-tool</div>
+      <p class="why">Developer social-proof model for Rec&nbsp;4. A playful band <b>&ldquo;Nice docs 😍 &mdash; 6,000 teams and counting&rdquo;</b> beside a <b>dense customer logo wall</b>, then <b>&ldquo;Customer stories&rdquo;</b> case-study cards tagged by vertical (Socure / Risk Mgmt, OneTrust / Data Security).</p>
+      <p class="detail"><b>Borrow:</b> logo wall + count stat + vertical-tagged case-study cards.</p>
+    </div>
+  </div>
+
+  <!-- SuperSend -->
+  <div class="card">
+    <div class="shot"><img loading="lazy" src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/sites/supersend/supersend_6b706a34b2b8d087a07e.png" alt="SuperSend deliverability page with placement test UI"></div>
+    <div class="body">
+      <div class="head"><span class="co">SuperSend</span><span class="lbl lw">Lazyweb</span></div>
+      <div class="src"><a href="https://supersend.io/features/deliverability" target="_blank" rel="noopener">supersend.io/features/deliverability</a> · adjacent (email)</div>
+      <p class="why">Deliverability-as-product proof for Rec&nbsp;2. Hero <b>&ldquo;More Deliverability Visibility&hellip;&rdquo;</b> + a <b>capability pill row</b> (Placement Testing, AI Bounce Analysis, Domain Health, Sender Scores) and a <b>&ldquo;Placement Test&rdquo; UI showing Gmail 96% / 91% inbox bars</b> with green-check benefit bullets.</p>
+      <p class="detail"><b>Borrow:</b> per-mailbox inbox-placement bars (Gmail/Outlook/Yahoo) as concrete deliverability evidence.</p>
+    </div>
+  </div>
+
+</div>
+
+<!-- North-star framed figure -->
+<figure>
+  <div class="frame">
+    <div class="bar"><i></i><i></i><i></i></div>
+    <div class="vp"><img loading="lazy" src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/sites/stripe-dashboard/stripe-dashboard_06a23127d968ee3ab336.png" alt="Stripe homepage, viewport-cropped"></div>
+  </div>
+  <figcaption><span class="lbl lw">Lazyweb</span> &nbsp;<b>Stripe</b> &mdash; <a href="https://stripe.com" target="_blank" rel="noopener">stripe.com</a> (cross-category polish north-star). Verified full-page capture: signature gradient hero, a real product-UI mosaic, customer logo wall and testimonials. Shown cropped to a desktop viewport &mdash; <a href="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/sites/stripe-dashboard/stripe-dashboard_06a23127d968ee3ab336.png" target="_blank" rel="noopener">open full image</a>. Match this restraint and craft; differentiate on the code experience (Rec&nbsp;5).</figcaption>
+</figure>
+
+<!-- ============ PATTERNS ============ -->
+<h2>Patterns &mdash; the table stakes</h2>
+<p>Common denominators across the strong examples above (Resend, Postmark, Twilio SendGrid, MagicBell, Brevo) and the Evil Martians 100-page study:</p>
+<table>
+  <thead><tr><th style="width:34%">Pattern</th><th>What it looks like &amp; who does it</th></tr></thead>
+  <tbody>
+    <tr><td><b>&ldquo;X for developers / for SaaS&rdquo; headline</b></td><td>3&ndash;5 words, ICP named explicitly. Resend (&ldquo;Email for developers&rdquo;), MagicBell (&ldquo;&hellip;API for Developers&rdquo;). Avoid clever-but-vague.</td></tr>
+    <tr><td><b>Code / cURL as the hero visual</b></td><td>Standard for SDK/infra products. Postmark&rsquo;s &ldquo;paste into Terminal&rdquo; cURL; the broader convention of a copy-paste <code>send()</code> snippet. Signals &ldquo;you can ship in minutes.&rdquo;</td></tr>
+    <tr><td><b>Dual CTA: build + docs</b></td><td>Bold primary (&ldquo;Start building / free&rdquo;) + quiet secondary (&ldquo;Documentation&rdquo;). Developers want to try, not &ldquo;book a demo.&rdquo; Resend, Postmark, DatoCMS.</td></tr>
+    <tr><td><b>Deliverability / scale numbers up top</b></td><td>Delivery rate, latency, monthly volume, uptime &mdash; often as dashboard-style cards. Mailchimp (99.99% / &lt;1s / 157B), Twilio (190B/mo), DatoCMS (44ms / 100%), Postmark (95% delivered).</td></tr>
+    <tr><td><b>Scannable feature grid / step flow</b></td><td>4&ndash;6 icon cells or a 3-step trigger→send diagram. MagicBell provider cards, Brevo 6-cell grid, ActiveCampaign flow.</td></tr>
+    <tr><td><b>Logo wall + curated quotes</b></td><td>Auto-scrolling client logos (~half of B2B dev pages) + hand-picked testimonials, ideally next to the relevant feature. Twilio, ReadMe, Postmark.</td></tr>
+    <tr><td><b>Restrained, type-led visual system</b></td><td>Clean typography, generous whitespace, minimal flashy motion (&ldquo;no salesy BS&rdquo;). Resend, Stripe.</td></tr>
+  </tbody>
+</table>
+
+<!-- ============ ANTI-PATTERNS ============ -->
+<h2>Anti-patterns &mdash; what to avoid</h2>
+<ul>
+  <li><b>Function-list copy with no problem framing.</b> The Evil Martians study ranks bare feature lists the <i>weakest</i> storytelling format; problem-oriented framing wins. Don&rsquo;t open with &ldquo;Send emails via API.&rdquo;</li>
+  <li><b>&ldquo;Book a demo&rdquo; as the primary hero CTA.</b> Friction for developers, who want to try now. Reserve sales CTAs for an enterprise track; make &ldquo;Start building / free&rdquo; primary and drop credit-card gates.</li>
+  <li><b>Abstract 3D blobs instead of a code sample.</b> ClearBank&rsquo;s &ldquo;Connect through our API&rdquo; slide is pretty but shows <i>no</i> code or numbers &mdash; a real risk for a dev product where the code <i>is</i> the proof. (Captured but deliberately not embedded as positive evidence.)</li>
+  <li><b>Education-first hero (&ldquo;What is transactional email?&rdquo;).</b> Mailjet leads its page with a definitional block before showing the product &mdash; fine for SEO further down, wrong as the opening move for a developer audience that already knows.</li>
+  <li><b>Generic/uncaptioned testimonial dumps.</b> Strong pages curate quotes and place them by the feature praised; a wall of anonymous praise reads as filler.</li>
+  <li><b>Marketing-style hero stat with no product evidence.</b> A bare &ldquo;99% deliverability&rdquo; line is weak; render it as a chart / placement-test UI (SuperSend, DatoCMS) so it reads as evidence, not a claim.</li>
+</ul>
+
+<!-- ============ UNIQUE ANGLES ============ -->
+<h2>Unique angles &mdash; the things that made us look twice</h2>
+<ul>
+  <li><b>Postmark&rsquo;s testimonials live <i>inside</i> the hero.</b> Most sites push social proof below the fold; Postmark stacks a column of real developer quotes immediately right of the headline, so credibility lands in the first second alongside the CTA.</li>
+  <li><b>DatoCMS&rsquo;s &ldquo;APIS GO BRRR&rdquo; + live metric cards.</b> A self-aware developer-meme eyebrow paired with genuine-looking <code>44ms</code> / <code>100%</code> charts &mdash; personality <i>and</i> proof in one block. A differentiated way to do Rec&nbsp;2.</li>
+  <li><b>ReadMe&rsquo;s &ldquo;Nice docs 😍&rdquo; emoji headline.</b> A category (developer docs) usually plays it dry; an emoji-led, conversational headline over a logo wall is disarming and on-brand for a dev audience.</li>
+  <li><b>MagicBell&rsquo;s &ldquo;provider agnostic&rdquo; positioning shown as a card row.</b> It turns its <i>architecture</i> (SendGrid/Mailgun/SES under one API) into the hero proof &mdash; a sharp wedge if your differentiator is infrastructure flexibility.</li>
+  <li><b>Strategic differentiator from web research:</b> Postmark sells <b>Message Streams</b> (isolating transactional vs. broadcast reputation) and Resend sells <b>React Email</b> (author emails as React components) as their headline wedge. Pick one ownable technical angle and make <i>it</i> the hero, rather than competing on &ldquo;reliable email API&rdquo; generically.</li>
+</ul>
+
+<!-- ============ A/B CONTEXT ============ -->
+<h2>A/B test context <span class="lbl ab">Lazyweb A/B</span></h2>
+<div class="note">
+  <p><b>Read this as hypotheses, not measured lift.</b> Lazyweb&rsquo;s A/B research tool (PRO) returned 12 experiments, but <b>all 12 are mobile-app subscription / paywall tests</b> (Mimo, Reddit, Instacart, VPN, Quizlet&hellip;) &mdash; there are <b>no developer-API / B2B landing-page experiments</b> in the set, and the tool itself flags it as &ldquo;a limited screenshot-diff evidence set&hellip; not statistically measured lift.&rdquo; So this is weak, indirect evidence for our brief.</p>
+</div>
+<p>Only the cross-cutting, conversion-psychology lessons plausibly transfer to a landing page:</p>
+<ul>
+  <li><b>Concrete benefit copy beats generic copy.</b> Multiple paywalls (Instacart, Speechify, Reddit) won by replacing vague membership language with specific, named benefits. Maps to our anti-pattern against function-list copy &mdash; say &ldquo;99.4% inbox delivery, &lt;100ms send,&rdquo; not &ldquo;reliable email.&rdquo;</li>
+  <li><b>Dense hero → scannable list.</b> Reddit moved from a &ldquo;dense hero-and-card layout&rdquo; to a clean vertical list of concrete perks &mdash; echoes Rec&nbsp;3 (scannable feature grid over a wall of copy).</li>
+  <li><b>Set expectations early / reduce commitment anxiety.</b> Trial-clarity wins (Mimo, Quizlet) loosely support a low-friction, no-credit-card &ldquo;Start building&rdquo; CTA.</li>
+</ul>
+<p class="meta">Recommendation: do not lean on this section for the marketing-page decisions; the direct-evidence screenshots above are far stronger. If A/B grounding matters, run your own experiments on headline (problem vs. ICP framing), hero visual (code sample vs. product UI), and CTA copy.</p>
+
+<!-- ============ FINDINGS ============ -->
+<h2>Findings &mdash; how we got here</h2>
+<p><b>Corpus check.</b> Lazyweb has dedicated categories for this exact space (<i>Transactional Email API, Email API for Developers, Email Infrastructure, Email Deliverability, Open-Source Notification Infrastructure</i>). Direct competitors are present but <b>thin</b> &mdash; typically one captured page each (Resend, Loops, Twilio SendGrid, MagicBell, Brevo, Mailjet, Mailchimp). Coverage is deeper for the broader <i>developer-tools</i> design space (GitHub, Stripe, Replit, DatoCMS, ReadMe, Netlify), which we used as adjacent best-in-class references.</p>
+<p><b>Method.</b> We ran ~12 Lazyweb desktop searches (concept + category + company angles), de-duplicated to 47 candidate screenshots, then <b>visually inspected each finalist</b> before embedding &mdash; the search payloads here returned <code>visionDescription: null</code> and <code>screenshotId: null</code>, so we could not caption from metadata or use <code>find_similar</code>; every caption above is written from the image we actually viewed. We added live web research (Evil Martians&rsquo; 100-dev-tool-page study; Resend/Postmark comparisons) and a live capture of Postmark (absent from the Lazyweb corpus).</p>
+<p><b>What the evidence says.</b> The three brief focus areas have clear, convergent answers: (a) the <b>hero</b> is dark, code-first, ICP-headlined, dual-CTA, with deliverability numbers near the top; (b) the <b>feature / how-it-works section</b> is a scannable icon grid or a short trigger→send flow naming dev-specific capabilities; (c) <b>developer social proof</b> is a logo wall + curated, contextual quotes + named case studies (+ GitHub stars if open-source). The honest gap is that no first-party A/B data exists in-corpus for this page type, so conversion claims are reasoned from design convention, not measured lift.</p>
+
+<!-- ============ SOURCES ============ -->
+<h2>Sources</h2>
+<p><b>Lazyweb screenshots (cited inline above):</b></p>
+<ul class="sources">
+  <li>Resend &mdash; <a href="https://resend.com" target="_blank" rel="noopener">resend.com</a> · cat. Email API for Developers</li>
+  <li>Twilio SendGrid Email API &mdash; <a href="https://www.twilio.com/en-us/products/email-api" target="_blank" rel="noopener">twilio.com/en-us/products/email-api</a></li>
+  <li>Mailchimp Transactional &mdash; <a href="https://mailchimp.com/en/features/transactional-email/" target="_blank" rel="noopener">mailchimp.com/&hellip;/transactional-email</a></li>
+  <li>ActiveCampaign Transactional &mdash; <a href="https://www.activecampaign.com/platform/transactional-email" target="_blank" rel="noopener">activecampaign.com/&hellip;/transactional-email</a></li>
+  <li>MagicBell &mdash; <a href="https://www.magicbell.com/email" target="_blank" rel="noopener">magicbell.com/email</a></li>
+  <li>Brevo (Sendinblue) Transactional &mdash; <a href="https://www.brevo.com/products/transactional-email/" target="_blank" rel="noopener">brevo.com/products/transactional-email</a></li>
+  <li>DatoCMS Developer Experience &mdash; <a href="https://www.datocms.com/features/developer-experience" target="_blank" rel="noopener">datocms.com/features/developer-experience</a></li>
+  <li>ReadMe Customers &mdash; <a href="https://readme.com/customers" target="_blank" rel="noopener">readme.com/customers</a></li>
+  <li>SuperSend Deliverability &mdash; <a href="https://supersend.io/features/deliverability" target="_blank" rel="noopener">supersend.io/features/deliverability</a></li>
+  <li>Stripe &mdash; <a href="https://stripe.com" target="_blank" rel="noopener">stripe.com</a> (cross-category polish reference)</li>
+</ul>
+<p><b>Web (live capture + expert sources):</b></p>
+<ul class="sources">
+  <li>Postmark &mdash; live capture, <a href="https://postmarkapp.com" target="_blank" rel="noopener">postmarkapp.com</a> (<code>references/postmark-home.png</code>)</li>
+  <li>Evil Martians &mdash; <a href="https://evilmartians.com/chronicles/we-studied-100-devtool-landing-pages-here-is-what-actually-works-in-2025" target="_blank" rel="noopener">We studied 100 dev-tool landing pages &mdash; what actually works in 2025</a></li>
+  <li>Nakora &mdash; <a href="https://nakora.ai/blog/developer-landing-page" target="_blank" rel="noopener">Developer landing pages: best examples, templates &amp; tips</a></li>
+  <li>Postmark vs Resend comparison &mdash; <a href="https://postmarkapp.com/compare/resend-alternative" target="_blank" rel="noopener">postmarkapp.com/compare/resend-alternative</a> (Message Streams, latency)</li>
+  <li>Courier &mdash; <a href="https://www.courier.com/blog/best-email-api-providers-for-developers" target="_blank" rel="noopener">Best Email API for developers (2026)</a></li>
+  <li>Lazyweb A/B test research (PRO) &mdash; 12 mobile-paywall experiments; treated as caveated hypotheses only.</li>
+</ul>
+
+<div class="foot">
+  Generated by Lazyweb design research · web-marketing · niche tier · 8 Jun 2026.
+  References labelled <span class="lbl lw">Lazyweb</span> are real captured screenshots embedded by storage URL;
+  <span class="lbl web">Web</span> items are a live capture or expert source. Tip: add <code>.lazyweb/</code> to your <code>.gitignore</code>.
+</div>
+
+</div>
+</body>
+</html>

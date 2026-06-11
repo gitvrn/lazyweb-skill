@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Design Research: Personalized Onboarding Questionnaire → Paywall (Mobile)</title>
+<style>
+  :root{
+    --ink:#15202b; --muted:#5b6b7b; --line:#e4e9ee; --bg:#fff; --soft:#f6f8fa;
+    --blue:#1d6fe0; --blue-soft:#eaf2fd; --blue-line:#bcd6f7;
+    --amber:#9a6b00; --amber-soft:#fff6e2; --green:#0f7a52; --red:#b42323;
+    --pill:#eef2f6;
+  }
+  *{box-sizing:border-box}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    color:var(--ink);background:var(--bg);line-height:1.62;margin:0;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:900px;margin:0 auto;padding:40px 22px 90px}
+  header.hd{border-bottom:1px solid var(--line);padding-bottom:20px;margin-bottom:8px}
+  .kicker{font-size:12px;letter-spacing:.10em;text-transform:uppercase;color:var(--blue);font-weight:700;margin-bottom:8px}
+  h1{font-size:30px;line-height:1.2;margin:0 0 10px}
+  .sub{color:var(--muted);font-size:15px;margin:0}
+  .tags{margin-top:14px;display:flex;gap:8px;flex-wrap:wrap}
+  .tag{font-size:12px;background:var(--soft);border:1px solid var(--line);border-radius:999px;padding:4px 11px;color:var(--muted)}
+  h2{font-size:21px;margin:46px 0 6px;padding-top:10px;border-top:1px solid var(--line)}
+  h2 .num{color:var(--blue);font-weight:800;margin-right:8px}
+  h3{font-size:16px;margin:26px 0 6px}
+  p{margin:10px 0} a{color:var(--blue)}
+  .lede{color:var(--muted);font-size:14.5px;margin-top:2px}
+  .tldr{background:var(--blue-soft);border:1px solid var(--blue-line);border-left:5px solid var(--blue);
+    border-radius:12px;padding:18px 20px;margin:22px 0 8px}
+  .tldr h2{border:0;margin:0 0 8px;padding:0;font-size:15px;letter-spacing:.06em;text-transform:uppercase;color:var(--blue)}
+  .tldr p{margin:8px 0;font-size:15.5px}
+  .callout{background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin:18px 0;font-size:14.5px}
+  .callout.warn{background:var(--amber-soft);border-color:#f0dca6}
+  ol.recs{padding-left:0;list-style:none;counter-reset:r;margin:14px 0}
+  ol.recs > li{counter-increment:r;position:relative;padding:16px 16px 16px 56px;border:1px solid var(--line);
+    border-radius:12px;margin:12px 0;background:#fff}
+  ol.recs > li::before{content:counter(r);position:absolute;left:14px;top:15px;width:30px;height:30px;border-radius:50%;
+    background:var(--blue);color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:14px}
+  ol.recs h3{margin:0 0 4px;font-size:16px}
+  ol.recs p{margin:4px 0;font-size:14.5px;color:#2b3947}
+  .ev{font-size:12.5px;color:var(--muted)}
+  pre.ascii{background:#0f1722;color:#cfe3ff;border-radius:10px;padding:14px 16px;overflow-x:auto;
+    font:12.5px/1.45 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;margin:10px 0 4px}
+  /* carousel */
+  .deck{display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;padding:8px 2px 18px;
+    margin:6px -22px 6px;padding-left:22px;padding-right:22px;-webkit-overflow-scrolling:touch}
+  .deck::-webkit-scrollbar{height:9px} .deck::-webkit-scrollbar-thumb{background:#cfd8e0;border-radius:9px}
+  .rcard{scroll-snap-align:start;flex:0 0 252px;margin:0;background:#fff;border:1px solid var(--line);
+    border-radius:14px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 1px 3px rgba(20,32,43,.05)}
+  .shot{background:var(--soft);display:flex;align-items:center;justify-content:center;border-bottom:1px solid var(--line)}
+  .shot.mobile img{width:100%;height:340px;object-fit:contain;object-position:center;display:block;padding:8px}
+  figcaption{padding:12px 13px 14px;font-size:13px}
+  .rhead{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:4px}
+  .rco{font-weight:700;font-size:13.5px}
+  .src{font-size:11px;font-weight:700;letter-spacing:.03em}
+  .src-lazyweb{color:var(--blue)} .src-web{color:var(--green)}
+  .flowtag{font-size:11px;color:var(--muted);background:var(--soft);border:1px solid var(--line);
+    border-radius:6px;padding:2px 7px;display:inline-block;margin:2px 0 6px}
+  .why,.detail{margin:6px 0;font-size:12.7px;color:#33414f}
+  .detail{color:#1f2c39}
+  .rmeta{margin-top:8px;font-size:11px;color:var(--muted);border-top:1px dashed var(--line);padding-top:7px}
+  .hint{font-size:12.5px;color:var(--muted);margin:0 0 2px}
+  /* flow strip */
+  .flowstrip{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0 6px}
+  .pill{font-size:11.5px;background:var(--pill);border:1px solid var(--line);border-radius:7px;padding:3px 8px;color:#33414f;white-space:nowrap}
+  .pill b{color:var(--blue);margin-right:3px}
+  .pill.hl-q{background:#fbfcfd}
+  .pill.hl-sum{background:#eef6ff;border-color:#bcd6f7;color:#0f4ea0;font-weight:600}
+  .pill.hl-build{background:#efeaff;border-color:#cabffa;color:#4a2fae;font-weight:700}
+  .pill.hl-ready{background:#e7f7ee;border-color:#aedcc3;color:#0f7a52;font-weight:700}
+  .pill.hl-pay{background:#ffeaea;border-color:#f3bcbc;color:#b42323;font-weight:800}
+  table{border-collapse:collapse;width:100%;margin:14px 0;font-size:13.5px}
+  th,td{border:1px solid var(--line);padding:9px 11px;text-align:left;vertical-align:top}
+  th{background:var(--soft);font-size:12.5px;letter-spacing:.02em}
+  td .conf{background:#e7f7ee;color:var(--green);font-size:11px;font-weight:700;border-radius:6px;padding:2px 7px}
+  ul.tight li{margin:6px 0}
+  .pat{border-left:3px solid var(--green);background:#f4faf7;border-radius:0 8px 8px 0;padding:2px 14px;margin:12px 0}
+  .anti{border-left:3px solid var(--red);background:#fdf5f5;border-radius:0 8px 8px 0;padding:2px 14px;margin:12px 0}
+  .uniq{border-left:3px solid var(--blue);background:#f3f8fe;border-radius:0 8px 8px 0;padding:2px 14px;margin:12px 0}
+  .src-list{font-size:13px;color:var(--muted)} .src-list li{margin:5px 0}
+  .footnote{font-size:12px;color:var(--muted);border-top:1px solid var(--line);margin-top:40px;padding-top:14px}
+  .legend{font-size:12px;color:var(--muted);margin-top:6px}
+  .legend b{color:var(--ink)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hd">
+  <div class="kicker">Lazyweb Design Research</div>
+  <h1>The personalized onboarding questionnaire → paywall flow</h1>
+  <p class="sub">How top consumer apps use a multi-step quiz to personalize a plan and prime conversion — question pacing, progress, goal &amp; commitment screens, the “building your plan” moment, and the hand-off into the paywall.</p>
+  <div class="tags">
+    <span class="tag">Platform: Mobile</span>
+    <span class="tag">Popularity: Popular / top-charting</span>
+    <span class="tag">25 references · 22 [Lazyweb] · 3 [Web]</span>
+    <span class="tag">A/B evidence: 20 experiments</span>
+    <span class="tag">2026-06-08</span>
+  </div>
+</header>
+
+<div class="tldr">
+  <h2>TL;DR</h2>
+  <p><strong>The quiz is not a survey — it is a conversion ramp.</strong> The best apps (BetterMe, Lose It, Noom, Impulse, Headspace, Duolingo-style) front-load a goal pick, pace one low-effort question per screen behind an honest progress bar, extract a real commitment (a daily-time or goal-date promise), then manufacture a dedicated “<em>building your plan</em>” moment that hands straight into the paywall <strong>while invested effort and anticipation peak</strong>.</p>
+  <p><strong>Do this:</strong> capture the goal on screen 1, echo it everywhere, end the quiz with a visual plan reveal (a projection graph / timeline), and drop the paywall the instant the plan is “ready” — carrying the user’s own goal into the paywall headline. Per BetterMe’s live flow, the paywall is literally step 38 of 38.</p>
+</div>
+
+<p class="lede">Lazyweb’s mobile corpus is unusually strong for this exact pattern — Health &amp; Fitness and Education apps live and die on it. Every screenshot below was selected after reading its <em>visionDescription</em>; captions are written from those descriptions and from live flow step labels. Mismatched references were dropped, not padded.</p>
+
+<h2><span class="num">1.</span>Recommendations / Next Steps</h2>
+<p class="hint">Priority order. Each recommendation maps to the evidence decks and A/B table further down.</p>
+<ol class="recs">
+
+  <li>
+    <h3>Capture the goal on the FIRST quiz screen — then echo it for the rest of the flow</h3>
+    <p>Goal selection is the emotional anchor. Lead with large, tappable goal cards (MindLlama, Headspace), cap multi-select at ~3 priorities (MyFitnessPal), then surface that goal again on the loader, the plan-reveal, and the paywall headline. Web teardowns are blunt: “personalization closes — surfacing the captured goal on the paywall, even a single string match, outperforms most layout experiments.”</p>
+    <p class="ev">Evidence: <em>Goal &amp; question deck</em> — MindLlama, Headspace, MyFitnessPal [Lazyweb]; RevenueCat / PaywallPro teardowns [Web].</p>
+<pre class="ascii">┌──────────────────────────┐   ┌──────────────────────────┐
+│ ●●○○○○○○            ✕     │   │  Your plan is ready 🎉    │
+│ What's your #1 goal?     │   │  Goal:  Lose weight      │
+│ ┌────────┐ ┌────────┐    │   │  ▁▂▃▅▆█  -12 lb / 12 wk   │
+│ │ Lose   │ │ Build  │    │ → │  ───────────────────     │
+│ │ weight✓│ │ muscle │    │   │  [   Get my plan  →   ]  │
+│ └────────┘ └────────┘    │   │  goal echoed from screen 1│
+│ [ Continue → ]           │   └──────────────────────────┘
+└──────────────────────────┘</pre>
+  </li>
+
+  <li>
+    <h3>One low-effort question per screen, behind an honest, persistent progress bar</h3>
+    <p>Isolate each question (Babbel’s age screen), prefer sliders/big cards over typing (JustFit level slider, Codecademy Go cards), auto-advance single-selects, and keep progress visible at all times. Research: 78% of onboarding flows now show progress, and “step 2 of 4” completes better than a bare “step 2.” Add an explicit <strong>Skip</strong> on any heavy question (Spring Health) so a single hard item never becomes a drop-off cliff.</p>
+    <p class="ev">Evidence: <em>Question &amp; pacing deck</em> — Babbel, JustFit, Codecademy Go, Spring Health, Finch [Lazyweb]; Appcues / UserGuiding stats [Web].</p>
+<pre class="ascii">┌──────────────────────────┐
+│ ◀  ▓▓▓▓▓░░░░░  Step 4/9   │   honest, persistent progress
+│                          │
+│  How active are you?     │   ← exactly ONE question
+│  ●───────○─────  Beginner │   slider > radio list
+│                          │
+│  [ Next ]      ( Skip )  │   skip valve on hard items
+└──────────────────────────┘</pre>
+  </li>
+
+  <li>
+    <h3>Extract a real commitment, not just preferences</h3>
+    <p>Turn a preference into a promise: a daily-time goal tied to streaks (Impulse: 5/10/20 min) or a target event + date (BetterMe steps 31–32). A self-made commitment is the sunk cost that makes the paywall feel like the natural next step rather than a toll booth.</p>
+    <p class="ev">Evidence: Impulse daily-goal screen, BetterMe event/date steps [Lazyweb]; “turn onboarding into building a plan” [Web, Airbridge].</p>
+<pre class="ascii">┌──────────────────────────┐
+│  Your daily goal         │
+│  ┌────┐ ┌────┐ ┌────┐    │
+│  │5min│ │10m✓│ │20m │    │  commitment → streak promise
+│  └────┘ └────┘ └────┘    │
+│  "Keeps your streak alive"│
+└──────────────────────────┘</pre>
+  </li>
+
+  <li>
+    <h3>Manufacture a dedicated “building your plan” moment — make the wait productive</h3>
+    <p>Give the build its own full screen, not a 300ms spinner. Itemize the work into named sub-steps with their own progress (MindLlama: “analyzing data… personalizing goals…”), and fill the seconds with credibility/social proof (Lose It stats, JustFit training-hours, Elevate 5-stars). The perceived effort is what makes the plan feel custom and worth paying for.</p>
+    <p class="ev">Evidence: <em>Build &amp; reveal deck</em> — MindLlama, Lose It, JustFit, Elevate [Lazyweb]; Noom animated weight-projection teardown [Web, RevenueCat].</p>
+<pre class="ascii">┌──────────────────────────┐
+│   Building your plan…    │
+│  Analyzing answers  100% │   itemized sub-steps,
+│  Personalizing plan  72% │   each with its own bar
+│  Optimizing schedule 30% │
+│  ★★★★★  "Loved by 4M+"   │   social proof fills the wait
+└──────────────────────────┘</pre>
+  </li>
+
+  <li>
+    <h3>Reveal the plan as a visual artifact, then drop the paywall immediately</h3>
+    <p>End on a plan the user does not want to abandon: a projection curve / timeline (BetterMe now→4 weeks; Lose It goal-completion date). Then show the paywall <em>at once</em>, carrying the goal + a trial timeline with “$0 due now” (Lose It) and a single dominant CTA. Per BetterMe’s captured flow, the paywall is step 38 of 38 — placement, not polish, is the most underrated lever.</p>
+    <p class="ev">Evidence: <em>Build &amp; reveal</em> + <em>Paywall transition deck</em> — BetterMe plan-ready, Lose It projection &amp; trial-timeline paywall, Impulse paywall [Lazyweb].</p>
+<pre class="ascii">  plan reveal                 paywall (next screen)
+┌──────────────┐          ┌──────────────────────┐
+│ ▁▂▃▅▆█ goal  │          │ Your plan is ready.   │
+│ -12lb / 12wk │   ──►    │ ● Plan created  (today)│
+│ [Get my plan]│          │ ● Premium unlocked     │
+└──────────────┘          │ ○ Day 5 reminder       │
+                          │ ○ Day 7 trial ends     │
+                          │ $0 due now·[Start free]│
+                          └──────────────────────┘</pre>
+  </li>
+</ol>
+
+<h2><span class="num">2.</span>The full flow, end to end</h2>
+<p>Lazyweb has BetterMe’s complete onboarding captured as a single 38-step flow — the clearest real-world map of this pattern. Note the rhythm: a long run of one-question-per-screen steps, a mid-flow <span class="pill hl-sum"><b>SUMMARY</b></span> recap, the commitment questions (event + date), a framing screen, the dedicated <span class="pill hl-build"><b>CREATING</b></span> build moment, the <span class="pill hl-ready"><b>PLAN READY</b></span> reveal, and then the <span class="pill hl-pay"><b>PAYWALL</b></span> as the very next step.</p>
+<div class="flowstrip"><span class="pill"><b>1</b> Login / guest chooser</span><span class="pill"><b>2</b> Consent to personalize</span><span class="pill hl-q"><b>3</b> Q: sex</span><span class="pill hl-q"><b>4</b> Q: primary goal</span><span class="pill hl-q"><b>5</b> Q: areas of interest</span><span class="pill"><b>6</b> OS notifications prompt</span><span class="pill hl-q"><b>7</b> Q: special programs</span><span class="pill hl-q"><b>8</b> Q: activities</span><span class="pill hl-q"><b>9</b> Q: focus area</span><span class="pill hl-q"><b>10</b> Q: body type</span><span class="pill hl-q"><b>11</b> Q: dream body</span><span class="pill hl-q"><b>12</b> Q: typical day</span><span class="pill hl-q"><b>13</b> Q: energy</span><span class="pill hl-q"><b>14</b> Q: how active</span><span class="pill hl-q"><b>15</b> Q: pushups</span><span class="pill hl-q"><b>16</b> Q: sedentary time</span><span class="pill hl-q"><b>17</b> Q: walking</span><span class="pill hl-q"><b>18</b> Q: sleep</span><span class="pill hl-q"><b>19</b> Q: diet</span><span class="pill hl-q"><b>20</b> Q: foods to exclude</span><span class="pill hl-q"><b>21</b> Q: bad habits</span><span class="pill hl-q"><b>22</b> Q: relate (1)</span><span class="pill hl-q"><b>23</b> Q: relate (2)</span><span class="pill hl-q"><b>24</b> Q: height</span><span class="pill hl-q"><b>25</b> Q: weight</span><span class="pill hl-q"><b>26</b> Q: goal weight</span><span class="pill hl-q"><b>27</b> Q: name</span><span class="pill hl-sum"><b>28</b> Info: SUMMARY of answers</span><span class="pill hl-q"><b>29</b> Q: pace / speed</span><span class="pill hl-q"><b>30</b> Q: anything besides</span><span class="pill hl-q"><b>31</b> Q: target event</span><span class="pill hl-q"><b>32</b> Q: event date</span><span class="pill"><b>33</b> Info: PLAN framing</span><span class="pill hl-build"><b>34</b> Info: CREATING your plan (build animation)</span><span class="pill"><b>35</b> OS ATT prompt</span><span class="pill hl-ready"><b>36</b> Info: PLAN READY</span><span class="pill hl-pay"><b>37</b> PAYWALL</span><span class="pill"><b>38</b> Home</span></div>
+<p class="legend"><b>Source:</b> Lazyweb flow “BetterMe · Onboarding” (38 steps, mobile). Step labels are the captured screen names; only screens with a read <em>visionDescription</em> are embedded as figures below.</p>
+
+<h3>2a. Opening &amp; flow framing</h3>
+<p class="hint">Scroll → . The intro promises a payoff; BetterMe’s own mid/late-flow screens show the recap, the pre-build framing, the build moment, and where the paywall lands.</p>
+<div class="deck">
+    <figure class="rcard">
+      <div class="shot mobile"><img loading="lazy" src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/uploaded_elevate/compare/2026-01-28/1771003238056_t__-_546.PNG" alt="Elevate onboarding screen"></div>
+      <figcaption>
+        <div class="rhead"><span class="rco">Elevate</span><span class="src src-lazyweb">[Lazyweb]</span></div>
+        
+        <p class="why"><strong>Why here:</strong> Opens the questionnaire by naming the payoff — “personalize your training program” — and setting the expectation that it is only a few quick questions.</p>
+        <p class="detail"><strong>Borrow:</strong> A one-line value promise + visible progress on the very first quiz screen, so users opt into the questions rather than feeling interrogated.</p>
+        <div class="rmeta">match 1/3 · sim 0.63</div>
+      </figcaption>
+    </figure>
+    <figure class="rcard">
+      <div class="shot mobile"><img loading="lazy" src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/uploaded_betterme/onboarding/compare/2026-05-31/1780200257334_27_29_Onboarding_info-summary.png" alt="BetterMe onboarding screen"></div>
+      <figcaption>
+        <div class="rhead"><span class="rco">BetterMe</span><span class="src src-lazyweb">[Lazyweb]</span></div>
+        <div class="flowtag">Onboarding flow step 29/38 (info-summary)</div>
+        <p class="why"><strong>Why here:</strong> BetterMe’s mid-flow recap screen (step 29 of a 38-step onboarding) plays back the answers collected so far before asking for the final commitment details.</p>
+        <p class="detail"><strong>Borrow:</strong> A “here’s what we heard” summary that makes the prior effort feel acknowledged and the upcoming plan feel earned.</p>
+        
+      </figcaption>
+    </figure>
+    <figure class="rcard">
+      <div class="shot mobile"><img loading="lazy" src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/uploaded_betterme/onboarding/compare/2026-05-31/1780200261015_32_34_Onboarding_info-plan.png" alt="BetterMe onboarding screen"></div>
+      <figcaption>
+        <div class="rhead"><span class="rco">BetterMe</span><span class="src src-lazyweb">[Lazyweb]</span></div>
+        <div class="flowtag">Onboarding flow step 34/38 (info-plan)</div>
+        <p class="why"><strong>Why here:</strong> The pre-loader “info-plan” screen (step 34) frames what is about to be generated, just before the building animation.</p>
+        <p class="detail"><strong>Borrow:</strong> Set up the reveal: tell the user a plan is being assembled from THEIR inputs before you show the loader.</p>
+        
+      </figcaption>
+    </figure>
+    <figure class="rcard">
+      <div class="shot mobile"><img loading="lazy" src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/uploaded_betterme/onboarding/compare/2026-05-31/1780200261715_33_35_Onboarding_info-creating-plan.png" alt="BetterMe onboarding screen"></div>
+      <figcaption>
+        <div class="rhead"><span class="rco">BetterMe</span><span class="src src-lazyweb">[Lazyweb]</span></div>
+        <div class="flowtag">Onboarding flow step 35/38 (info-creating-plan)</div>
+        <p class="why"><strong>Why here:</strong> BetterMe’s dedicated “creating-plan” screen (step 35) — the manufactured ‘building your plan’ moment that sits one screen before the paywall.</p>
+        <p class="detail"><strong>Borrow:</strong> A separate, full-screen build moment (not a 300ms spinner) so the work feels substantial.</p>
+        
+      </figcaption>
+    </figure>
+    <figure class="rcard">
+      <div class="shot mobile"><img loading="lazy" src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/uploaded_betterme/paywall/compare/2026-05-31/1780200388263_00_38_Paywall_paywall.png" alt="BetterMe onboarding screen"></div>
+      <figcaption>
+        <div class="rhead"><span class="rco">BetterMe</span><span class="src src-lazyweb">[Lazyweb]</span></div>
+        <div class="flowtag">Onboarding flow step 38/38 (paywall)</div>
+        <p class="why"><strong>Why here:</strong> The paywall is literally step 38 of 38 — it lands the instant the personalized plan is ready, at peak invested-effort.</p>
+        <p class="detail"><strong>Borrow:</strong> Place the paywall immediately after the plan reveal, while sunk-cost and anticipation are highest.</p>
+        
+      </figcaption>
+    </figure></div>
+
+<h2><span class="num">3.</span>Key examples</h2>
+
+<h3>3a. Question pacing, goal &amp; commitment screens</h3>
+<p class="hint">Scroll → . The questionnaire engine: goal capture, one-per-screen pacing, sliders vs cards, skip valves, and the commitment ask.</p>
+<div class="deck">
+    <figure class="rcard">
+      <div class="shot mobile"><img loading="lazy" src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/uploaded_mindllama/compare/2026-01-29/1771004033971_t__-_1051.PNG" alt="Mindllama onboarding screen"></div>
+      <figcaption>
+        <div class="rhead"><span class="rco">Mindllama</span><span class="src src-lazyweb">[Lazyweb]</span></div>
+        
+        <p class="why"><strong>Why here:</strong> Goal picker with large toggle cards and checkmarks — the emotional anchor that every downstream screen (and the paywall) refers back to.</p>
+        <p class="detail"><strong>Borrow:</strong> Big tappable goal cards with instant check feedback; capture the goal first so you can echo it later.</p>
+        <div class="rmeta">match 3/3 · sim 0.71</div>
+      </figcaption>
+    </figure>
+    <figure class="rcard">
+      <div class="shot mobile"><img loading="lazy" src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/uploaded_headspace/compare/2026-01-28/1771003905949_t__-_892.PNG" alt="Headspace onboarding screen"></div>
+      <figcaption>
+        <div class="rhead"><span class="rco">Headspace</span><span class="src src-lazyweb">[Lazyweb]</span></div>
+        
+        <p class="why"><strong>Why here:</strong> Headspace’s multi-select goal screen (“what do you want to work toward together”) — warm, collaborative framing of the same goal-capture step.</p>
+        <p class="detail"><strong>Borrow:</strong> “Together” copy reframes a data-collection question as a shared plan; multi-select keeps it low-pressure.</p>
+        <div class="rmeta">match 3/3 · sim 0.70</div>
+      </figcaption>
+    </figure>
+    <figure class="rcard">
+      <div class="shot mobile"><img loading="lazy" src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/uploaded_myfitnesspal/compare/2026-01-29/1771006764118_t__-_1072.PNG" alt="Myfitnesspal onboarding screen"></div>
+      <figcaption>
+        <div class="rhead"><span class="rco">Myfitnesspal</span><span class="src src-lazyweb">[Lazyweb]</span></div>
+        
+        <p class="why"><strong>Why here:</strong> MyFitnessPal caps goal selection at three priorities — forces prioritization without overwhelming.</p>
+        <p class="detail"><strong>Borrow:</strong> A “choose up to 3” constraint keeps the personalization signal high and the screen scannable.</p>
+        <div class="rmeta">match 3/3 · sim 0.69</div>
+      </figcaption>
+    </figure>
+    <figure class="rcard">
+      <div class="shot mobile"><img loading="lazy" src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/health2_impulse/compare/2025-04-25-16-06-14-.png" alt="Impulse onboarding screen"></div>
+      <figcaption>
+        <div class="rhead"><span class="rco">Impulse</span><span class="src src-lazyweb">[Lazyweb]</span></div>
+        
+        <p class="why"><strong>Why here:</strong> Impulse asks “what do you want to learn about yourself” with curiosity-driven options (archetype, ADHD type, stress level) — questions that double as a value tease.</p>
+        <p class="detail"><strong>Borrow:</strong> Frame questions so each option previews a payoff the user now wants the app to deliver.</p>
+        <div class="rmeta">match 3/3 · sim 0.64</div>
+      </figcaption>
+    </figure>
+    <figure class="rcard">
+      <div class="shot mobile"><img loading="lazy" src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/uploaded_justfit/compare/2026-01-29/1770828981933_D6C940E3-DA54-468E-88A8-DABE1DAEF772_1_105_c.jpeg" alt="Justfit onboarding screen"></div>
+      <figcaption>
+        <div class="rhead"><span class="rco">Justfit</span><span class="src src-lazyweb">[Lazyweb]</span></div>
+        
+        <p class="why"><strong>Why here:</strong> Single fitness-level slider with a circular progress indicator and a live descriptive label — one decision per screen.</p>
+        <p class="detail"><strong>Borrow:</strong> Sliders for ordinal answers (level, intensity) feel faster and more tactile than radio lists.</p>
+        <div class="rmeta">match 1/3 · sim 0.68</div>
+      </figcaption>
+    </figure>
+    <figure class="rcard">
+      <div class="shot mobile"><img loading="lazy" src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/uploaded_spring_health/compare/2025-12-16/1771169298182_t__-_12329.PNG" alt="Spring Health onboarding screen"></div>
+      <figcaption>
+        <div class="rhead"><span class="rco">Spring Health</span><span class="src src-lazyweb">[Lazyweb]</span></div>
+        
+        <p class="why"><strong>Why here:</strong> Spring Health’s 0–10 agreement slider with progress, back, close, Next AND Skip — a clinical-grade survey question that still respects the user’s time.</p>
+        <p class="detail"><strong>Borrow:</strong> Offer an explicit Skip on heavier questions so a hard item never becomes a drop-off cliff.</p>
+        <div class="rmeta">match 3/3 · sim 0.65</div>
+      </figcaption>
+    </figure>
+    <figure class="rcard">
+      <div class="shot mobile"><img loading="lazy" src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/uploaded_codeacademy_go/compare/2025-11-23/1771279130873_t__-_10697.PNG" alt="Codeacademy Go onboarding screen"></div>
+      <figcaption>
+        <div class="rhead"><span class="rco">Codeacademy Go</span><span class="src src-lazyweb">[Lazyweb]</span></div>
+        
+        <p class="why"><strong>Why here:</strong> Codecademy Go uses three big experience-level cards (Beginner / Intermediate / Advanced) — tap-to-advance, no Next button needed.</p>
+        <p class="detail"><strong>Borrow:</strong> For single-select, auto-advance on tap removes a step and accelerates pacing.</p>
+        <div class="rmeta">match 2/3 · sim 0.69</div>
+      </figcaption>
+    </figure>
+    <figure class="rcard">
+      <div class="shot mobile"><img loading="lazy" src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/uploaded_babbel/compare/2026-01-28/1769625232591_IMG_2942.PNG" alt="Babbel onboarding screen"></div>
+      <figcaption>
+        <div class="rhead"><span class="rco">Babbel</span><span class="src src-lazyweb">[Lazyweb]</span></div>
+        
+        <p class="why"><strong>Why here:</strong> Babbel isolates a single demographic question (“How old are you?”) on its own screen with persistent progress.</p>
+        <p class="detail"><strong>Borrow:</strong> One question per screen + always-visible progress is the table-stakes pacing pattern.</p>
+        <div class="rmeta">match 1/3 · sim 0.67</div>
+      </figcaption>
+    </figure>
+    <figure class="rcard">
+      <div class="shot mobile"><img loading="lazy" src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/uploaded_finch/compare/2026-01-29/1770837926062_4E703B84-4A3B-405A-91D8-D32738148BEA_1_105_c.jpeg" alt="Finch onboarding screen"></div>
+      <figcaption>
+        <div class="rhead"><span class="rco">Finch</span><span class="src src-lazyweb">[Lazyweb]</span></div>
+        
+        <p class="why"><strong>Why here:</strong> Finch (mental-health) lists selectable challenges (ADHD, PTSD, depression, anxiety) with a disabled Next that activates after a choice.</p>
+        <p class="detail"><strong>Borrow:</strong> Disable the CTA until a valid selection exists — guides without nagging.</p>
+        <div class="rmeta">match 1/3 · sim 0.67</div>
+      </figcaption>
+    </figure>
+    <figure class="rcard">
+      <div class="shot mobile"><img loading="lazy" src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/health2_impulse/compare/2025-04-25-16-06-57-.png" alt="Impulse onboarding screen"></div>
+      <figcaption>
+        <div class="rhead"><span class="rco">Impulse</span><span class="src src-lazyweb">[Lazyweb]</span></div>
+        
+        <p class="why"><strong>Why here:</strong> Impulse’s commitment screen ties a daily time goal (5/10/20 min) to streaks — converts a preference into a behavioral promise.</p>
+        <p class="detail"><strong>Borrow:</strong> A time/frequency commitment screen turns onboarding into a contract the user makes with themselves.</p>
+        <div class="rmeta">match 3/3 · sim 0.65</div>
+      </figcaption>
+    </figure>
+    <figure class="rcard">
+      <div class="shot mobile"><img loading="lazy" src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/health7_betterme/compare/2024-07-15-00-52-07-.png" alt="Betterme onboarding screen"></div>
+      <figcaption>
+        <div class="rhead"><span class="rco">Betterme</span><span class="src src-lazyweb">[Lazyweb]</span></div>
+        
+        <p class="why"><strong>Why here:</strong> BetterMe asks for the user’s name mid-flow — a tiny identity investment that personalizes later copy.</p>
+        <p class="detail"><strong>Borrow:</strong> Capture the name so the plan-ready and paywall screens can address the user directly.</p>
+        <div class="rmeta">match 1/3 · sim 0.71</div>
+      </figcaption>
+    </figure></div>
+
+<h3>3b. “Building your plan” &amp; the plan reveal</h3>
+<p class="hint">Scroll → . The manufactured-effort moment and the visual plan artifact that earns the paywall.</p>
+<div class="deck">
+    <figure class="rcard">
+      <div class="shot mobile"><img loading="lazy" src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/uploaded_mindllama/compare/2026-01-29/1771004036206_t__-_1055.PNG" alt="Mindllama onboarding screen"></div>
+      <figcaption>
+        <div class="rhead"><span class="rco">Mindllama</span><span class="src src-lazyweb">[Lazyweb]</span></div>
+        
+        <p class="why"><strong>Why here:</strong> MindLlama’s loader shows an animated mascot plus MULTIPLE labeled progress bars (“analyzing data”, “personalizing goals”) with percentages — the build feels like real computation.</p>
+        <p class="detail"><strong>Borrow:</strong> Itemize the work into 3–4 named sub-steps with their own progress so the plan feels custom-built, not canned.</p>
+        <div class="rmeta">match 1/3 · sim 0.70</div>
+      </figcaption>
+    </figure>
+    <figure class="rcard">
+      <div class="shot mobile"><img loading="lazy" src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/uploaded_lose_it/compare/2026-01-29/1770821191136_E16962A1-0A5D-4E07-B64F-914E5DC49F21_1_105_c.jpeg" alt="Lose It onboarding screen"></div>
+      <figcaption>
+        <div class="rhead"><span class="rco">Lose It</span><span class="src src-lazyweb">[Lazyweb]</span></div>
+        
+        <p class="why"><strong>Why here:</strong> Lose It pairs the “generating your custom plan” message with credibility stats during the wait.</p>
+        <p class="detail"><strong>Borrow:</strong> Use the loading seconds to surface social proof / credibility stats — productive waiting primes the paywall.</p>
+        <div class="rmeta">match 3/3 · sim 0.61</div>
+      </figcaption>
+    </figure>
+    <figure class="rcard">
+      <div class="shot mobile"><img loading="lazy" src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/uploaded_justfit/exploration/compare/2026-05-28/1780008327880_00_com.fitness.beauty.png" alt="Justfit onboarding screen"></div>
+      <figcaption>
+        <div class="rhead"><span class="rco">Justfit</span><span class="src src-lazyweb">[Lazyweb]</span></div>
+        
+        <p class="why"><strong>Why here:</strong> JustFit shows a circular percentage loader (“Creating your personal plan”) with a total-training-hours social-proof stat.</p>
+        <p class="detail"><strong>Borrow:</strong> A single bold percentage + one proof stat is a lighter-weight alternative to multi-bar loaders.</p>
+        <div class="rmeta">match 2/3 · sim 0.59</div>
+      </figcaption>
+    </figure>
+    <figure class="rcard">
+      <div class="shot mobile"><img loading="lazy" src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/uploaded_elevate/compare/2026-01-28/1771003260306_t__-_574.PNG" alt="Elevate onboarding screen"></div>
+      <figcaption>
+        <div class="rhead"><span class="rco">Elevate</span><span class="src src-lazyweb">[Lazyweb]</span></div>
+        
+        <p class="why"><strong>Why here:</strong> Elevate’s “Creating your training program…” spinner carries a 5-star rating as social proof during the build.</p>
+        <p class="detail"><strong>Borrow:</strong> Even a simple spinner converts better when the wait carries a trust signal.</p>
+        <div class="rmeta">match 1/3 · sim 0.58</div>
+      </figcaption>
+    </figure>
+    <figure class="rcard">
+      <div class="shot mobile"><img loading="lazy" src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/health7_betterme/compare/2024-07-15-00-51-54-.png" alt="Betterme onboarding screen"></div>
+      <figcaption>
+        <div class="rhead"><span class="rco">Betterme</span><span class="src src-lazyweb">[Lazyweb]</span></div>
+        
+        <p class="why"><strong>Why here:</strong> BetterMe’s plan-ready screen renders the plan as a progress-timeline chart (now → after 4 weeks) with the captured goal and interests, then a single “Get my plan” CTA.</p>
+        <p class="detail"><strong>Borrow:</strong> Reveal the plan as a visual artifact (a projection curve / timeline) the user does not want to abandon.</p>
+        <div class="rmeta">match 3/3 · sim 0.57</div>
+      </figcaption>
+    </figure>
+    <figure class="rcard">
+      <div class="shot mobile"><img loading="lazy" src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/uploaded_lose_it/compare/2026-01-29/1770821190411_EB4E7AB6-75D5-42D3-A191-0F48FC5EB39D_1_105_c.jpeg" alt="Lose It onboarding screen"></div>
+      <figcaption>
+        <div class="rhead"><span class="rco">Lose It</span><span class="src src-lazyweb">[Lazyweb]</span></div>
+        
+        <p class="why"><strong>Why here:</strong> Lose It tees up the reveal by promising to “project your goal completion date” — the outcome graph that makes the plan feel real.</p>
+        <p class="detail"><strong>Borrow:</strong> An explicit goal-DATE / outcome projection is the single strongest reason-to-subscribe asset.</p>
+        <div class="rmeta">match 2/3 · sim 0.70</div>
+      </figcaption>
+    </figure></div>
+
+<h3>3c. The transition into the paywall</h3>
+<p class="hint">Scroll → . Post-plan paywalls that read as the <em>delivery</em> of the plan, not an interruption.</p>
+<div class="deck">
+    <figure class="rcard">
+      <div class="shot mobile"><img loading="lazy" src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/uploaded_lose_it/compare/2026-01-29/1770821193752_D37D9B42-6CE6-4746-A8C0-42511398BB4F_1_105_c.jpeg" alt="Lose It onboarding screen"></div>
+      <figcaption>
+        <div class="rhead"><span class="rco">Lose It</span><span class="src src-lazyweb">[Lazyweb]</span></div>
+        
+        <p class="why"><strong>Why here:</strong> Lose It’s post-plan paywall uses a trial TIMELINE (“program created → premium today → reminder near end → trial ends”) with ‘no payment due now’ and ratings.</p>
+        <p class="detail"><strong>Borrow:</strong> A visual trial timeline + “$0 due now” removes the two biggest free-trial fears at the exact conversion moment.</p>
+        <div class="rmeta">match 2/3 · sim 0.54</div>
+      </figcaption>
+    </figure>
+    <figure class="rcard">
+      <div class="shot mobile"><img loading="lazy" src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/uploaded_finch/paywall/compare/2026-05-31/1780206735799_03_14_Paywall_plan-picker.png" alt="Finch onboarding screen"></div>
+      <figcaption>
+        <div class="rhead"><span class="rco">Finch</span><span class="src src-lazyweb">[Lazyweb]</span></div>
+        
+        <p class="why"><strong>Why here:</strong> Finch’s paywall adds a limited-time countdown with a discounted annual ‘best deal’ vs a monthly alternative, cancel-anytime note, and one primary CTA.</p>
+        <p class="detail"><strong>Borrow:</strong> Anchor annual as the ‘best deal’ against monthly, with a single dominant CTA — but use urgency sparingly (see anti-patterns).</p>
+        <div class="rmeta">match 1/3 · sim 0.73</div>
+      </figcaption>
+    </figure>
+    <figure class="rcard">
+      <div class="shot mobile"><img loading="lazy" src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/uploaded_impulse/paywall/compare/2026-05-28/1780023504910_00_Impulse-20260529-025824-01.png" alt="Impulse onboarding screen"></div>
+      <figcaption>
+        <div class="rhead"><span class="rco">Impulse</span><span class="src src-lazyweb">[Lazyweb]</span></div>
+        
+        <p class="why"><strong>Why here:</strong> Impulse’s onboarding paywall sells the tracked-progress payoff with a 3-day-trial weekly plan vs a discounted lifetime option and a clear ‘Start Free Trial’ CTA.</p>
+        <p class="detail"><strong>Borrow:</strong> Carry the onboarding promise (progress tracking) onto the paywall hero so the offer reads as the plan’s delivery, not an ad.</p>
+        <div class="rmeta">match 1/3 · sim 0.74</div>
+      </figcaption>
+    </figure></div>
+
+<h2><span class="num">4.</span>A/B test evidence <span style="font-size:13px;font-weight:400;color:var(--muted)">(Lazyweb experiment corpus)</span></h2>
+<p>Beyond what looks polished, these are real screenshot-diff experiments on the paywall that this flow feeds into. They tell you what to test once the questionnaire is doing its job. <strong>Treat as directional hypotheses, not measured lift.</strong></p>
+<table>
+  <thead><tr><th>App</th><th>Category</th><th>What changed</th><th>Learning (hypothesis)</th><th>Conf.</th></tr></thead>
+  <tbody><tr><td><strong>Mimo</strong></td><td>Education</td><td>7→14 day trial, annual price made explicit on the CTA</td><td>Longer trial + clear annual pricing can cut commitment anxiety and set payment expectations earlier</td><td><span class='conf'>high</span></td></tr><tr><td><strong>JustFit</strong></td><td>Health &amp; Fitness</td><td>Countdown-driven plan selector, monthly price cards, explicit ‘skip free trial’ copy</td><td>Urgency + plan comparison + a clear trial bypass can reduce purchase friction at the decision moment</td><td><span class='conf'>high</span></td></tr><tr><td><strong>Drops</strong></td><td>Education</td><td>Lifetime anchor placed above a discounted yearly trial (yearly pre-selected, prominent ‘Start Free Trial’)</td><td>Leading with a lifetime anchor makes the annual trial feel cheaper and easier to start</td><td><span class='conf'>high</span></td></tr><tr><td><strong>Loona</strong></td><td>Health &amp; Fitness</td><td>Discount sheet moved from a 40% deal to a first-timer 50% offer, keeping a simple accept / decline</td><td>A stronger %-off anchor lets the paywall raise the discounted price while keeping a binary choice</td><td><span class='conf'>high</span></td></tr><tr><td><strong>AI-Arta</strong></td><td>Graphics &amp; Design</td><td>Replaced a free-trial toggle with an explicit 7-day intro-trial row above the yearly plan</td><td>Making the intro-trial price + renewal visible reduces uncertainty before the yearly choice</td><td><span class='conf'>high</span></td></tr><tr><td><strong>Quizlet</strong></td><td>Education</td><td>Moved the free-trial condition next to the primary ‘Start free trial’ CTA</td><td>Putting the trial condition beside the CTA clarifies what starts today and reduces hesitation</td><td><span class='conf'>high</span></td></tr><tr><td><strong>Apple Music</strong></td><td>Music</td><td>Generic ‘1 month free’ header → concrete audio-quality value + a 3-month trial + acceptance-language CTA</td><td>Concrete benefit + longer trial makes plan selection feel like claiming value, not comparing prices</td><td><span class='conf'>high</span></td></tr><tr><td><strong>MyRadar</strong></td><td>Weather</td><td>Hero pitch → feature-LIST layout with ‘Start Trial’ primary + restore-purchase + annual fallback</td><td>A concrete feature list makes a mature offer feel tangible while keeping the trial path dominant</td><td><span class='conf'>high</span></td></tr></tbody>
+</table>
+<div class="callout warn"><strong>Dataset caveat (from Lazyweb):</strong> the experiment set is a limited screenshot-diff evidence base. Outcome lift is only present where captured in the learning text; <code>interesting_learning</code> defaults to false because uncommon learnings overfit a small dataset. Pair every change with a guardrail metric (downstream retention / refund / support).</div>
+
+<h2><span class="num">5.</span>Patterns <span style="font-size:13px;font-weight:400;color:var(--muted)">(table stakes)</span></h2>
+<div class="pat"><ul class="tight">
+  <li><strong>Goal-first.</strong> The flow opens by capturing a goal, and every later screen references it.</li>
+  <li><strong>One question per screen + honest persistent progress</strong> (“step N of M”), with sliders/cards over typing.</li>
+  <li><strong>Micro-commitments accumulate</strong> — each tap is a small sunk cost; the disabled-until-valid CTA guides without nagging.</li>
+  <li><strong>A manufactured “building your plan” screen</strong> sits one step before the paywall and uses the wait for social proof.</li>
+  <li><strong>A visual plan reveal</strong> (timeline / projection graph) precedes the paywall.</li>
+  <li><strong>The paywall is the immediate next step</strong>, framed as the plan’s delivery, with a trial timeline + “$0 due now.”</li>
+</ul></div>
+
+<h2><span class="num">6.</span>Anti-patterns <span style="font-size:13px;font-weight:400;color:var(--muted)">(avoid)</span></h2>
+<div class="anti"><ul class="tight">
+  <li><strong>Decorative questions.</strong> If the post-onboarding experience is identical for everyone, the quiz is just friction (Web, multiple teardowns). Only ask questions that change the plan, defaults, or paywall copy.</li>
+  <li><strong>Front-loading every field.</strong> 20+ questions with no payoff in sight bleeds users; spread heavy data collection out and deliver a sense of value first.</li>
+  <li><strong>Dishonest / surprise progress.</strong> A bar that jumps backward or a “you’re almost done” that isn’t destroys trust mid-flow.</li>
+  <li><strong>Fake or aggressive urgency.</strong> Countdown timers (e.g. Finch-style limited-time offers) can lift conversion but read as manipulative if the “deal” reappears every launch — use sparingly and keep it real.</li>
+  <li><strong>A token spinner instead of a build moment.</strong> A 300ms loader wastes the single best opportunity to make the plan feel earned.</li>
+  <li><strong>A paywall divorced from the quiz.</strong> A generic “Go Premium” wall that ignores the goal the user just entered throws away all the invested effort.</li>
+</ul></div>
+
+<h2><span class="num">7.</span>Unique angles <span style="font-size:13px;font-weight:400;color:var(--muted)">(the X100 details)</span></h2>
+<div class="uniq"><ul class="tight">
+  <li><strong>MindLlama’s itemized loader.</strong> Multiple <em>separately-labeled</em> progress bars (“analyzing data”, “personalizing goals”) with a mascot turn a wait into visible, custom-feeling computation — far past a single spinner.</li>
+  <li><strong>Impulse’s curiosity questions.</strong> “What do you want to learn about yourself?” (IQ, archetype, ADHD type) makes the questionnaire itself a value tease — each option previews a payoff the user now wants delivered.</li>
+  <li><strong>Spring Health’s clinical Skip.</strong> A 0–10 agreement slider <em>with an explicit Skip</em> respects the user on heavy items — rare in growth-optimized flows and a smart drop-off valve.</li>
+  <li><strong>Lose It’s goal-DATE projection.</strong> Promising to “project your goal completion date” converts an abstract goal into a concrete, dated outcome — the strongest single reason-to-subscribe asset in the set.</li>
+  <li><strong>Noom’s real-time weight curve</strong> (Web): the projection graph animates <em>while</em> the plan builds, fusing the build moment and the reveal into one anticipatory beat.</li>
+</ul></div>
+
+<h2><span class="num">8.</span>Findings <span style="font-size:13px;font-weight:400;color:var(--muted)">(how we got here)</span></h2>
+<p>Six Lazyweb searches (mobile) returned a dense, high-similarity cluster of Health &amp; Fitness and Education apps — the categories that have most ruthlessly optimized this flow. The strongest single artifact was BetterMe’s 38-step onboarding flow, which makes the abstract pattern concrete: the paywall is literally the last onboarding step, immediately after the plan-ready reveal. Loader and plan-reveal screens (MindLlama, Lose It, JustFit, Elevate, BetterMe) consistently pair a “building/creating your plan” message with social proof, confirming the wait is engineered, not incidental.</p>
+<p>Web research (RevenueCat’s Noom teardown, Airbridge, PaywallPro, Appcues, Adapty) converges on the same thesis from the growth side: <em>micro-commitments + personalization carryover + paywall timing</em> beat layout tweaks, and the onboarding+free-trial-paywall pairing is the top-performing configuration (~1.78% install-to-conversion cited). The Lazyweb A/B corpus then tells you what to test on the paywall itself — trial length, explicit annual pricing on the CTA, lifetime/annual anchoring, and feature-list clarity — all with “high” confidence but only directional, screenshot-diff backing.</p>
+<p class="callout"><strong>Corpus honesty:</strong> coverage of the questionnaire screens themselves is excellent. Coverage thins slightly on the exact <em>plan-ready→paywall</em> hand-off as a captured sequence (BetterMe is the cleanest full example; others are reconstructed from individual screens). A few of the embedded screens are single-angle matches (match 1/3) but were kept only when their visionDescription was an exact fit for the point being made.</p>
+
+<h2><span class="num">9.</span>Sources</h2>
+<p class="src-list"><strong>Lazyweb (screenshots cited inline above, [Lazyweb]):</strong> BetterMe (onboarding flow + plan-ready + name), Lose It (loader, goal-date projection, trial-timeline paywall), Impulse (questions, commitment, paywall), MindLlama (goal picker, itemized loader), Headspace (goals), MyFitnessPal (goals), JustFit (level slider, loader), Babbel (age, goals), Spring Health (0–10 slider), Codecademy Go (level cards), Finch (challenges, paywall), Elevate (intro, loader). A/B evidence via Lazyweb experiment corpus: Mimo, JustFit, Drops, Loona, AI-Arta, Quizlet, Apple Music, MyRadar, and 12 more (20 experiments total).</p>
+<ul class="src-list">
+  <li>[Web] RevenueCat — <a href="https://www.revenuecat.com/blog/growth/web-to-app-onboarding-funnel/">Inside Noom’s Web-to-App Onboarding Funnel: UX Teardown</a></li>
+  <li>[Web] Airbridge — <a href="https://www.airbridge.io/en/blog/5-steps-app-onboarding-before-the-paywall">App Onboarding Before Paywall: 5 Steps</a></li>
+  <li>[Web] PaywallPro (dev.to) — <a href="https://dev.to/paywallpro/complete-onboarding-breakdown-9-steps-from-first-screen-to-paywall-2j7">Complete Onboarding Breakdown: 9 Steps from First Screen to Paywall</a> · <a href="https://dev.to/paywallpro/subscription-onboarding-15-patterns-you-must-know-4n4f">Subscription Onboarding: 15 Patterns</a></li>
+  <li>[Web] Adapty — <a href="https://adapty.io/blog/how-to-fix-your-onboarding-flow/">7 Mobile App Onboarding Best Practices (2026)</a></li>
+  <li>[Web] Appcues — <a href="https://www.appcues.com/blog/in-app-onboarding">In-app onboarding: a step-by-step guide (2026)</a></li>
+  <li>[Web] UserGuiding — <a href="https://userguiding.com/blog/user-onboarding-statistics">100+ User Onboarding Statistics (2026)</a></li>
+  <li>[Web] Purchasely — <a href="https://www.purchasely.com/blog/ux-mistakes-mobile-apps-2026">Why Users Quit Your App: 10 UX Mistakes (2026)</a></li>
+  <li>[Web] UXCam — <a href="https://uxcam.com/blog/10-apps-with-great-user-onboarding/">12 Apps with Great User Onboarding (2026)</a></li>
+</ul>
+
+<p class="footnote">Generated by the Lazyweb <code>lazyweb-design-research</code> skill · 38-step flow reference + 25 embedded references (22 [Lazyweb], 3 [Web]) + 20 A/B experiments · Mobile · 2026-06-08. Every screenshot was selected after reading its Lazyweb <em>visionDescription</em>; captions are written from those descriptions and live flow step labels. Tip: add <code>.lazyweb/</code> to your <code>.gitignore</code>.</p>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Design Improvement — Inngest Marketing Hero</title>
+<style>
+  :root{
+    --ink:#13151a; --muted:#5b6472; --line:#e4e7ec; --soft:#f6f8fa;
+    --accent:#1f6feb; --accentbg:#eef4ff; --accentline:#cfe0ff;
+    --good:#0a7d3c; --goodbg:#edf8f1; --warnbg:#fff7e6; --warnline:#ffe1a6;
+    --star:#b8860b;
+  }
+  *{box-sizing:border-box}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    color:var(--ink); line-height:1.62; margin:0; background:#fbfcfd;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:900px; margin:0 auto; padding:48px 28px 96px;}
+  header.masthead{border-bottom:1px solid var(--line); padding-bottom:22px; margin-bottom:32px;}
+  .eyebrow{font-size:12px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); font-weight:600;}
+  h1{font-size:30px; line-height:1.2; margin:8px 0 6px; letter-spacing:-.01em;}
+  .sub{color:var(--muted); font-size:15px;}
+  .meta{font-size:13px; color:var(--muted); margin-top:14px;}
+  .meta code{background:var(--soft); padding:2px 6px; border-radius:5px; font-size:12px;}
+
+  h2{font-size:21px; margin:46px 0 14px; padding-bottom:8px; border-bottom:1px solid var(--line); letter-spacing:-.01em;}
+  h3{font-size:17px; margin:30px 0 6px;}
+  p{margin:10px 0;}
+
+  .tldr{background:var(--accentbg); border:1px solid var(--accentline); border-radius:12px; padding:18px 20px; margin:8px 0 4px;}
+  .tldr .label{font-size:12px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--accent); margin-bottom:4px;}
+  .tldr p{margin:4px 0 0; font-size:16px;}
+
+  figure{margin:14px 0 6px;}
+  img.shot{display:block; width:100%; height:auto; border-radius:12px; border:1px solid var(--line);
+    box-shadow:0 6px 22px rgba(20,30,55,.10);}
+  figcaption{font-size:13px; color:var(--muted); margin-top:8px; line-height:1.5;}
+  .src{display:inline-block; font-size:11px; font-weight:700; letter-spacing:.04em; padding:1px 7px; border-radius:999px; vertical-align:middle; margin-left:4px;}
+  .src.lw{background:#eef4ff; color:#1f5fd1; border:1px solid #cfe0ff;}
+  .src.web{background:#f0f0f3; color:#444; border:1px solid #dadde3;}
+
+  .idea{border:1px solid var(--line); border-radius:14px; padding:22px 24px; margin:22px 0; background:#fff;}
+  .idea.star{border-color:#f0dca0; box-shadow:0 4px 18px rgba(184,134,11,.08);}
+  .idea h3{margin-top:0; display:flex; align-items:baseline; gap:8px; flex-wrap:wrap;}
+  .chip{font-size:11px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; padding:2px 8px; border-radius:999px;}
+  .chip.high{background:#fbf3da; color:var(--star);}
+  .chip.med{background:#eef4ff; color:var(--accent);}
+  .chip.effort{background:var(--soft); color:var(--muted);}
+  .why{background:var(--soft); border-left:3px solid var(--accentline); padding:10px 14px; border-radius:0 8px 8px 0; margin:14px 0; font-size:14.5px;}
+  .why b{color:var(--ink);}
+
+  pre.ascii{background:#0e1117; color:#d7dce3; border-radius:10px; padding:16px 18px; overflow-x:auto;
+    font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace; font-size:12.5px; line-height:1.45; margin:14px 0 2px;}
+  .sketchlabel{font-size:12px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:var(--muted); margin-top:14px;}
+
+  ul.working{list-style:none; padding:0; margin:8px 0;}
+  ul.working li{background:var(--goodbg); border:1px solid #cdeed8; border-radius:10px; padding:12px 16px; margin:10px 0; font-size:14.5px;}
+  ul.working li b{color:var(--good);}
+
+  .callout-warn{background:var(--warnbg); border:1px solid var(--warnline); border-radius:10px; padding:14px 18px; font-size:14px; margin:14px 0;}
+
+  table{border-collapse:collapse; width:100%; margin:14px 0; font-size:13.5px;}
+  th,td{border:1px solid var(--line); padding:9px 12px; text-align:left; vertical-align:top;}
+  th{background:var(--soft); font-weight:600;}
+  td a{color:var(--accent); text-decoration:none;}
+  td a:hover{text-decoration:underline;}
+
+  .gallery{display:grid; grid-template-columns:repeat(2,1fr); gap:18px; margin:16px 0;}
+  .gallery figure{margin:0;}
+  .gallery img{border-radius:10px;}
+  @media(max-width:640px){.gallery{grid-template-columns:1fr;}}
+
+  .foot{margin-top:54px; padding-top:18px; border-top:1px solid var(--line); font-size:12.5px; color:var(--muted);}
+  a.inline{color:var(--accent); text-decoration:none;} a.inline:hover{text-decoration:underline;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="masthead">
+  <div class="eyebrow">Lazyweb · Design Improve</div>
+  <h1>Inngest — Marketing Landing Hero</h1>
+  <div class="sub">Above-the-fold hero for a durable-workflows / background-jobs platform for developers. Web / desktop, 1440×900.</div>
+  <div class="meta">
+    Current state captured from <code>inngest.com</code> · References sourced from the Lazyweb screenshot library and labeled
+    <span class="src lw">Lazyweb</span> / <span class="src web">Web</span>. Date: 2026-06-08.
+  </div>
+</header>
+
+<!-- ============================ TL;DR ============================ -->
+<section>
+  <div class="tldr">
+    <div class="label">TL;DR — the single biggest opportunity</div>
+    <p>The hero communicates the <em>idea</em> (“Make any code durable by default”) but shows nothing of the <em>product</em>.
+    The whole left-aligned column sits on an empty dark grid; the only thing a developer can actually evaluate — the code —
+    is buried far below the fold. <b>Pull a real code / trace visual into the hero’s empty right half.</b> Every strong
+    dev-tool hero in this space (Linear, GitHub Copilot, the GitHub Codespaces demo) lets you <em>see the thing working</em>
+    before you scroll. That is the highest-impact, lowest-risk change here.</p>
+  </div>
+</section>
+
+<!-- ============================ CURRENT STATE ============================ -->
+<section>
+  <h2>Current state</h2>
+  <figure>
+    <img class="shot" src="references/current.png" alt="Inngest marketing hero, current state">
+    <figcaption>
+      Inngest hero as captured (1440×900). Left-aligned headline <em>“Make <b>any</b> code durable by default”</em>,
+      a one-line value subhead, two CTAs (<em>Start building for free</em> filled gold + <em>Get a demo</em> outlined),
+      and a partial “Trusted in production at” logo bar (Replit, SoundCloud, Cohere, Tripadvisor, Resend…) appearing at
+      the very bottom edge. The right two-thirds of the fold is an empty black grid decorated with scattered green/gold
+      quarter-circle and triangle tiles. No product, code, or trace visual is shown above the fold. <span class="src web">Web — captured</span>
+    </figcaption>
+  </figure>
+</section>
+
+<!-- ============================ IMPROVEMENT IDEAS ============================ -->
+<section>
+  <h2>Improvement ideas</h2>
+  <p>Five concrete changes, ordered by impact-to-effort. Each is tied to a real reference whose
+  <em>visionDescription</em> was read before it was attached; captions describe what is actually in each screenshot.
+  References are inspiration, not templates — adapt the pattern, don’t clone the layout.</p>
+
+  <!-- IDEA 1 -->
+  <div class="idea star">
+    <h3>1. Put the product in the hero — fill the empty right half with a code + trace visual
+      <span class="chip high">★ highest impact</span><span class="chip effort">low–medium effort</span></h3>
+    <p>Right now the right two-thirds of the fold is decorative grid tiles. For a durability platform, the most persuasive
+    thing you have is the code — <code>step.run(...)</code> with automatic retries, and the trace that proves it recovered.
+    You already own this asset; it just lives 4–5 scrolls down. Lift a tightened version of the
+    <code>step.run</code> / <code>step.ai</code> / <code>step.sleep</code> snippet (or a short trace timeline) into the
+    hero’s right column so a developer can read what Inngest <em>does</em> before deciding whether to scroll.</p>
+
+    <figure>
+      <img class="shot" src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/sites/postgresml/postgresml_5040154ab15319d3b40f.png" alt="GitHub Codespaces hero with live editor demo">
+      <figcaption>
+        <b>GitHub Codespaces</b> — hero headline “Secure development made simple” with two CTAs (“Get started for free”,
+        “Contact Sales”) and a <em>live demo of the editor interface</em> — file explorer, code being edited, and a preview
+        pane rendering the result — sitting right in the fold. The headline sells the idea; the editor proves it.
+        <span class="src lw">Lazyweb</span> · <a class="inline" href="https://github.com/features/codespaces">github.com/features/codespaces</a>
+      </figcaption>
+    </figure>
+
+    <div class="why"><b>Why this works:</b> Developers buy proof, not adjectives. “Durable by default” is a claim;
+    a retrying <code>step.run</code> block beside it is evidence. Surfacing the code you already feature lower on the page
+    closes the gap between promise and demonstration without inventing any new asset — and it makes the dead right half of
+    the fold earn its space.</p>
+
+    <div class="sketchlabel">Sketch</div>
+    <pre class="ascii">┌──────────────────────────────────────────────────────────────┐
+│ INNGEST   Platform  Customers  Resources  Docs   [Sign up →]   │
+├──────────────────────────────────────────────────────────────┤
+│                                  ┌───────────────────────────┐ │
+│  Make any code durable           │ ● ● ●  transcribe.ts      │ │
+│  by default                      │  const x = await step.run(│ │
+│                                  │   'transcribe', async()=> │ │
+│  Workflows, agents, endpoints,   │     deepgram.transcribe() │ │
+│  background jobs — Inngest        │  )   ✔ retried · 1 run    │ │
+│  makes it unbreakable.           │  await step.sleep('1d')   │ │
+│                                  ├───────────────────────────┤ │
+│  [ Start building for free ]     │ trace ▸ transcribe ✔ 0.4s │ │
+│  [ Get a demo → ]                │       ▸ summarize  ↻✔ 1.2s│ │
+│                                  └───────────────────────────┘ │
+│  Trusted in production at  · replit · soundcloud · cohere …    │
+└──────────────────────────────────────────────────────────────┘</pre>
+  </div>
+
+  <!-- IDEA 2 -->
+  <div class="idea">
+    <h3>2. Show a real product screenshot, not decorative tiles
+      <span class="chip med">high impact</span><span class="chip effort">low effort</span></h3>
+    <p>If a full code demo is too much for v1, the lighter version of Idea&nbsp;1 is to drop a single high-fidelity
+    screenshot of the Inngest Cloud run view / trace timeline into the hero. The decorative quarter-circle tiles are
+    on-brand but say nothing; one real UI image does the work of the entire empty grid.</p>
+
+    <figure>
+      <img class="shot" src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/sites/linear/linear_c2efa1061639e8ab47f7.png" alt="Linear dark marketing hero with product UI screenshot">
+      <figcaption>
+        <b>Linear</b> — dark-themed marketing landing for a product-development system. The hero pairs the headline and
+        top nav with a <em>product UI screenshot</em> right in the fold, so the dark aesthetic carries real interface,
+        not empty space. Same dark palette Inngest already uses, with the fold doing more work.
+        <span class="src lw">Lazyweb</span> · <a class="inline" href="https://linear.app/">linear.app</a>
+      </figcaption>
+    </figure>
+
+    <div class="why"><b>Why this works:</b> Linear proves a dark, restrained hero doesn’t have to be empty — it can be
+    dark <em>and</em> show the product. Inngest’s grid-of-tiles treatment keeps the same mood but spends the fold on
+    decoration. Swapping tiles for one trace/run screenshot keeps the brand and adds substance. Adapt, don’t copy: Inngest’s
+    differentiator is the <em>run/trace</em> view (recovery, replay), so feature that surface rather than a generic dashboard.</p>
+
+    <div class="sketchlabel">Sketch</div>
+    <pre class="ascii">┌──────────────────────────────────────────────────────────────┐
+│  Make any code durable by default                              │
+│  Workflows, agents, endpoints, background jobs…                │
+│  [ Start building for free ]   [ Get a demo → ]                │
+│  ┌──────────────────────────────────────────────────────────┐ │
+│  │  Inngest Cloud · Runs                                     │ │
+│  │  ▸ process-video   ✔ completed   3 steps   1.8s          │ │
+│  │    ├ transcribe    ✔            ├ summarize ↻✔           │ │
+│  │    └ notify        ✔            [ Replay ] [ Cancel ]     │ │
+│  └──────────────────────────────────────────────────────────┘ │
+└──────────────────────────────────────────────────────────────┘</pre>
+  </div>
+
+  <!-- IDEA 3 -->
+  <div class="idea">
+    <h3>3. Make one CTA clearly primary and add a micro-trust line
+      <span class="chip med">medium impact</span><span class="chip effort">very low effort</span></h3>
+    <p>The two CTAs (“Start building for free”, “Get a demo →”) are similar in weight and sit side by side with no
+    supporting context. Commit to one primary action: keep <em>Start building for free</em> as the solid button and demote
+    <em>Get a demo</em> to a quieter secondary (ghost/text). Add a one-line reassurance under the buttons —
+    e.g. <em>“No credit card · Free tier · Self-host or cloud”</em> — to remove the friction a niche developer audience
+    weighs before clicking.</p>
+
+    <figure>
+      <img class="shot" src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/sites/github/github_2d2e67f45961d30e5cbd.png" alt="GitHub Copilot marketing hero with headline, product video and CTAs">
+      <figcaption>
+        <b>GitHub Copilot</b> — marketing hero with a headline, a product video, and primary CTAs to “start a free trial”
+        vs. “view documentation,” with trusted-by logos directly below. The action hierarchy is unambiguous: one obvious
+        primary path, one quiet secondary. <span class="src lw">Lazyweb</span> ·
+        <a class="inline" href="https://github.com/features/copilot/copilot-business">github.com/features/copilot</a>
+      </figcaption>
+    </figure>
+
+    <div class="why"><b>Why this works:</b> Two equally-weighted buttons split attention and slow the decision. Copilot’s
+    hero pairs a single dominant CTA with a clearly secondary one and props it with social proof — the same trusted-by
+    logos Inngest already has (but currently strands at the very bottom edge of the fold). A reassurance microline is the
+    cheapest conversion lever on the page: zero layout change, removes the “will this cost me?” hesitation.</p>
+
+    <div class="sketchlabel">Sketch</div>
+    <pre class="ascii">  before →   [ Start building for free ]  [ Get a demo → ]
+                  (both look equally clickable, no context)
+
+  after  →   ┌───────────────────────────┐
+             │  Start building for free  │   Get a demo →   (ghost)
+             └───────────────────────────┘
+             No credit card · Free tier · Self-host or cloud</pre>
+  </div>
+
+  <!-- IDEA 4 -->
+  <div class="idea">
+    <h3>4. Promote the trusted-by logos and the “6.9K stars” into the fold
+      <span class="chip med">medium impact</span><span class="chip effort">very low effort</span></h3>
+    <p>Inngest already has two strong, niche-credible trust signals — a serious logo wall (Replit, SoundCloud, Cohere,
+    Tripadvisor, Resend, ElevenLabs…) and a 6.9K-star open-source badge in the nav. But the logo bar only peeks in at the
+    bottom edge of the fold, and the GitHub stars are visually buried in the header. Lift the logo strip a few hundred
+    pixels so a full row is visible without scrolling, and give the star count more prominence near the CTAs.</p>
+
+    <figure>
+      <img class="shot" src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/sites/github/github_2d2e67f45961d30e5cbd.png" alt="GitHub Copilot hero with trusted-by logos below CTAs">
+      <figcaption>
+        <b>GitHub Copilot</b> (same reference, different lesson) — its vision description explicitly notes trusted-by logos
+        placed immediately below the hero CTAs, before the feature cards. Social proof is treated as part of the fold, not
+        an afterthought. <span class="src lw">Lazyweb</span> ·
+        <a class="inline" href="https://github.com/features/copilot/copilot-business">github.com/features/copilot</a>
+      </figcaption>
+    </figure>
+
+    <div class="why"><b>Why this works:</b> For a niche, technical buyer, “who already trusts this in production” and
+    “is this a real, healthy OSS project” are the two fastest credibility checks. Both signals exist on the page but are
+    positioned where they do the least work. Raising them into the fold is pure repositioning — no new content needed.</p>
+
+    <div class="sketchlabel">Sketch</div>
+    <pre class="ascii">┌──────────────────────────────────────────────────────────────┐
+│  … CTAs …                                                      │
+│                                                                │
+│  ★ 6.9K on GitHub        Trusted in production at              │
+│  replit  soundcloud  cohere  tripadvisor  resend  elevenlabs   │
+│  └────────────── full row visible above the fold ───────────┘  │
+└──────────────────────────────────────────────────────────────┘</pre>
+  </div>
+
+  <!-- IDEA 5 -->
+  <div class="idea">
+    <h3>5. Sharpen the headline’s payoff for a skim-reading developer
+      <span class="chip med">lower impact</span><span class="chip effort">very low effort · copy</span></h3>
+    <p>“Make any code durable by default” is strong and ownable — keep its spirit. The gap is that the concrete payoff
+    (retries, recovery, no infra) lives only in the subhead. Consider a benefit-led support line directly under the
+    headline so a 3-second skim lands the value, e.g. <em>“Automatic retries, recovery, and flow control — no queues,
+    no workers, no new infra.”</em> This complements (doesn’t replace) the existing copy.</p>
+
+    <figure>
+      <img class="shot" src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/sites/temporal/temporal_485c32182dbffbddcd61.png" alt="Temporal durable execution landing with prominent CTA and onboarding steps">
+      <figcaption>
+        <b>Temporal</b> (closest conceptual competitor — durable execution) — its landing explains durable execution with
+        a prominent “Dive into Temporal” CTA and a three-step Develop → Deploy → Learn-more flow. Note: this is Temporal’s
+        <em>“how it works”</em> page, not its homepage hero, so treat it as a positioning reference rather than a hero
+        layout to copy. <span class="src lw">Lazyweb</span> · <a class="inline" href="https://temporal.io/how-it-works">temporal.io/how-it-works</a>
+      </figcaption>
+    </figure>
+
+    <div class="why"><b>Why this works:</b> Inngest and Temporal compete on the same “durable execution” idea, but Temporal
+    leans hard on naming the concept and the next step. Inngest’s headline is punchier; the opportunity is to make sure the
+    <em>concrete</em> benefit (what you don’t have to build) is readable at a glance, not only in the subhead. This is a
+    copy tweak, lowest risk of all — validate against your own analytics before committing.</p>
+
+    <div class="sketchlabel">Sketch</div>
+    <pre class="ascii">  Make any code durable by default
+  Automatic retries, recovery & flow control — no queues, no workers.   ← new skim line
+  Workflows, agents, endpoints, background jobs … makes it unbreakable. ← existing subhead</pre>
+  </div>
+</section>
+
+<!-- ============================ WHAT'S WORKING ============================ -->
+<section>
+  <h2>What’s working — don’t change these</h2>
+  <ul class="working">
+    <li><b>The headline is genuinely strong.</b> “Make <em>any</em> code durable by default” is short, ownable, and the
+    bolded <em>any</em> does real work. Don’t water it down — only add a supporting skim line beneath it (Idea&nbsp;5).</li>
+    <li><b>The dark, restrained, grid aesthetic fits the audience.</b> It reads as a serious infra tool and matches peers
+    like Linear and Harness. The problem isn’t the style — it’s that the fold is empty, not that it’s dark.</li>
+    <li><b>The trust assets are real and on-brand.</b> A credible production logo wall (Replit, SoundCloud, Cohere,
+    ElevenLabs…) plus a 6.9K-star OSS badge. They just need to move up (Idea&nbsp;4), not change.</li>
+    <li><b>Dual “build vs. demo” intent is the right instinct</b> for a tool serving both self-serve devs and enterprise
+    buyers. Keep both CTAs — just give them a clear primary/secondary hierarchy (Idea&nbsp;3).</li>
+  </ul>
+</section>
+
+<!-- ============================ EVIDENCE NOTES ============================ -->
+<section>
+  <h2>A/B-test evidence (honest note)</h2>
+  <div class="callout-warn">
+    I queried Lazyweb’s A/B-test research agent for hero / signup-CTA experiments. The company-scoped query returned
+    <b>0 matching experiments</b> for a B2B dev-tool marketing hero, and a broadened landing-page/CTA query returned 24
+    experiments — but all were <b>mobile-app consumer paywall/pricing tests</b> (e.g. trial-length and price-card changes
+    in fitness, VPN, and social apps). None map to a desktop developer-tool hero, so attaching them would be a
+    context-mismatch. <b>The recommendations above therefore rest on the visual product references, not on measured lift.</b>
+    Validate each change against your own funnel analytics before rolling it out.
+  </div>
+</section>
+
+<!-- ============================ ALL REFERENCES ============================ -->
+<section>
+  <h2>All references</h2>
+  <table>
+    <thead>
+      <tr><th>Company (image source)</th><th>Source</th><th>What it shows (from visionDescription)</th><th>Used for</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><b>GitHub Codespaces</b><br><a href="https://github.com/features/codespaces">github.com/features/codespaces</a></td>
+        <td><span class="src lw">Lazyweb</span></td>
+        <td>Headline “Secure development made simple” + dual CTA, with a live editor demo (file explorer, code, preview pane) in the fold.</td>
+        <td>Idea 1 — code/product demo in hero</td>
+      </tr>
+      <tr>
+        <td><b>Linear</b><br><a href="https://linear.app/">linear.app</a></td>
+        <td><span class="src lw">Lazyweb</span></td>
+        <td>Dark-themed marketing landing; hero pairs headline + nav with a product UI screenshot in the fold.</td>
+        <td>Idea 2 — product screenshot on dark hero</td>
+      </tr>
+      <tr>
+        <td><b>GitHub Copilot</b><br><a href="https://github.com/features/copilot/copilot-business">github.com/features/copilot</a></td>
+        <td><span class="src lw">Lazyweb</span></td>
+        <td>Hero with headline, product video, primary CTAs (free trial vs. docs), and trusted-by logos directly below.</td>
+        <td>Ideas 3 &amp; 4 — CTA hierarchy + social proof in fold</td>
+      </tr>
+      <tr>
+        <td><b>Temporal</b><br><a href="https://temporal.io/how-it-works">temporal.io/how-it-works</a></td>
+        <td><span class="src lw">Lazyweb</span></td>
+        <td>Durable-execution explainer with a prominent CTA and a three-step Develop → Deploy → Learn-more flow. (How-it-works page, not the homepage hero.)</td>
+        <td>Idea 5 — positioning / headline payoff</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p class="sub" style="margin-top:18px">Reference thumbnails (embedded via Lazyweb storage URLs):</p>
+  <div class="gallery">
+    <figure>
+      <img class="shot" src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/sites/postgresml/postgresml_5040154ab15319d3b40f.png" alt="GitHub Codespaces hero">
+      <figcaption>GitHub Codespaces — live editor demo in hero <span class="src lw">Lazyweb</span></figcaption>
+    </figure>
+    <figure>
+      <img class="shot" src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/sites/linear/linear_c2efa1061639e8ab47f7.png" alt="Linear hero">
+      <figcaption>Linear — dark hero with product UI screenshot <span class="src lw">Lazyweb</span></figcaption>
+    </figure>
+    <figure>
+      <img class="shot" src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/sites/github/github_2d2e67f45961d30e5cbd.png" alt="GitHub Copilot hero">
+      <figcaption>GitHub Copilot — headline + video + CTAs + logos <span class="src lw">Lazyweb</span></figcaption>
+    </figure>
+    <figure>
+      <img class="shot" src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/sites/temporal/temporal_485c32182dbffbddcd61.png" alt="Temporal how it works">
+      <figcaption>Temporal — durable-execution explainer + CTA <span class="src lw">Lazyweb</span></figcaption>
+    </figure>
+  </div>
+
+  <p class="sub" style="margin-top:14px"><b>Considered but not attached (honesty notes):</b>
+  <em>Trigger.dev</em> (Background Jobs — the closest category competitor) and <em>Supermaven</em> surfaced in search but had
+  empty visionDescriptions, so they are mentioned in text only — no image. <em>Appwrite</em> and <em>CockroachLabs</em>
+  results were a docs page and a mis-tagged jobs-listing screenshot respectively, so they were dropped to avoid a
+  mismatched reference. A <em>Brightcove developer / Zencoder</em> result showed a strong dark hero with code-editor
+  background visuals and reinforced Idea&nbsp;1, but the two GitHub examples illustrate the “code in the fold” idea more
+  cleanly, so it was held back rather than padding the gallery.</p>
+</section>
+
+<div class="foot">
+  Generated by the Lazyweb <code>design-improve</code> skill. References embedded directly from the Lazyweb screenshot
+  library (storage-backed URLs); current-state screenshot saved locally at <code>references/current.png</code>.
+  Captions are written from each result’s <em>visionDescription</em> — not invented. References are inspiration, not
+  templates: adapt the pattern to Inngest’s context and validate conversion changes against your own analytics.
+</div>
+
+</div>
+</body>
+</html>

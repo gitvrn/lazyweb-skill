@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Paywall Optimization — Intermittent-Fasting App (Hard Post-Onboarding Paywall)</title>
+<style>
+  :root{
+    --bg:#0c0f14; --panel:#141923; --panel2:#1b212e; --line:#262e3d;
+    --ink:#e9edf4; --muted:#9aa6b8; --faint:#6b7686;
+    --accent:#5b8cff; --accent2:#27d0a8; --warn:#ffcc66; --danger:#ff7a7a;
+    --pill:#222a39; --good:#27d0a8;
+    --shadow:0 10px 30px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:linear-gradient(180deg,#0a0d12,#0c0f14 240px);
+    color:var(--ink);
+    font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1120px;margin:0 auto;padding:40px 24px 96px}
+  header.hero{
+    border:1px solid var(--line);border-radius:18px;padding:28px 30px;
+    background:radial-gradient(1200px 320px at 12% -10%,rgba(91,140,255,.18),transparent 60%),
+               radial-gradient(900px 300px at 100% 0%,rgba(39,208,168,.12),transparent 55%),
+               var(--panel);
+    box-shadow:var(--shadow);
+  }
+  .kicker{font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent2);font-weight:700}
+  h1{font-size:30px;line-height:1.18;margin:10px 0 6px;letter-spacing:-.01em}
+  .sub{color:var(--muted);max-width:850px}
+  .meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+  .tag{background:var(--pill);border:1px solid var(--line);color:var(--ink);
+       border-radius:999px;padding:5px 12px;font-size:12.5px;font-weight:600}
+  .tag b{color:var(--accent2);font-weight:700}
+  h2{font-size:20px;margin:42px 0 6px;letter-spacing:-.01em;display:flex;align-items:center;gap:10px}
+  h2 .n{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:8px;
+        background:var(--accent);color:#06101f;font-size:13px;font-weight:800}
+  .lead{color:var(--muted);margin:0 0 18px;max-width:900px}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px 24px;box-shadow:var(--shadow)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  @media(max-width:860px){.grid2,.grid3{grid-template-columns:1fr}}
+  .card{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+  .card h4{margin:0 0 8px;font-size:14.5px}
+  .card ul{margin:6px 0 0;padding-left:18px;color:var(--muted)}
+  .card li{margin:4px 0}
+  .label{font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);font-weight:700;margin-bottom:6px}
+  .src-lw{color:#0a1220;background:var(--accent2)}
+  .src-web{color:#0a1220;background:var(--warn)}
+  .src-tgt{color:#0a1220;background:var(--accent)}
+  .srcpill{display:inline-block;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:800;letter-spacing:.04em}
+
+  /* reference cards */
+  .refgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  @media(max-width:980px){.refgrid{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:620px){.refgrid{grid-template-columns:1fr}}
+  .ref{background:var(--panel2);border:1px solid var(--line);border-radius:12px;overflow:hidden;display:flex;flex-direction:column}
+  .ref .imgwrap{background:#05070b;display:flex;align-items:center;justify-content:center;height:300px;overflow:hidden;border-bottom:1px solid var(--line)}
+  .ref img{width:100%;height:100%;object-fit:contain;display:block}
+  .ref .body{padding:13px 15px 16px}
+  .ref .co{font-weight:700;font-size:14.5px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .ref .ctx{color:var(--accent2);font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin:3px 0 8px}
+  .ref .why{color:var(--muted);font-size:13px}
+  .ref .cap{color:var(--faint);font-size:11.5px;margin-top:8px;border-top:1px dashed var(--line);padding-top:8px}
+  .sim{font-size:11px;color:var(--faint);font-weight:600}
+
+  /* hypothesis cards */
+  .hyp{border:1px solid var(--line);border-radius:14px;padding:0;overflow:hidden;background:var(--panel);margin-bottom:20px;box-shadow:var(--shadow)}
+  .hyp .top{padding:18px 22px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,rgba(91,140,255,.10),transparent)}
+  .hyp.h2t .top{background:linear-gradient(180deg,rgba(39,208,168,.10),transparent)}
+  .hyp.h3t .top{background:linear-gradient(180deg,rgba(255,204,102,.10),transparent)}
+  .hyp.h4t .top{background:linear-gradient(180deg,rgba(255,122,122,.09),transparent)}
+  .hyp .htitle{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .hyp .badge{font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#06101f;background:var(--accent);border-radius:7px;padding:4px 10px}
+  .hyp.h2t .badge{background:var(--accent2)}
+  .hyp.h3t .badge{background:var(--warn)}
+  .hyp.h4t .badge{background:var(--danger)}
+  .hyp h3{margin:0;font-size:18px;letter-spacing:-.01em}
+  .hyp .sentence{font-size:15.5px;margin:12px 0 0;color:var(--ink)}
+  .hyp .sentence b{color:#fff}
+  .hyp .grid{display:grid;grid-template-columns:1.3fr 1fr;gap:0}
+  @media(max-width:820px){.hyp .grid{grid-template-columns:1fr}}
+  .hyp .col{padding:18px 22px}
+  .hyp .col+.col{border-left:1px solid var(--line)}
+  @media(max-width:820px){.hyp .col+.col{border-left:0;border-top:1px solid var(--line)}}
+  .kv{margin:0 0 14px}
+  .kv .k{font-size:11.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--faint);font-weight:700;margin-bottom:3px}
+  .kv .v{color:var(--muted)}
+  .kv .v b{color:var(--ink)}
+  .metric{display:inline-block;background:var(--pill);border:1px solid var(--line);border-radius:8px;padding:6px 12px;font-weight:700;color:var(--accent2);font-size:13.5px}
+  .ev{list-style:none;margin:0;padding:0}
+  .ev li{padding:9px 0;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
+  .ev li:first-child{border-top:0}
+  .ev .who{color:var(--ink);font-weight:700}
+  .ev .exp{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10.5px;color:var(--faint)}
+  .risk{background:rgba(255,122,122,.07);border:1px solid rgba(255,122,122,.28);border-radius:10px;padding:12px 14px;color:#ffc2c2;font-size:13px}
+  .risk b{color:#ffd9d9}
+
+  table.prio{width:100%;border-collapse:collapse;font-size:13.5px;overflow:hidden;border-radius:12px}
+  table.prio th,table.prio td{padding:12px 14px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+  table.prio thead th{background:var(--panel2);color:var(--muted);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase}
+  table.prio tbody tr:hover{background:rgba(91,140,255,.05)}
+  .pill-s{font-weight:800;border-radius:6px;padding:2px 8px;font-size:11.5px}
+  .s-hi{background:rgba(39,208,168,.18);color:var(--good)}
+  .s-md{background:rgba(255,204,102,.16);color:var(--warn)}
+  .s-lo{background:rgba(255,122,122,.16);color:var(--danger)}
+  .rank{font-weight:800;color:var(--accent)}
+  .note{color:var(--faint);font-size:12.5px;margin-top:10px}
+  .callout{border-left:3px solid var(--accent2);background:var(--panel2);border-radius:0 10px 10px 0;padding:14px 18px;color:var(--muted);margin:14px 0}
+  .callout b{color:var(--ink)}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin:12px 0 0;color:var(--muted);font-size:12.5px}
+  footer{margin-top:54px;border-top:1px solid var(--line);padding-top:20px;color:var(--faint);font-size:12.5px}
+  a{color:var(--accent)}
+  .divhint{font-size:12.5px;color:var(--faint)}
+  code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;background:var(--pill);border:1px solid var(--line);padding:1px 6px;border-radius:5px;color:#cdd6e5}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <div class="kicker">Lazyweb · Paywall Optimization</div>
+    <h1>Hard post-onboarding paywall — niche intermittent-fasting app</h1>
+    <p class="sub">Evidence-backed redesign hypotheses to lift <b>paid conversion</b> and <b>annual-plan share</b> on a full-screen mobile paywall (annual defaulted, 7-day free trial, benefits list + single CTA, cold-ish first session). Grounded in Lazyweb paywall references and PRO A/B experiment evidence.</p>
+    <div class="meta">
+      <span class="tag">Platform: <b>Mobile (iOS-style)</b></span>
+      <span class="tag">Category: <b>Health &amp; Fitness</b></span>
+      <span class="tag">Popularity tier: <b>Niche</b></span>
+      <span class="tag">User state: <b>Post-onboarding · cold first session</b></span>
+      <span class="tag">Goals: <b>Paid conversion + annual share</b></span>
+      <span class="tag">Date: <b>2026-06-08</b></span>
+    </div>
+    <div class="legend">
+      <span><span class="srcpill src-lw">LAZYWEB</span> screenshot from the Lazyweb library</span>
+      <span><span class="srcpill src-web">WEB</span> web research capture</span>
+      <span><span class="srcpill src-tgt">TARGET</span> the product under review</span>
+    </div>
+  </header>
+
+  <!-- ===================== TARGET READ ===================== -->
+  <h2><span class="n">1</span> Target paywall read</h2>
+  <p class="lead">No target screenshot was provided. This read is reconstructed from the supplied brief, then validated against the closest analog in the Lazyweb library — <b>Zero</b>, an intermittent-fasting app whose live paywall matches the described structure almost exactly (full-screen, 7-day trial then yearly, single CTA, "more billing options" link, top close affordance).</p>
+
+  <div class="grid2">
+    <div class="panel">
+      <div class="label">Components present</div>
+      <ul style="margin:0;padding-left:18px;color:var(--muted)">
+        <li>Full-screen modal, top-<b>left</b> close (X) affordance</li>
+        <li>Hero / value headline</li>
+        <li>Vertical <b>benefits list</b></li>
+        <li>Single pricing block — <b>annual pre-selected</b>, 7-day free trial</li>
+        <li><b>One</b> primary CTA (e.g. "Start Free Trial")</li>
+        <li>Legal / restore-purchase footer</li>
+      </ul>
+      <div class="label" style="margin-top:16px">Likely missing</div>
+      <ul style="margin:0;padding-left:18px;color:var(--muted)">
+        <li>Visible <b>annual-vs-monthly comparison</b> (monthly is hidden behind "more options")</li>
+        <li><b>Trial-mechanics timeline</b> ("no charge today" / day-5 reminder)</li>
+        <li><b>Social proof</b> / credibility (rating, user count, testimonial)</li>
+        <li>Per-day or per-month <b>price reframe</b> on the annual plan</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <div class="label">Layout, offer &amp; state</div>
+      <div class="kv"><div class="k">Layout pattern</div><div class="v">Full-screen, single-column benefit stack with one defaulted plan + single CTA (not a comparison grid or checkout step).</div></div>
+      <div class="kv"><div class="k">Offer</div><div class="v"><b>Single tier</b> · 7-day free trial → annual recurring · annual emphasized, monthly de-emphasized.</div></div>
+      <div class="kv"><div class="k">User state</div><div class="v"><b>Post-onboarding, cold-ish first session.</b> User has invested onboarding effort but has near-zero product trust and no first value moment yet.</div></div>
+      <div class="kv"><div class="k">Strategic moves already used</div><div class="v">Trial framing; annual default (a soft anchor). <b>Not</b> used: explicit anchoring vs monthly, urgency, social proof, risk-reversal framing, locked-feature framing.</div></div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <b>Current friction (the conversion thesis).</b> On a cold first session a niche fasting app has three live frictions: (1) <b>trust</b> — "is this app legit and will it work for me?"; (2) <b>trial anxiety</b> — "will I get charged today / surprise-billed?"; (3) <b>price legibility</b> — the annual plan is defaulted but its value vs monthly and its per-day cost are invisible, so "annual" reads as "expensive" rather than "best deal." The hypotheses below each attack one named friction with a distinct mechanism.
+  </div>
+
+  <!-- ===================== EVIDENCE SUMMARY ===================== -->
+  <h2><span class="n">2</span> Evidence summary</h2>
+  <p class="lead">Five evidence angles were run against Lazyweb. The PRO A/B Test Agent is active (<code>lazyweb_ab_test_research</code> returned <code>ok:true</code>, 20 experiments). Treat all experiment learnings as <b>directional hypotheses</b>, not measured lift — the dataset is a screenshot-diff evidence set, not a statistical readout (Lazyweb's own caveat).</p>
+
+  <div class="grid3">
+    <div class="card">
+      <div class="label">A/B experiment evidence <span class="srcpill src-lw" style="margin-left:6px">LAZYWEB · PRO</span></div>
+      <h4>20 experiments returned</h4>
+      <ul>
+        <li>Directly relevant fitness/trial/annual cases: <b>mimo, justfit, dawn, gentler, apple-fitness, drops, lockwidget, instacart, reddit, apple-music, loona</b></li>
+        <li>Every recommendation carries a <b>target metric + guardrail metric</b> and confidence:&nbsp;high</li>
+        <li>Mode: <code>conservative_default</code> — do not over-index on uncommon learnings</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="label">Visual references <span class="srcpill src-lw" style="margin-left:6px">LAZYWEB</span></div>
+      <h4>4 searches · 60+ screens scanned</h4>
+      <ul>
+        <li>Fitness paywalls: zero, gentler, rootd, betterme, myfitnesspal, peloton, headspace</li>
+        <li>Plan selectors: zero, mimo, speak, grammarly, blinkist, nyt</li>
+        <li>Trial timelines: betterme, rays, lose-it, quizlet, mimo, facetune</li>
+        <li>Social proof: i-am-sober, breathwrk, mindllama, genie, zero</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="label">Similarity + flows <span class="srcpill src-lw" style="margin-left:6px">LAZYWEB</span></div>
+      <h4>Closest analog: Zero (fasting)</h4>
+      <ul>
+        <li><code>find_similar</code> on Zero's paywall returned a tight cluster of 9 Zero paywall variants (sim 0.73–0.99) — the nearest real-world match to this brief.</li>
+        <li><code>get_flows</code> (onboarding→paywall) returned <b>0 ordered flows</b> for this query — so sequencing claims here lean on the post-onboarding convention, not a Lazyweb-captured journey.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ===================== REFERENCE GALLERY ===================== -->
+  <h2><span class="n">3</span> Reference gallery</h2>
+  <p class="lead">The load-bearing Lazyweb screenshots behind the hypotheses. Captions are written from each screenshot's <em>visionDescription</em>; nothing is invented. A few tightly-matched references are shown rather than a long loose list.</p>
+
+  <div class="refgrid">
+
+    <div class="ref">
+      <div class="imgwrap"><img loading="lazy" alt="Zero fasting app — more billing options, annual most popular" src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/health116_zero/compare/figma/IMG_1776.png"></div>
+      <div class="body">
+        <div class="co">Zero <span class="srcpill src-lw">LAZYWEB</span></div>
+        <div class="ctx">Fasting · annual selector · sim 0.67</div>
+        <div class="why">The closest analog in the corpus and the spine of Hypothesis 2: when the plan picker is shown, annual $69.99 is flagged <b>most popular</b> with a <b>per-month savings</b> line beside the 7-day trial.</div>
+        <div class="cap">Vision: "showing more billing options with selectable annual and monthly plans, highlighting a most popular annual $69.99 option with a 7-day free trial and per-month savings."</div>
+      </div>
+    </div>
+
+    <div class="ref">
+      <div class="imgwrap"><img loading="lazy" alt="Zero fasting paywall, 7-day trial then yearly, single CTA" src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/health116_zero/lazyscreenshots/2023_12_16_15-35-03_FED14B69.png"></div>
+      <div class="body">
+        <div class="co">Zero <span class="srcpill src-lw">LAZYWEB</span></div>
+        <div class="ctx">Fasting · benefit list + single CTA · sim 0.75</div>
+        <div class="why">Mirrors the target's default state almost 1:1 (validates the "Target read"): benefits + "7-day free trial then yearly", a single "Try Free &amp; Subscribe" CTA, a "More billing options" link, and a close button.</div>
+        <div class="cap">Vision: "highlighting premium benefits like personalized stats, expert tips, and custom plans … 7-day free trial then yearly cost, a primary 'Try Free &amp; Subscribe' CTA, a 'More billing options' link, and a close button."</div>
+      </div>
+    </div>
+
+    <div class="ref">
+      <div class="imgwrap"><img loading="lazy" alt="BetterMe 7-day trial timeline" src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/health7_betterme/compare/2024-08-04-00-18-28-.png"></div>
+      <div class="body">
+        <div class="co">BetterMe <span class="srcpill src-lw">LAZYWEB</span></div>
+        <div class="ctx">Health &amp; Fitness · trial timeline · sim 0.74</div>
+        <div class="why">Backs Hypothesis 1: a today → day-5 reminder → day-7 charge timeline with cancel-anytime, used by a fitness app at the same post-onboarding moment.</div>
+        <div class="cap">Vision: "explaining how a 7-day free trial works with a timeline (today unlock premium, day 5 reminder notification, day 7 subscription begins) … cancel-anytime messaging."</div>
+      </div>
+    </div>
+
+    <div class="ref">
+      <div class="imgwrap"><img loading="lazy" alt="Rays paywall trial timeline plus annual monthly choice, no payment due now" src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/64z_rays/compare/!onboarding-flow_step-10/2025_05_18_17-01-08_504F1D94.png"></div>
+      <div class="body">
+        <div class="co">Rays <span class="srcpill src-lw">LAZYWEB</span></div>
+        <div class="ctx">Trial timeline + plan choice · sim 0.70</div>
+        <div class="why">Shows H1 and H2 combined on one screen: trial timeline + "no payment due now" reassurance <em>and</em> a discounted yearly vs monthly choice — proof the two mechanisms coexist.</div>
+        <div class="cap">Vision: "explaining how a 7-day free trial works with a timeline … choose between discounted yearly plan or monthly pricing, see 'no payment due now,' and tap a primary CTA."</div>
+      </div>
+    </div>
+
+    <div class="ref">
+      <div class="imgwrap"><img loading="lazy" alt="Grammarly free vs premium comparison, continue with annual plan" src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/uploaded_grammarly/compare/2026-01-28/1771006567163_t__-_835.PNG"></div>
+      <div class="body">
+        <div class="co">Grammarly <span class="srcpill src-lw">LAZYWEB</span></div>
+        <div class="ctx">Free-vs-Premium grid · annual CTA · sim 0.64</div>
+        <div class="why">Backs H2's annual-share move: a Free-vs-Premium checklist with billing options where the primary CTA is explicitly "<b>Continue with Annual Plan</b>" — the default is named, not just pre-ticked.</div>
+        <div class="cap">Vision: "Free vs Premium feature comparison checklist … choose a billing option (annual, quarterly, monthly) … proceed via a 'Continue with Annual Plan' CTA."</div>
+      </div>
+    </div>
+
+    <div class="ref">
+      <div class="imgwrap"><img loading="lazy" alt="Washington Post paywall monthly yearly toggle best value" src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/mag9_wash-post/compare/2024-05-19-22-04-43-.png"></div>
+      <div class="body">
+        <div class="co">Washington Post <span class="srcpill src-lw">LAZYWEB</span></div>
+        <div class="ctx">Monthly/yearly toggle · best value · sim 0.70</div>
+        <div class="why">Reinforces H2: a monthly↔yearly toggle that highlights "best value" with introductory annual pricing and the renewal rate shown inline — the legibility pattern the target lacks.</div>
+        <div class="cap">Vision: "a monthly vs yearly toggle highlighting 'best value' … prominent CTA showing introductory annual pricing and renewal rate."</div>
+      </div>
+    </div>
+
+    <div class="ref">
+      <div class="imgwrap"><img loading="lazy" alt="Rootd 7-day trial then annual benefits checklist single CTA" src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/health142_rootd/compare/2024-09-07-22-31-43-.png"></div>
+      <div class="body">
+        <div class="co">Rootd <span class="srcpill src-lw">LAZYWEB</span></div>
+        <div class="ctx">Health &amp; Fitness · benefit checklist · sim 0.75</div>
+        <div class="why">Backs H3: a tight, checkmarked, outcome-named benefit list ("unlock all content, unlimited …, daily affirmations") above a single 7-day-trial CTA — a model for productized fasting benefits.</div>
+        <div class="cap">Vision: "7-day free trial then annual pricing, with a checklist of premium benefits like unlocking all content, unlimited breathing/visualizations, and daily affirmations … a primary CTA."</div>
+      </div>
+    </div>
+
+    <div class="ref">
+      <div class="imgwrap"><img loading="lazy" alt="i am sober plus paywall community count rating testimonial" src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/uploaded_i_am_sober/onboarding/compare/2026-05-31/1780210827843_17_18_Onboarding_onboarding-paywall.png"></div>
+      <div class="body">
+        <div class="co">I Am Sober <span class="srcpill src-lw">LAZYWEB</span></div>
+        <div class="ctx">Habit app · social proof · onboarding paywall</div>
+        <div class="why">Backs H4: a post-onboarding habit-app paywall that leads with community count + a 4.9 rating + a user testimonial — the trust mechanism for a niche, low-brand app.</div>
+        <div class="cap">Vision: "promoting a 'Plus' plan with social proof (community count, 4.9 rating, user testimonial) and trial pricing details."</div>
+      </div>
+    </div>
+
+    <div class="ref">
+      <div class="imgwrap"><img loading="lazy" alt="Breathwrk last chance annual discount social proof" src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/uploaded_breathwrk/compare/2026-01-28/1770998945001_t__-_164.PNG"></div>
+      <div class="body">
+        <div class="co">Breathwrk <span class="srcpill src-lw">LAZYWEB</span></div>
+        <div class="ctx">Health &amp; Fitness · social proof + urgency</div>
+        <div class="why">Supports H4 (social proof) and the divergent urgency option: "users who started premium" social proof beside a "last chance" annual discount and % savings.</div>
+        <div class="cap">Vision: "limited-time 'last chance' discount on an annual subscription, highlighting percentage savings, price per year/month, and social proof (number of users who started premium)."</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===================== HYPOTHESES ===================== -->
+  <h2><span class="n">4</span> Redesign hypotheses</h2>
+  <p class="lead">Four falsifiable hypotheses, each attacking a different named friction with a distinct mechanism. Form: <em>making [change] should [outcome] because [mechanism]</em>. Metrics name a primary lever and a guardrail, mirroring the A/B Agent's <code>target_metric</code> / <code>guardrail_metric</code> structure.</p>
+
+  <!-- H1 -->
+  <article class="hyp h1t">
+    <div class="top">
+      <div class="htitle"><span class="badge">H1</span><h3>Add a "no charge today" trial-mechanics timeline</h3></div>
+      <p class="sentence">Replacing the bare "7-day free trial then $X/yr" line with an explicit <b>today → day-5 reminder → day-7 charge</b> timeline plus a "no payment due now" badge should <b>raise trial-start rate</b> (and net paid conversion) <b>because</b> cold first-session users hesitate at a hard paywall mainly out of fear of a surprise charge — making the no-cost window and the reminder concrete removes that specific anxiety.</p>
+    </div>
+    <div class="grid">
+      <div class="col">
+        <div class="kv"><div class="k">Concrete change</div><div class="v">Below the CTA, add a 3-step vertical timeline: <b>Today</b> — full access, $0 charged · <b>Day 5</b> — reminder notification before billing · <b>Day 7</b> — trial ends, annual plan begins, cancel anytime. Add a small "No payment due now" pill on/near the CTA. Optionally pre-schedule the day-5 reminder and confirm it inline (BoldVoice pattern).</div></div>
+        <div class="kv"><div class="k">Friction addressed</div><div class="v">Trial anxiety / surprise-charge fear on a cold session.</div></div>
+        <div class="kv"><div class="k">Expected metric</div><div class="v"><span class="metric">Trial-start rate ↑</span> &nbsp;<span class="note">guardrail: trial→paid conversion &amp; refund/support volume must not fall</span></div></div>
+      </div>
+      <div class="col">
+        <div class="label">Supporting evidence</div>
+        <ul class="ev">
+          <li><span class="who">mimo</span> [Lazyweb · PRO A/B] — extended trial + explicit annual pricing on the CTA surface; learning: a clearer trial + payment expectation "can reduce commitment anxiety." <span class="exp">exp 4b363766 · conf high</span></li>
+          <li><span class="who">BetterMe, Rays, Lose It, Quizlet, mimo, Facetune</span> [Lazyweb] — the today/day-5/day-7 timeline + "no payment due now" is a widely-shipped convention, including in Health &amp; Fitness.</li>
+        </ul>
+        <div class="risk" style="margin-top:14px"><b>Risk:</b> a billing timeline makes the charge more salient and can <em>suppress</em> trial starts among the most price-sensitive. Treat learning as directional; this is the lowest-novelty bet, so run it as a clean A/B before layering other changes.</div>
+      </div>
+    </div>
+  </article>
+
+  <!-- H2 -->
+  <article class="hyp h2t">
+    <div class="top">
+      <div class="htitle"><span class="badge">H2</span><h3>Surface an annual-vs-monthly comparison with a per-day reframe</h3></div>
+      <p class="sentence">Replacing the single defaulted annual plan (monthly hidden behind "more options") with <b>two visible plan rows</b> — annual <b>pre-selected and badged "Best value / Most popular," reframed as "~$X/mo, billed yearly"</b> next to a deliberately less attractive monthly row — should <b>lift annual-plan share</b> (without cutting overall conversion) <b>because</b> users only perceive the annual discount when they can see the monthly price it beats; an invisible comparison reads as "expensive," a visible one reads as "obviously the better deal."</p>
+    </div>
+    <div class="grid">
+      <div class="col">
+        <div class="kv"><div class="k">Concrete change</div><div class="v">Show both plans on the paywall (no extra tap). Annual row pre-selected, with a "Best value" badge, a "Save NN%" chip, and a <b>per-month/per-day breakdown</b> ("$6.99/mo, billed annually"). Keep monthly visible but plain. Name the default in the CTA: "<b>Start free trial → Annual</b>". Hold the annual price steady while keeping monthly full-price so annual looks relatively better.</div></div>
+        <div class="kv"><div class="k">Friction addressed</div><div class="v">Price legibility — the annual value vs monthly is currently invisible.</div></div>
+        <div class="kv"><div class="k">Expected metric</div><div class="v"><span class="metric">Annual-plan share ↑</span> &nbsp;<span class="note">guardrail: overall paid-conversion rate must hold</span></div></div>
+      </div>
+      <div class="col">
+        <div class="label">Supporting evidence</div>
+        <ul class="ev">
+          <li><span class="who">dawn</span> [Lazyweb · PRO A/B] — held annual steady while raising the weekly price; learning: this "makes the annual plan look relatively more attractive." <span class="exp">exp 79bf0ed7 · conf high</span></li>
+          <li><span class="who">lockwidget</span> [Lazyweb · PRO A/B] — swapping weekly for a lower-commitment monthly option "anchors users toward a higher annual price." <span class="exp">exp 1e83e388 · conf high</span></li>
+          <li><span class="who">Zero</span> [Lazyweb] — its own "more billing options" sheet badges annual $69.99 "most popular" with a per-month savings line — the exact reframe, in a fasting app.</li>
+          <li><span class="who">Grammarly, Washington Post, Speak, MyFitnessPal</span> [Lazyweb] — visible annual/monthly with "best value" badge and an explicitly annual CTA is the dominant convention.</li>
+        </ul>
+        <div class="risk" style="margin-top:14px"><b>Risk:</b> exposing monthly can let undecided users pick the cheaper monthly entry point, denting annual share if the annual framing isn't strong enough. Mitigate by keeping annual the visual default and the per-day delta large.</div>
+      </div>
+    </div>
+  </article>
+
+  <!-- H3 -->
+  <article class="hyp h3t">
+    <div class="top">
+      <div class="htitle"><span class="badge">H3</span><h3>Productize the benefits into fasting-specific outcomes</h3></div>
+      <p class="sentence">Replacing the generic benefits list with a <b>short, productized list of fasting-specific outcomes</b> ("Personalized fasting windows," "Fasting-streak tracking," "Glucose &amp; weight trends," "Coach-built protocols") should <b>raise paid conversion</b> <b>because</b> a cold user on a niche app converts on a concrete picture of what the subscription <em>does for them</em>, not on broad "Premium / VIP" language — outcome-named features make the value legible before the price.</p>
+    </div>
+    <div class="grid">
+      <div class="col">
+        <div class="kv"><div class="k">Concrete change</div><div class="v">Cut generic lines; keep <b>4–5</b> outcome-named rows, each with an icon and a one-line payoff tied to fasting (windows, streaks, glucose/weight trends, protocol library, Apple Health sync). Optionally end with an "…and more" catchall to imply breadth without a wall of text (Carrot pattern). Lead the headline with the outcome, not the offer.</div></div>
+        <div class="kv"><div class="k">Friction addressed</div><div class="v">Trust / value clarity — "what exactly do I get, and is it for <em>my</em> fasting goal?"</div></div>
+        <div class="kv"><div class="k">Expected metric</div><div class="v"><span class="metric">Paid conversion ↑</span> &nbsp;<span class="note">guardrail: scroll-depth / CTA-tap rate (don't bury the CTA)</span></div></div>
+      </div>
+      <div class="col">
+        <div class="label">Supporting evidence</div>
+        <ul class="ev">
+          <li><span class="who">reddit</span> [Lazyweb · PRO A/B] — moved from broad VIP language to a productized perk list; learning: "a productized feature list can clarify Premium value better than broad VIP language." <span class="exp">exp 825f3dd8 · conf high</span></li>
+          <li><span class="who">apple-fitness</span> [Lazyweb · PRO A/B] — benefit-led activation copy "sells the workout outcome before the subscription terms." <span class="exp">exp 47238428 · conf high</span></li>
+          <li><span class="who">gentler</span> [Lazyweb · PRO A/B] — broader, expanded benefit story "can support higher pricing." <span class="exp">exp 40106370 · conf high</span></li>
+          <li><span class="who">Rootd, Zero, MyFitnessPal</span> [Lazyweb] — checkmarked, outcome-named benefit lists are the fitness-paywall norm (Zero: "personalized stats … custom plans").</li>
+        </ul>
+        <div class="risk" style="margin-top:14px"><b>Risk:</b> over-specific claims a cold user can't yet verify can read as hype and erode trust. Keep claims concrete and demonstrable; pairs well with H4's third-party proof.</div>
+      </div>
+    </div>
+  </article>
+
+  <!-- H4 -->
+  <article class="hyp h4t">
+    <div class="top">
+      <div class="htitle"><span class="badge">H4</span><h3>Add a social-proof &amp; credibility band</h3></div>
+      <p class="sentence">Adding a compact <b>credibility band</b> — a star rating, a fasted-with-us user count, and one short outcome testimonial — directly above the CTA should <b>raise paid conversion</b> <b>because</b> a niche app carries almost no brand trust on a cold first session, and third-party proof substitutes for the trust the brand can't supply, lowering the "is this legit / will it work for me" barrier at the decision point.</p>
+    </div>
+    <div class="grid">
+      <div class="col">
+        <div class="kv"><div class="k">Concrete change</div><div class="v">Insert a single-row proof band: ★ rating + count ("4.8 · 12k ratings"), a "Trusted by N fasters" stat, and one rotating 1-line testimonial naming a concrete result. Optional press/award badge if real. Keep it to one screen-row so it doesn't push the CTA below the fold.</div></div>
+        <div class="kv"><div class="k">Friction addressed</div><div class="v">Trust deficit specific to a niche / low-brand app on first session.</div></div>
+        <div class="kv"><div class="k">Expected metric</div><div class="v"><span class="metric">Paid conversion ↑</span> &nbsp;<span class="note">guardrail: time-to-CTA / bounce — proof must not crowd out the offer</span></div></div>
+      </div>
+      <div class="col">
+        <div class="label">Supporting evidence</div>
+        <ul class="ev">
+          <li><span class="who">I Am Sober</span> [Lazyweb] — post-onboarding habit-app paywall leads with community count + 4.9 rating + testimonial: the exact pattern for a niche behavior-change app.</li>
+          <li><span class="who">Breathwrk, MindLlama, Genie, Zero</span> [Lazyweb] — "users who started premium" counts, award/star badges, 5-star testimonial carousels, and social-proof logos recur across Health &amp; Fitness paywalls.</li>
+          <li class="note">Honesty note: no A/B experiment in the returned set isolates a social-proof <em>band</em> as its variable, so H4 is <b>visual/convention-grounded, not experiment-backed.</b> Strong prior, weaker evidence than H1–H3.</li>
+        </ul>
+        <div class="risk" style="margin-top:14px"><b>Risk:</b> fabricated or thin proof backfires and can trip App Store review — use only real numbers. Adding <em>urgency</em> instead of proof (countdown/last-chance) is a separate, more aggressive lever; see Divergent options, and guard refund/chargeback rates if tested.</div>
+      </div>
+    </div>
+  </article>
+
+  <!-- ===================== CONVENTION CHECK ===================== -->
+  <h2><span class="n">5</span> Convention check</h2>
+  <div class="grid3">
+    <div class="card">
+      <h4 style="color:var(--good)">Already has ✓</h4>
+      <ul>
+        <li>Full-screen hard paywall (standard for post-onboarding fitness)</li>
+        <li>7-day free trial framing</li>
+        <li>Annual default as a soft anchor</li>
+        <li>Single primary CTA (good — avoids choice overload)</li>
+        <li>Benefits list + close + restore/legal footer</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4 style="color:var(--warn)">Missing vs convention</h4>
+      <ul>
+        <li>Visible annual-vs-monthly comparison &amp; per-day reframe (H2)</li>
+        <li>Trial-mechanics timeline / "no charge today" (H1)</li>
+        <li>Social proof / rating / testimonial (H4)</li>
+        <li>Outcome-named (vs generic) benefits (H3)</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4 style="color:var(--accent)">Unusual / notable</h4>
+      <ul>
+        <li><b>Close affordance top-left</b> — most reference paywalls (Zero, gentler, headspace) put the X top-<em>right</em>; top-left is slightly nonstandard but acceptable. Not worth changing on its own.</li>
+        <li>Single-tier, no monthly visible — cleaner than most, but it's exactly why H2 has room.</li>
+      </ul>
+    </div>
+  </div>
+  <p class="note">Per the skill's hard rules: trial framing and the annual default are <em>not</em> re-recommended as-is — H1 changes how the trial is communicated and H2 changes how the annual default is presented/compared, rather than telling you to "add a trial" or "default to annual" (you already do both).</p>
+
+  <!-- ===================== DIVERGENT ===================== -->
+  <h2><span class="n">6</span> Divergent option (bolder, transfers from adjacent categories)</h2>
+  <div class="panel">
+    <div class="htitle" style="margin-bottom:6px"><span class="badge" style="background:var(--warn)">D1</span><h3 style="margin:0;font-size:17px">Offer a "skip the trial, start annual now" express path</h3></div>
+    <p style="color:var(--muted);margin:8px 0 14px">For high-intent users, add a secondary, clearly-labelled <b>"Skip free trial — start annual today"</b> option (a small link/row, not a competing button) that converts straight to the paid annual plan, optionally sweetened with a small first-purchase discount. <b>Mechanism transferred</b> from fitness-challenge and language apps: a visible trial-bypass removes a redundant step for users already sold, and an explicit annual discount nudges them past it — without removing the trial path for everyone else.</p>
+    <ul class="ev" style="max-width:900px">
+      <li><span class="who">justfit</span> [Lazyweb · PRO A/B, Health &amp; Fitness] — countdown plan selector with <b>explicit skip-free-trial copy</b>; learning: "urgency, plan comparison, and clear trial bypass can reduce purchase friction when users are deciding whether to subscribe now." <span class="exp">exp 258ef49b · conf high</span></li>
+      <li><span class="who">drops</span> [Lazyweb · PRO A/B] — leading with a lifetime anchor while pre-selecting a discounted yearly trial "can make the annual trial feel cheaper and easier to start." <span class="exp">exp fae32674 · conf high</span></li>
+      <li><span class="who">apple-music</span> [Lazyweb · PRO A/B] — concrete value + acceptance-language CTA makes plan selection "feel like claiming value before comparing prices." <span class="exp">exp bfd1aa04 · conf high</span></li>
+    </ul>
+    <div class="risk" style="margin-top:6px"><b>Risk / why it's divergent, not default:</b> a trial-bypass can <em>cannibalize</em> trial starts (and the trial's downstream retention benefit) if it's too prominent, and added urgency raises refund/chargeback exposure. Ship it small and guard trial-start volume + refund rate. This is a deliberately bolder bet than H1–H4.</div>
+  </div>
+
+  <!-- ===================== PRIORITIZATION ===================== -->
+  <h2><span class="n">7</span> Prioritization</h2>
+  <p class="lead">Ranked by expected impact on the two stated goals, implementation effort, evidence strength, and fit for a niche fasting app. Evidence strength reflects whether a recommendation is experiment-backed (directional) or convention-backed.</p>
+  <table class="prio">
+    <thead>
+      <tr><th>Rank</th><th>Hypothesis</th><th>Primary goal it moves</th><th>Impact</th><th>Effort</th><th>Evidence</th><th>Fit</th><th>Why this order</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="rank">1</td>
+        <td><b>H2</b> — annual/monthly comparison + per-day reframe</td>
+        <td>Annual share (+ holds conversion)</td>
+        <td><span class="pill-s s-hi">High</span></td>
+        <td><span class="pill-s s-md">Med</span></td>
+        <td><span class="pill-s s-hi">Strong</span></td>
+        <td><span class="pill-s s-hi">High</span></td>
+        <td>Directly targets the second stated goal; backed by two A/B experiments + the app's own analog (Zero). Highest leverage.</td>
+      </tr>
+      <tr>
+        <td class="rank">2</td>
+        <td><b>H1</b> — trial-mechanics timeline</td>
+        <td>Trial starts → paid conversion</td>
+        <td><span class="pill-s s-md">Med-High</span></td>
+        <td><span class="pill-s s-hi">Low</span></td>
+        <td><span class="pill-s s-md">Good</span></td>
+        <td><span class="pill-s s-hi">High</span></td>
+        <td>Cheapest to ship and lowest-risk; a clean first A/B that won't confound the others. Convention is near-universal.</td>
+      </tr>
+      <tr>
+        <td class="rank">3</td>
+        <td><b>H3</b> — productized fasting benefits</td>
+        <td>Paid conversion</td>
+        <td><span class="pill-s s-md">Med</span></td>
+        <td><span class="pill-s s-md">Med</span></td>
+        <td><span class="pill-s s-md">Good</span></td>
+        <td><span class="pill-s s-hi">High</span></td>
+        <td>Strong fitness-specific fit and 3 supporting experiments, but copy/scope work and gains may overlap with H4's trust lift.</td>
+      </tr>
+      <tr>
+        <td class="rank">4</td>
+        <td><b>H4</b> — social-proof / credibility band</td>
+        <td>Paid conversion</td>
+        <td><span class="pill-s s-md">Med</span></td>
+        <td><span class="pill-s s-hi">Low</span></td>
+        <td><span class="pill-s s-lo">Convention only</span></td>
+        <td><span class="pill-s s-md">Med-High</span></td>
+        <td>Strong prior for a niche app and cheap, but no isolating experiment in this set and depends on having real proof to show.</td>
+      </tr>
+      <tr>
+        <td class="rank">D1</td>
+        <td><b>Divergent</b> — skip-trial express annual</td>
+        <td>Annual conversion (high-intent)</td>
+        <td><span class="pill-s s-md">Med</span></td>
+        <td><span class="pill-s s-md">Med</span></td>
+        <td><span class="pill-s s-md">Good</span></td>
+        <td><span class="pill-s s-md">Med</span></td>
+        <td>Bolder and higher-variance; test only after H1/H2 land, with trial-start volume and refund rate as guardrails.</td>
+      </tr>
+    </tbody>
+  </table>
+  <p class="note">Sequencing: run <b>H1</b> first as a clean baseline change, then <b>H2</b> (the highest-impact, goal-aligned bet). H3 and H4 stack on the winner; D1 is a later, guarded experiment. Avoid testing H3 + H4 simultaneously — both move the same metric via overlapping trust mechanisms and would confound each other.</p>
+
+  <footer>
+    <p><b>Evidence sourcing &amp; honesty.</b> All references are Lazyweb library screenshots; captions are written from each result's <em>visionDescription</em>. A/B learnings come from Lazyweb's PRO experiment set (<code>lazyweb_ab_test_research</code>, 20 records, <code>conservative_default</code> mode) and are <b>directional hypotheses, not measured lift</b> — the source is screenshot-diff evidence, not a statistical readout. No measured percentage lift is claimed because the tool did not return validated performance figures. <code>get_flows</code> returned zero ordered onboarding→paywall journeys for this query, so sequencing rests on the post-onboarding convention rather than a captured flow. No target screenshot was provided; the "Target read" is reconstructed from the brief and validated against Zero, the closest in-corpus analog.</p>
+    <p>Lazyweb tools used: <code>lazyweb_ab_test_research</code>, <code>lazyweb_search</code> (×4), <code>lazyweb_find_similar</code>, <code>lazyweb_get_flows</code>. Generated 2026-06-08 for: hard post-onboarding paywall, niche intermittent-fasting app, mobile · goals: paid conversion + annual share.</p>
+  </footer>
+
+</div>
+</body>
+</html>

@@ -1,5 +1,6 @@
 ---
 name: lazyweb-design-improve
+route: 'Feedback on / improvement of an existing screen or design'
 description: |
   Capture a screenshot of the user's current design, find similar screens in Lazyweb,
   and generate concrete improvement ideas backed by real references. Use when the user

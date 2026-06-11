@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A/B Test Research: Lifting Annual-Plan Share on a Hard Paywall (Language Learning)</title>
+<style>
+:root{--ink:#1f2328;--mut:#57606a;--line:#d0d7de;--soft:#eef4fb;--accent:#0969da}
+body{font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;color:var(--ink);background:#fff;max-width:900px;margin:0 auto;padding:40px 22px}
+h1{font-size:27px;line-height:1.25;margin:0 0 6px}
+h2{font-size:20px;margin:34px 0 10px;padding-top:6px;border-top:1px solid var(--line)}
+h1+p.sub{color:var(--mut);margin:0 0 8px}
+table{border-collapse:collapse;width:100%;font-size:14px}th,td{border:1px solid var(--line);padding:7px 9px;vertical-align:top}th{background:#f6f8fa;text-align:left}
+td code{font:12px ui-monospace,Menlo,monospace;background:#f6f8fa;border-radius:5px;padding:1px 5px;white-space:nowrap}
+.agent-instructions{background:var(--soft);border-left:4px solid var(--accent);border-radius:8px;padding:14px 16px;margin:18px 0}
+.ai-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:8px}
+.ai-badge{font-size:11px;font-weight:700;letter-spacing:.04em;color:#0a3b78}
+.ai-copy{font:600 12px/1 inherit;cursor:pointer;border:1px solid var(--accent);color:var(--accent);background:#fff;border-radius:6px;padding:5px 11px}.ai-copy:hover{background:var(--accent);color:#fff}
+.ai-human{margin:0 0 10px;font-size:15px}
+.ai-block{white-space:pre-wrap;word-break:break-word;background:#fff;border:1px solid var(--line);border-radius:6px;padding:12px 13px;margin:0;font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--ink);user-select:all}
+#ab-tests .caveat{font-size:13px;color:var(--mut);background:#fff8e6;border:1px solid #f0e0b0;border-radius:6px;padding:8px 11px;margin:8px 0 16px}
+.exp{border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin:14px 0;background:#fff}
+.exp-h{display:flex;flex-wrap:wrap;gap:8px;align-items:baseline}.exp-co{font-weight:700}.exp-meta{color:var(--mut);font-size:13px;flex:1}
+.exp-id{font:12px ui-monospace,Menlo,monospace;color:var(--mut);background:#f6f8fa;border-radius:5px;padding:1px 7px}
+.exp-target{font-size:13px;color:var(--mut);margin:6px 0 10px}
+.exp-pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:600px){.exp-pair{grid-template-columns:1fr}}
+.exp-pair img{width:100%;height:auto;max-height:420px;object-fit:contain;border:1px solid var(--line);border-radius:8px;background:#fafbfc}
+.exp-pair figcaption{font-size:12px;font-weight:600;margin-top:5px}.exp-pair .vd{display:block;font-weight:400;color:var(--mut);font-size:11.5px;margin-top:2px}
+.exp-pair .nonprod{display:block;font-weight:600;color:#9a6700;font-size:11px;margin-top:3px}
+.exp-pair figure.img-missing img{display:none}
+.exp-pair figure.img-missing figcaption::after{content:" — image unavailable; see description";color:#cf222e;font-weight:400}
+.exp-facts{display:grid;grid-template-columns:max-content 1fr;gap:4px 12px;margin:12px 0 0;font-size:14px}.exp-facts dt{font-weight:600;color:var(--mut)}
+ul{margin:8px 0;padding-left:20px}li{margin:4px 0}
+.note{color:var(--mut);font-size:13px}
+.mock{margin:14px 0}.mock .frame{border:1px solid var(--line);border-radius:14px;background:#fff;overflow:hidden}.mock.mobile .frame{max-width:300px;border-radius:26px;border:8px solid #1f2328}.mock.desktop .frame{max-width:760px}
+.mock .body{padding:14px;display:flex;flex-direction:column;gap:10px}.mock .box{background:var(--soft);border:1px dashed #b9c7d6;border-radius:8px;min-height:34px;display:flex;align-items:center;justify-content:center;color:#4a5a6a;font-size:12px;padding:8px}.mock .box.cta{background:var(--accent);border:0;color:#fff;font-weight:600}.mock .row{display:flex;gap:10px}.mock .row>.box{flex:1}.mock .cap{font-size:12px;color:var(--mut);margin-top:6px;text-align:center}
+</style>
+</head>
+<body>
+
+<h1>A/B Test Research: Lifting Annual-Plan Share on a Hard Paywall</h1>
+<p class="sub">Education / language learning (Duolingo-class) · hard paywall, annual vs monthly · goal: grow annual-plan mix without tanking overall subscribe / trial-start rate · 2026-06-08</p>
+
+<section id="agent-instructions" class="agent-instructions">
+  <div class="ai-head"><span class="ai-badge">FOR THE CODING AGENT</span>
+    <button class="ai-copy" type="button" onclick="
+      var sec=this.closest('.agent-instructions'); var txt=sec.querySelector('.ai-block').innerText;
+      var done=function(ok){this.textContent=ok?'Copied':'Press Cmd/Ctrl+C';setTimeout(function(){this.textContent='Copy';}.bind(this),1500);}.bind(this);
+      if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(function(){done(true);},function(){done(false);});}
+      else{var r=document.createRange();r.selectNodeContents(sec.querySelector('.ai-block'));var s=getSelection();s.removeAllRanges();s.addRange(r);try{document.execCommand('copy');done(true);}catch(e){done(false);}}">Copy</button>
+  </div>
+  <p class="ai-human">Restructure the hard paywall to pre-select a discounted annual <em>trial</em> against a higher-ARPU anchor with one clear Start-Free-Trial CTA — that is the single highest-leverage test for lifting annual share without scaring off subscribers.</p>
+  <pre class="ai-block">LAZYWEB REPORT — AGENT HANDOFF
+Use this report as a starting point for prioritizing and shipping annual-vs-monthly hard-paywall experiments grounded in what comparable apps have already tested.
+
+TOP RECOMMENDATIONS (do first):
+1. Restructure the plan selector to lead with a high-ARPU lifetime anchor while pre-selecting a discounted annual trial with a single Start-Free-Trial CTA (rests on exp drops fae32674).
+2. Attach a short free trial (7-14 days) to the annual plan so the higher yearly price reads as low-risk, then watch trial-start and refund guardrails (rests on exp blinkist 5abb41ba, elevate 7ca0f42b, mimo 1764fcb1).
+3. Make the trial / annual path unmistakable on the card itself — a Free-Trial badge or ribbon on the pre-selected annual card — before the user parses pricing (rests on exp gauthmath c1790900).
+
+INDEX ON: the drops lifetime-anchor + selected annual-trial restructure (exp fae32674); trial-softens-annual-price across blinkist/elevate/mimo (exp 5abb41ba, 7ca0f42b, 1764fcb1); trial badge on the pre-selected card (exp gauthmath c1790900)
+DO NOT OVER-INDEX ON: every learning here is a directional screenshot-diff signal, not measured lift; the gauthmath price-cut and 6-month-plan moves (exp c07e3f9c) trade annual mix for entry conversion and could hurt your annual-share goal; single-experiment discount-intensity tweaks like mimo 50%-&gt;33% (exp 63175d48) and blinkist anchor believability (exp 9ac3d7e0); most rows have no platform tag and none state lift
+DIVE FURTHER: /lazyweb-paywall-optimization to turn a paywall learning into a falsifiable redesign, or lazyweb_ab_test_research operation=grab with the cited experiment_id(s) — to pull the full screenshot pair and confirm the exact plan-selector layout before building
+
+Evidence basis: A/B experiments (screenshot-diff) · 2026-06-08</pre>
+</section>
+
+<h2>Recommendations</h2>
+<p class="note">Ranked for the stated goal — annual-plan share without hurting the subscribe/trial-start guardrail. Every row rests on a real experiment shown below; jump via the <em>Rests on</em> id.</p>
+<table>
+  <thead>
+    <tr><th>Recommendation</th><th>Target metric</th><th>Guardrail</th><th>Confidence</th><th>Rests on</th></tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><strong>1. The plan selector changed from three comparable Yearly, Lifetime, and Monthly cards to two purchase choices that put a $199.99 one-time purchase above a discounted yearly trial, with Yearly selected and a prominent Start Free Trial CTA.</strong><div class="note">Hypothesis: Leading with a lifetime anchor while selecting a discounted yearly trial can make the annual trial feel cheaper and easier to start, likely improving trial starts without removing the higher-ARPU option.</div></td>
+        <td>annual plan share (annual vs monthly mix) without tanking overall subscribe and trial start rate</td>
+        <td>downstream retention or refund/support signal</td>
+        <td>high</td>
+        <td><code>drops fae32674</code></td>
+      </tr>
+      <tr>
+        <td><strong>2. The legacy plan selector raised monthly and annual prices, added a 7-day trial to the annual plan, and tightened cancellation language.</strong><div class="note">Hypothesis: A short trial can soften a higher annual price while preserving the path to higher ARPU.</div></td>
+        <td>annual plan share (annual vs monthly mix) without tanking overall subscribe and trial start rate</td>
+        <td>downstream retention or refund/support signal</td>
+        <td>high</td>
+        <td><code>blinkist 5abb41ba</code></td>
+      </tr>
+      <tr>
+        <td><strong>3. control_screenshot_id=2396 CTA &#x27;$3.33 per month&#x27; with &#x27;$39.99 billed annually&#x27; changed in experiment_screenshot_id=2392 to &#x27;Try free and unlock&#x27; with &#x27;7-day trial, then $39.99/year. Cancel anytime&#x27;.</strong><div class="note">Hypothesis: Changing monthly pricing CTA to 7-day free trial then annual plan likely improves trial starts because removing upfront cost lowers barrier and lets users experience value first.</div></td>
+        <td>annual plan share (annual vs monthly mix) without tanking overall subscribe and trial start rate</td>
+        <td>downstream retention or refund/support signal</td>
+        <td>high</td>
+        <td><code>elevate 7ca0f42b</code></td>
+      </tr>
+      <tr>
+        <td><strong>4. The annual-selected plan selector lowered yearly price and added a 14-day free trial.</strong><div class="note">Hypothesis: Combining a lower annual anchor with trial access can reduce risk and make the yearly package easier to start.</div></td>
+        <td>annual plan share (annual vs monthly mix) without tanking overall subscribe and trial start rate</td>
+        <td>downstream retention or refund/support signal</td>
+        <td>high</td>
+        <td><code>mimo 1764fcb1</code></td>
+      </tr>
+      <tr>
+        <td><strong>5. Plus added a red Free Trial ribbon to the selected 3-month plan card and made the selected card more visually prominent.</strong><div class="note">Hypothesis: Trial badges help users identify the no-upfront-payment path before reading pricing details.</div></td>
+        <td>annual plan share (annual vs monthly mix) without tanking overall subscribe and trial start rate</td>
+        <td>downstream retention or refund/support signal</td>
+        <td>high</td>
+        <td><code>gauthmath c1790900</code></td>
+      </tr>
+      <tr>
+        <td><strong>6. The monthly-selected plan selector reduced the annual discount badge from 50% to 33%.</strong><div class="note">Hypothesis: Lower promotional intensity can protect price credibility while still preserving an annual savings anchor.</div></td>
+        <td>annual plan share (annual vs monthly mix) without tanking overall subscribe and trial start rate</td>
+        <td>downstream retention or refund/support signal</td>
+        <td>high</td>
+        <td><code>mimo 63175d48</code></td>
+      </tr>
+      <tr>
+        <td><strong>7. The modern annual selector lowered the displayed crossed-out anchor price on the Pro plan while keeping the payable weekly price the same.</strong><div class="note">Hypothesis: A more believable strike-through anchor can preserve the savings frame without making the discount feel inflated.</div></td>
+        <td>annual plan share (annual vs monthly mix) without tanking overall subscribe and trial start rate</td>
+        <td>downstream retention or refund/support signal</td>
+        <td>high</td>
+        <td><code>blinkist 9ac3d7e0</code></td>
+      </tr>
+      <tr>
+        <td><strong>8. Premium replaced the $99.99 annual option with a lower-priced 6-month plan and cut the monthly entry price to $5.99.</strong><div class="note">Hypothesis: Lower upfront commitments can reduce subscription sticker shock while still preserving a paid path beyond the trial.</div></td>
+        <td>annual plan share (annual vs monthly mix) without tanking overall subscribe and trial start rate</td>
+        <td>downstream retention or refund/support signal</td>
+        <td>high</td>
+        <td><code>gauthmath c07e3f9c</code></td>
+      </tr>
+  </tbody>
+</table>
+
+<section id="ab-tests">
+  <h2>The A/B tests</h2>
+  <p class="caveat">_experiments is a limited screenshot-diff evidence set. Treat learnings as hypotheses, not statistically measured lift.</p>
+
+  <article class="exp">
+    <header class="exp-h"><span class="exp-co">drops</span>
+      <span class="exp-meta">Education › Language Learning · Cat #174 · platform n/a</span>
+      <span class="exp-id">exp fae32674</span></header>
+    <p class="exp-target">Target screen: hard paywall with annual vs monthly plan selection, annual preselected, no free continue option</p>
+    <div class="exp-pair">
+      <figure><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/edu119_drops/compare/2025-05-03-14-37-14-.png" alt="Control — drops" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+        <figcaption>Control<span class="vd">Premium subscription upsell screen for a language-learning app highlighting faster progress and offering a free trial, with pricing plan cards to choose between yearly (most popular), lifetime, and monthly billing options and an option to dismiss/close.</span></figcaption></figure>
+      <figure><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/uploaded_drops/paywall/compare/2026-05-28/1780021944177_00_Drops-20260529-023223-01.png" alt="Variant — drops" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+        <figcaption>Variant</figcaption></figure>
+    </div>
+    <dl class="exp-facts"><dt>What changed</dt><dd>The plan selector changed from three comparable Yearly, Lifetime, and Monthly cards to two purchase choices that put a $199.99 one-time purchase above a discounted yearly trial, with Yearly selected and a prominent Start Free Trial CTA.</dd>
+      <dt>Learning</dt><dd>Leading with a lifetime anchor while selecting a discounted yearly trial can make the annual trial feel cheaper and easier to start, likely improving trial starts without removing the higher-ARPU option.</dd><dt>Confidence</dt><dd>high</dd></dl>
+  </article>
+  <article class="exp">
+    <header class="exp-h"><span class="exp-co">blinkist</span>
+      <span class="exp-meta">Education › Study Aids &amp; Flashcards · Cat #123 · platform n/a</span>
+      <span class="exp-id">exp 5abb41ba</span></header>
+    <p class="exp-target">Target screen: hard paywall with annual vs monthly plan selection, annual preselected, no free continue option</p>
+    <div class="exp-pair">
+      <figure><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/edu120_blinkist/compare/h_2024-01-20-02-54-40-.png_2025-04-25-00-18-52-.png/2024-01-20-02-54-40-.png" alt="Control — blinkist" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+        <figcaption>Control<span class="vd">Subscription paywall screen promoting unlimited access and listing premium benefits (audio/text options, 5,000+ nonfiction titles, curated collections) with plan selection cards for yearly “best value” and monthly recurring billing prices, plus a close button to dismiss.</span></figcaption></figure>
+      <figure><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/edu120_blinkist/compare/2024-02-03(20-38-55).png" alt="Variant — blinkist" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+        <figcaption>Variant<span class="vd">Subscription paywall screen promoting unlimited access to app content, highlighting benefits like audio/text options and access to thousands of nonfiction titles. Users can choose between a best-value yearly plan with a 7-day free trial and a monthly recurring plan, with a close (X) to dismiss.</span></figcaption></figure>
+    </div>
+    <dl class="exp-facts"><dt>What changed</dt><dd>The legacy plan selector raised monthly and annual prices, added a 7-day trial to the annual plan, and tightened cancellation language.</dd>
+      <dt>Learning</dt><dd>A short trial can soften a higher annual price while preserving the path to higher ARPU.</dd><dt>Confidence</dt><dd>high</dd></dl>
+  </article>
+  <article class="exp">
+    <header class="exp-h"><span class="exp-co">elevate</span>
+      <span class="exp-meta">Education › Study Aids &amp; Flashcards · Cat #16 · platform n/a</span>
+      <span class="exp-id">exp 7ca0f42b</span></header>
+    <p class="exp-target">Target screen: hard paywall with annual vs monthly plan selection, annual preselected, no free continue option</p>
+    <div class="exp-pair">
+      <figure><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/edu4_elevate/compare/!tab1_home/!tab1_home_states/2023-06-02-15-31-26-.png" alt="Control — elevate" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+        <figcaption>Control<span class="vd">Subscription paywall screen promoting an “Elevate” premium upgrade with an onboarding-style carousel highlighting benefits like unlimited access to 40+ games. Primary CTA is a monthly price button with annual billing note, plus options to view all plans and close the paywall.</span><span class="nonprod">Non-production capture (internal/state path) — treat layout as indicative only.</span></figcaption></figure>
+      <figure><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/edu4_elevate/compare/!tab1_home/!tab1_home_states/2023-06-12-08-48-33-.png" alt="Variant — elevate" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+        <figcaption>Variant<span class="vd">Premium subscription paywall screen promoting “Unlock Elevate” with an “Unlimited Games” benefit, featuring a primary CTA to start a free trial and unlock access. It shows trial and annual pricing details, cancellation info, a link to view all plans, and a close button.</span><span class="nonprod">Non-production capture (internal/state path) — treat layout as indicative only.</span></figcaption></figure>
+    </div>
+    <dl class="exp-facts"><dt>What changed</dt><dd>control_screenshot_id=2396 CTA &#x27;$3.33 per month&#x27; with &#x27;$39.99 billed annually&#x27; changed in experiment_screenshot_id=2392 to &#x27;Try free and unlock&#x27; with &#x27;7-day trial, then $39.99/year. Cancel anytime&#x27;.</dd>
+      <dt>Learning</dt><dd>Changing monthly pricing CTA to 7-day free trial then annual plan likely improves trial starts because removing upfront cost lowers barrier and lets users experience value first.</dd><dt>Confidence</dt><dd>high</dd></dl>
+  </article>
+  <article class="exp">
+    <header class="exp-h"><span class="exp-co">mimo</span>
+      <span class="exp-meta">Education › Focus &amp; Screen Time · Cat #147 · platform n/a</span>
+      <span class="exp-id">exp 1764fcb1</span></header>
+    <p class="exp-target">Target screen: hard paywall with annual vs monthly plan selection, annual preselected, no free continue option</p>
+    <div class="exp-pair">
+      <figure><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/edu111_mimo/lazyscreenshots/2024_07_06_13-47-18_B8B658C5.png" alt="Control — mimo" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+        <figcaption>Control<span class="vd">Subscription paywall screen promoting “Unlimited Access” for a learning app, highlighting benefits like full course library, completion certificate, unlimited lives/hearts, and ad-free lessons. Users can choose between yearly or monthly pricing and tap “Upgrade to Pro,” with options to close, restore purchases, and view privacy/terms.</span></figcaption></figure>
+      <figure><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/edu111_mimo/lazyscreenshots/2024_10_06_13-54-03_2980F0D7.png" alt="Variant — mimo" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+        <figcaption>Variant<span class="vd">Subscription paywall upgrade screen promoting “Unlimited Access” with a list of premium benefits like full course library, completion certificate, unlimited hearts, and no ads. Users can choose between annual (with 14‑day free trial) or monthly pricing, restore purchases, view privacy/terms, close the modal, and tap a primary “Upgrade to Pro” CTA.</span></figcaption></figure>
+    </div>
+    <dl class="exp-facts"><dt>What changed</dt><dd>The annual-selected plan selector lowered yearly price and added a 14-day free trial.</dd>
+      <dt>Learning</dt><dd>Combining a lower annual anchor with trial access can reduce risk and make the yearly package easier to start.</dd><dt>Confidence</dt><dd>high</dd></dl>
+  </article>
+  <article class="exp">
+    <header class="exp-h"><span class="exp-co">gauthmath</span>
+      <span class="exp-meta">Education › Homework &amp; Math Help · Overall #158 · platform n/a</span>
+      <span class="exp-id">exp c1790900</span></header>
+    <p class="exp-target">Target screen: hard paywall with annual vs monthly plan selection, annual preselected, no free continue option</p>
+    <div class="exp-pair">
+      <figure><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/edu13_gauthmath/lazyscreenshots/2024_06_29_23-25-37_D0FC280D.png" alt="Control — gauthmath" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+        <figcaption>Control<span class="vd">Subscription paywall screen offering monthly, quarterly, and annual pricing with a 3‑day free trial and points unlock, plus a restore purchases option. Includes a benefits comparison table (monthly points, unlimited answers, 24/7 expert help, AI features), an age confirmation checkbox, and a primary CTA to activate the free trial.</span></figcaption></figure>
+      <figure><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/edu13_gauthmath/compare/h_img_0744.png_IMG_5576.png/img_0744.png" alt="Variant — gauthmath" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+        <figcaption>Variant<span class="vd">Subscription paywall screen for a premium plan showing pricing options for 1, 3 (highlighted with free trial), and 12 months, with copy about a 3‑day free trial and points unlocked. Includes a benefits comparison table (premium vs free), an age confirmation checkbox, a restore purchases link, and a primary CTA button to activate the free trial.</span></figcaption></figure>
+    </div>
+    <dl class="exp-facts"><dt>What changed</dt><dd>Plus added a red Free Trial ribbon to the selected 3-month plan card and made the selected card more visually prominent.</dd>
+      <dt>Learning</dt><dd>Trial badges help users identify the no-upfront-payment path before reading pricing details.</dd><dt>Confidence</dt><dd>high</dd></dl>
+  </article>
+  <article class="exp">
+    <header class="exp-h"><span class="exp-co">mimo</span>
+      <span class="exp-meta">Education › Focus &amp; Screen Time · Cat #147 · mobile</span>
+      <span class="exp-id">exp 63175d48</span></header>
+    <p class="exp-target">Target screen: hard paywall with annual vs monthly plan selection, annual preselected, no free continue option</p>
+    <div class="exp-pair">
+      <figure><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/edu111_mimo/lazyscreenshots/2024_03_20_22-16-14_F3F1088F.png" alt="Control — mimo" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+        <figcaption>Control<span class="vd">Premium subscription paywall for an online learning app highlighting Pro benefits like full course library access, certificates, unlimited hearts, and no ads. Users can choose between monthly or annual plans with a free trial and savings badge, restore purchases, and tap “Upgrade to Pro” to subscribe.</span></figcaption></figure>
+      <figure><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/edu111_mimo/compare/h_img_0747.png_IMG_1630.png/img_0747.png" alt="Variant — mimo" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+        <figcaption>Variant<span class="vd">Subscription paywall screen prompting users to unlock unlimited access, highlighting premium benefits like full course library access, completion certificates, unlimited hearts, and no ads. Includes plan selection for monthly vs annual (with free trial and savings badge), a Restore purchases option, and a primary “Upgrade to Pro” CTA with privacy/terms links and cancel anytime note.</span></figcaption></figure>
+    </div>
+    <dl class="exp-facts"><dt>What changed</dt><dd>The monthly-selected plan selector reduced the annual discount badge from 50% to 33%.</dd>
+      <dt>Learning</dt><dd>Lower promotional intensity can protect price credibility while still preserving an annual savings anchor.</dd><dt>Confidence</dt><dd>high</dd></dl>
+  </article>
+  <article class="exp">
+    <header class="exp-h"><span class="exp-co">blinkist</span>
+      <span class="exp-meta">Education › Study Aids &amp; Flashcards · Cat #123 · mobile</span>
+      <span class="exp-id">exp 9ac3d7e0</span></header>
+    <p class="exp-target">Target screen: hard paywall with annual vs monthly plan selection, annual preselected, no free continue option</p>
+    <div class="exp-pair">
+      <figure><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/edu120_blinkist/compare/2025-04-25(00-15-54).png" alt="Control — blinkist" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+        <figcaption>Control<span class="vd">Subscription paywall screen promoting an AI-powered learning/summarization app, highlighting benefits like summarizing content, large library of book/podcast summaries, quick read/listen time, and daily recommendations. Users can choose between annual PRO or PREMIUM plans with pricing (including weekly cost), close the modal, and tap Continue to start the subscription with cancel-anytime messaging.</span></figcaption></figure>
+      <figure><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/edu120_blinkist/compare/2025-04-25(00-18-52).png" alt="Variant — blinkist" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+        <figcaption>Variant<span class="vd">Subscription paywall screen for a personal growth/learning app promoting AI-powered summaries of books, podcasts, articles, and daily recommendations. Users can compare annual Pro vs Premium plans with pricing and weekly cost, select an option, tap Continue to subscribe, or close the modal, with cancel-anytime and App Store purchase terms shown.</span></figcaption></figure>
+    </div>
+    <dl class="exp-facts"><dt>What changed</dt><dd>The modern annual selector lowered the displayed crossed-out anchor price on the Pro plan while keeping the payable weekly price the same.</dd>
+      <dt>Learning</dt><dd>A more believable strike-through anchor can preserve the savings frame without making the discount feel inflated.</dd><dt>Confidence</dt><dd>high</dd></dl>
+  </article>
+  <article class="exp">
+    <header class="exp-h"><span class="exp-co">gauthmath</span>
+      <span class="exp-meta">Education › Homework &amp; Math Help · Overall #158 · platform n/a</span>
+      <span class="exp-id">exp c07e3f9c</span></header>
+    <p class="exp-target">Target screen: hard paywall with annual vs monthly plan selection, annual preselected, no free continue option</p>
+    <div class="exp-pair">
+      <figure><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/edu13_gauthmath/lazyscreenshots/2023_11_12_13-28-47_B642D006.png" alt="Control — gauthmath" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+        <figcaption>Control<span class="vd">Premium subscription paywall screen for “Gauth PLUS” showing plan benefits and pricing options, including a 3‑day free trial with quarterly renewal plus 12‑month and 1‑month subscriptions and the option to buy tickets separately. Users can restore purchases, confirm they are 18+, and tap the primary CTA to unlock the premium membership.</span></figcaption></figure>
+      <figure><img src="https://zlfyzdmohcskkucuunmk.supabase.co/storage/v1/object/public/screenshots/edu13_gauthmath/lazyscreenshots/2023_12_16_10-05-18_88D8CE2E.png" alt="Variant — gauthmath" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')">
+        <figcaption>Variant<span class="vd">Premium subscription paywall screen promoting an “Annual Lowest Price” plan and listing benefits like monthly ticket allowances and viewing all answers. Users can choose between 1-month, 6-month, or a 3-day free trial that renews quarterly, restore purchases, confirm age via checkbox, and tap a primary CTA to activate the free trial with a countdown timer shown.</span></figcaption></figure>
+    </div>
+    <dl class="exp-facts"><dt>What changed</dt><dd>Premium replaced the $99.99 annual option with a lower-priced 6-month plan and cut the monthly entry price to $5.99.</dd>
+      <dt>Learning</dt><dd>Lower upfront commitments can reduce subscription sticker shock while still preserving a paid path beyond the trial.</dd><dt>Confidence</dt><dd>high</dd></dl>
+  </article>
+</section>
+
+<h2>Strong / Weak points</h2>
+<p class="note"><strong>Strong</strong></p>
+<ul>
+    <li>Uses generic _experiments evidence across screen types rather than paywall-only retrieval.</li>
+    <li>Returns control and variant screenshot IDs so agents can inspect visual evidence before recommending changes.</li>
+</ul>
+<p class="note"><strong>Weak</strong></p>
+<ul>
+    <li>Observed screenshot-diff evidence is not a statistically measured experiment readout.</li>
+    <li>Outcome lift is only available when captured in the experiment learning text.</li>
+    <li>interesting_learning defaults false because uncommon learnings can overfit this limited dataset.</li>
+</ul>
+
+<h2>Where not to overgeneralize</h2>
+<ul>
+  <li>This corpus is mobile-subscription-centric and these are directional <em>screenshot-diff</em> signals, not measured lift — no row reports a win/loss number or significance.</li>
+  <li>Two of eight experiments (blinkist, elevate) sit in <em>Study Aids / Flashcards</em>, and gauthmath is <em>Homework &amp; Math Help</em>; only drops is true language learning. Read cross-app patterns as hypotheses to localize on your own hard paywall, not as guarantees for a Duolingo-class audience.</li>
+  <li>Several moves cut price or commitment (gauthmath exp c07e3f9c swaps the annual plan for a cheaper 6-month plan and a lower monthly). Those can lift overall conversion while <em>lowering</em> annual share — the opposite of this goal — so treat them as guardrail context, not as things to copy.</li>
+  <li>Most rows have no platform tag; do not assume the layout transfers cleanly between iOS, Android, and web checkout without a per-surface test.</li>
+</ul>
+
+</body>
+</html>

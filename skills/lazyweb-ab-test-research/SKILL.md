@@ -1,5 +1,6 @@
 ---
 name: lazyweb-ab-test-research
+route: 'A/B tests, experiments, pricing/trial/monetization strategy'
 description: |
   Research growth, monetization, onboarding, checkout, paywall, cancellation,
   pricing, activation, or other product A/B tests using Lazyweb experiment
