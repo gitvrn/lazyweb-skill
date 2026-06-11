@@ -73,6 +73,7 @@ Choose exactly one mode:
 | Rewrite, evaluate, or stress-test ONE paywall CTA (button copy, not layout) | `skills/lazyweb-paywall-cta/SKILL.md` |
 | Sign-up / registration screen redesign, critique, or signup-conversion optimization | `skills/lazyweb-signup-optimization/SKILL.md` |
 | A/B tests, experiment examples, pricing, trials, lifecycle, or monetization strategy | `skills/lazyweb-ab-test-research/SKILL.md` |
+| Design best practices for X — find the top community-rated skill online and apply it as context (no install) | `skills/lazyweb-design-best-practices/SKILL.md` |
 | Update local Lazyweb skills, reinstall Lazyweb, or sync Lazyweb into agentic IDEs | `skills/lazyweb-update/SKILL.md` |
 
 For a bare `/lazyweb` request, briefly explain the modes above and ask which
@@ -83,6 +84,10 @@ Route CTA copy questions to `lazyweb-paywall-cta` only when the ask is about
 the button text itself; a broader paywall redesign goes to
 `lazyweb-paywall-optimization` even if the CTA is part of it. Route explicit
 install, update, refresh, or stale slash-command requests to `lazyweb-update`.
+Route "design best practices for X" / "what's the best skill for animation,
+landing pages, typography…" asks to `lazyweb-design-best-practices`, which
+researches live community reviews, fetches the winning skill's instructions
+from the internet, and applies them as context — nothing gets installed.
 
 ## Mode Handoff
 
@@ -137,12 +142,11 @@ These rules apply to every `lazyweb_search` call in every mode:
   `paywall_design_run` / `paywall_design_check_status` (and the parallel
   `signup_design_run` / `signup_design_check_status`) are gated behind
   env flags and may also be exposed — check the live tool list.
-- The paid tools (`lazyweb_ab_test_research`, `lazyweb_paywall_cta_research`,
-  `paywall_design_run`, `signup_design_run`) return a free-tier-friendly
-  response when the caller lacks Pro access: an `ab_test_subscription_required`
-  payload (paid wrappers) or a queued `tier='free'` run that produces a
-  LOCKED HTML report (run tools). Free callers should NOT abort — they
-  should follow the locked-render contract in the active mode's `SKILL.md`.
+- All current public Lazyweb MCP tools and visible workflow skills are free,
+  including `lazyweb_ab_test_research`, `lazyweb_paywall_cta_research`,
+  `paywall_design_run`, and `signup_design_run` when those run tools are
+  exposed by the live schema. If a tool is missing or returns no matching
+  evidence, treat that as an availability or coverage issue, not a billing gate.
 - Richer internal/backend surfaces may expose `lazyweb_find_experiments`,
   `lazyweb_recent_experiments`, or
   `list_companies_by_categories`; use them only when the live tool schema shows

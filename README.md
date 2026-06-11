@@ -51,6 +51,7 @@ The installer exposes a hybrid skill surface:
 | `/lazyweb-paywall-cta` | Rewrite, evaluate, or stress-test ONE paywall CTA (button copy, not layout). |
 | `/lazyweb-signup-optimization` | Sign-up / registration screen redesign, critique, or signup-conversion optimization. |
 | `/lazyweb-ab-test-research` | A/B tests, experiments, pricing, lifecycle, or monetization strategy. |
+| `/lazyweb-design-best-practices` | Design best practices for X — live review sweep (skills.sh, design Twitter/X, Reddit, forums) finds the top-rated skill, fetches its instructions, and applies them as context. No install. |
 | `/lazyweb-update` | Update the local Lazyweb skill pack and reinstall it into agentic IDEs. |
 
 `SKILL.md` at the repo root is the high-level router. The installer materializes
@@ -132,7 +133,7 @@ Current public gateway tools:
 | `lazyweb_list_collections` | List or fetch curated Lazyweb collections; hydrated screenshots include full image URLs. |
 | `lazyweb_get_workflows` | Discover and fetch current Lazyweb workflow instructions. |
 | `lazyweb_get_flows` | Fetch ordered multi-screen product journeys with full step image URLs. |
-| `lazyweb_ab_test_research` | Paid A/B Test Agent wrapper for PM-facing research; when `include_images` is true, evidence includes full control/variant image URLs. |
+| `lazyweb_ab_test_research` | Free A/B Test Agent wrapper for PM-facing research; when `include_images` is true, evidence includes full control/variant image URLs. |
 
 All Lazyweb screenshot-bearing tools return usable full URLs for screenshots.
 Supabase storage-backed image URLs are signed for 365 days. Do not ask tools for
@@ -144,10 +145,10 @@ Richer backend/internal surfaces may also expose `lazyweb_find_experiments`,
 `lazyweb_recent_experiments`, and
 `list_companies_by_categories`. Use those only when the live schema shows them.
 
-The A/B Test Agent is the only paid feature. It costs $49/month and unlocks
-mobile growth, paywall, onboarding, checkout, pricing, lifecycle, and
-monetization A/B test context:
-https://buy.stripe.com/4gM3cwbdE8Mc46df5fawo07
+All current Lazyweb MCP tools and visible workflow skills are free, including
+the A/B Test Agent and paywall CTA research wrappers. If a live MCP tool is
+missing or returns no evidence, treat that as an availability or coverage issue,
+not a billing gate.
 
 ## Repository Structure
 

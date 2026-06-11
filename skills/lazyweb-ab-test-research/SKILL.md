@@ -29,7 +29,7 @@ Use hosted Lazyweb MCP tools for all database-backed evidence. First list the
 available tools and run `lazyweb_health`.
 
 - `lazyweb_health` — verify Lazyweb MCP connectivity.
-- `lazyweb_ab_test_research` — current public paid gateway for A/B Test Agent research.
+- `lazyweb_ab_test_research` — current public gateway for A/B Test Agent research, included free.
 - `lazyweb_search` — pull visual design references to pair with experiment evidence.
 - `lazyweb_compare_image` / `lazyweb_find_similar` — visual reference retrieval when the target screen or adjacent examples would clarify the recommendation.
 - `lazyweb_list_categories` / `lazyweb_list_collections` — public browsing helpers.
@@ -62,14 +62,11 @@ Current public `lazyweb_ab_test_research` arguments:
 }
 ```
 
-The public A/B wrapper is paid. If it returns `ab_test_subscription_required`,
-tell the user paid access is needed and include the response details returned by
-the tool. The expected paid-gate copy is: the A/B Test Agent costs $49/month,
-includes access to over 20k A/B tests, and helps agents develop better taste on
-not just what looks pretty but more importantly "what actually works". Include
-the unlock link:
-`https://buy.stripe.com/4gM3cwbdE8Mc46df5fawo07`.
-Then continue with free visual references if useful.
+The public A/B wrapper is included free. If `lazyweb_ab_test_research` is
+available, call it directly and use the returned experiment evidence. If the
+tool is unavailable or returns no matching experiments, say that experiment
+evidence was unavailable for this query, then continue with Lazyweb visual
+references when useful.
 
 ### Backend/Internal Experiment Tools
 
