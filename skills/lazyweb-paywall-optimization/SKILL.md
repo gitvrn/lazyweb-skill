@@ -32,12 +32,67 @@ or not, ALWAYS:
 2. Embed Lazyweb references directly with returned `imageUrl`/`image_url`; save only current-state and web-captured screenshots under `.lazyweb/paywall-optimization/{topic}-{date}/references/`
 3. Do NOT create `report.md` or any other Markdown report artifact
 4. Do NOT write optimization content into a plan file
-5. After saving, summarize the 2-4 hypotheses and tell the user where the report is
-6. Ask the user if the paywall direction looks good
-7. If in plan mode, exit plan mode after the user confirms
-8. Suggest next steps: "You can now implement the strongest hypothesis, ask
+5. Publish a shareable link (see "Publish a Shareable Link" below) — automatic, non-blocking
+6. After saving, summarize the 2-4 hypotheses, tell the user where the report is,
+   and include the shareable link if publishing succeeded
+7. Ask the user if the paywall direction looks good
+8. If in plan mode, exit plan mode after the user confirms
+9. Suggest next steps: "You can now implement the strongest hypothesis, ask
    `/lazyweb-ab-test-research` for deeper experiment mining, or ask `/lazyweb`
    for adjacent design references."
+
+## Publish a Shareable Link (always, right after writing report.html)
+
+Every report is auto-published to lazyweb.com so the user can share it with
+teammates. Run this with `$REPORT_DIR` set to `.lazyweb/paywall-optimization/{topic}-{date}`:
+
+```bash
+LAZYWEB_TOKEN=$(cat "$HOME/.lazyweb/lazyweb_mcp_token" 2>/dev/null || true)
+if [ -n "$LAZYWEB_TOKEN" ]; then
+  python3 - "$REPORT_DIR" "$LAZYWEB_TOKEN" "paywall-optimization" <<'PUBLISH_EOF'
+import base64, json, pathlib, sys, urllib.error, urllib.request
+report_dir, token, skill = pathlib.Path(sys.argv[1]), sys.argv[2], sys.argv[3]
+version_file = pathlib.Path.home() / ".lazyweb" / "VERSION"
+version = version_file.read_text().strip() if version_file.exists() else "0.0.0"
+html = (report_dir / "report.html").read_text(encoding="utf-8")
+refs = report_dir / "references"
+assets = [
+    {"name": p.name, "b64": base64.b64encode(p.read_bytes()).decode()}
+    for p in (sorted(refs.iterdir()) if refs.is_dir() else [])
+    if p.is_file()
+]
+body = json.dumps({"skill": skill, "version": version, "html": html, "assets": assets}).encode()
+req = urllib.request.Request(
+    "https://www.lazyweb.com/api/reports",
+    data=body,
+    headers={"Content-Type": "application/json", "Authorization": f"Bearer {token}"},
+)
+try:
+    resp = json.loads(urllib.request.urlopen(req, timeout=90).read())
+    print(f"SHAREABLE_URL: {resp['url']}")
+except urllib.error.HTTPError as exc:
+    print(f"PUBLISH_FAILED: {exc.code} {exc.read().decode()[:500]}")
+except Exception as exc:
+    print(f"PUBLISH_SKIPPED: {exc}")
+PUBLISH_EOF
+fi
+```
+
+- On `SHAREABLE_URL:`, include the link in the final summary next to the local
+  path: "Shareable link: {url} (unlisted — anyone with the link can view)".
+- On `PUBLISH_FAILED: 400 ...` the body names exactly what is unhostable
+  (e.g. `missing_assets` lists files, `unhostable_local_reference` quotes the
+  bad src). Fix the report and re-run the publish ONCE.
+- On `PUBLISH_SKIPPED:` or a missing token, say nothing about publishing and
+  continue — publish failure NEVER fails the skill; the local report stands.
+
+### Hosting-safe HTML (the template already complies — keep it that way)
+
+The hosted copy is served byte-for-byte, so the report must only use:
+- inline CSS and inline `<script>` — never an external `<script src=...>`
+- images via the absolute `imageUrl`/`image_url` URLs Lazyweb returns, or
+  relative `references/{filename}` paths for locally saved screenshots
+- no `file://` URLs and no absolute local paths (`/Users/...`, `C:\...`)
 
 ## When to Use This
 
