@@ -51,6 +51,7 @@ The installer exposes a hybrid skill surface:
 | `/lazyweb-paywall-cta` | Rewrite, evaluate, or stress-test ONE paywall CTA (button copy, not layout). |
 | `/lazyweb-signup-optimization` | Sign-up / registration screen redesign, critique, or signup-conversion optimization. |
 | `/lazyweb-ab-test-research` | A/B tests, experiments, pricing, lifecycle, or monetization strategy. |
+| `/lazyweb-update` | Update the local Lazyweb skill pack and reinstall it into agentic IDEs. |
 
 `SKILL.md` at the repo root is the high-level router. The installer materializes
 that file into each local client as `lazyweb/SKILL.md`, while platforms that can
@@ -91,6 +92,13 @@ To run setup for a specific client:
 ```
 
 Use `--host all` to install every supported local skill root.
+
+To update an existing install from GitHub and refresh every supported local
+skill root:
+
+```bash
+~/.lazyweb/bin/lazyweb-update --host all
+```
 
 ## Auto-updates (opt-in)
 
@@ -146,7 +154,8 @@ https://buy.stripe.com/4gM3cwbdE8Mc46df5fawo07
 - `SKILL.md` - canonical high-level Lazyweb router skill.
 - `skills/*/SKILL.md` - visible mode skills.
 - `setup` - standalone multi-host installer.
-- `bin/` - helper scripts used by skills and setup.
+- `bin/` - helper scripts used by skills and setup, including
+  `lazyweb-update` for refreshing an existing install.
 - `browse/` - optional browser capture helper for web screenshots.
 - `scripts/validate-skill-pack.mjs` - static skill-pack validation.
 - `test/` - installer, helper, and contract tests.

@@ -92,7 +92,7 @@ const setupPath = path.join(root, "setup");
 assert.ok(existsSync(setupPath), "missing root setup script");
 assert.ok(statSync(setupPath).mode & 0o111, "root setup must be executable");
 
-for (const binName of ["lazyweb-context-detect", "lazyweb-log", "lazyweb-telemetry-flush", "lazyweb-update-check"]) {
+for (const binName of ["lazyweb-context-detect", "lazyweb-log", "lazyweb-telemetry-flush", "lazyweb-update", "lazyweb-update-check"]) {
   const binPath = path.join(root, "bin", binName);
   assert.ok(existsSync(binPath), `missing bin/${binName}`);
   assert.ok(statSync(binPath).mode & 0o111, `bin/${binName} must be executable`);

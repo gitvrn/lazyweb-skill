@@ -1,0 +1,84 @@
+#!/usr/bin/env bash
+# Update the GitHub-backed Lazyweb skill checkout, then reinstall skills into
+# local coding clients. This intentionally bypasses install.sh's auto-host
+# wrapper so agents can request --host all deterministically.
+set -euo pipefail
+
+REPO="${LAZYWEB_SKILL_REPO:-https://github.com/aboul3ata/lazyweb-skill}"
+TARGET="${LAZYWEB_SKILL_DIR:-$HOME/.lazyweb/repos/lazyweb-skill}"
+HOST="${LAZYWEB_UPDATE_HOST:-all}"
+QUIET=0
+SETUP_FLAGS=()
+
+usage() {
+  cat <<'USAGE'
+Usage: lazyweb-update [--host auto|all|codex|claude|cursor|opencode|kiro|factory|slate|hermes|antigravity] [--quiet] [--auto-update|--no-auto-update]
+
+Pulls the Lazyweb skill pack from GitHub and reruns setup for the selected host.
+Defaults to --host all so all local skill roots are refreshed.
+USAGE
+}
+
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --host)
+      [ "${2:-}" ] || { echo "Missing value for --host" >&2; exit 1; }
+      HOST="$2"
+      shift 2
+      ;;
+    --host=*)
+      HOST="${1#--host=}"
+      shift
+      ;;
+    -q|--quiet)
+      QUIET=1
+      SETUP_FLAGS+=("--quiet")
+      shift
+      ;;
+    --auto-update|--no-auto-update)
+      SETUP_FLAGS+=("$1")
+      shift
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    *)
+      echo "Unknown option: $1" >&2
+      usage >&2
+      exit 1
+      ;;
+  esac
+done
+
+log() {
+  [ "$QUIET" -eq 1 ] || printf '%s\n' "$*"
+}
+
+if ! command -v git >/dev/null 2>&1; then
+  echo "lazyweb-update requires git." >&2
+  exit 1
+fi
+
+before="none"
+if [ -d "$TARGET/.git" ]; then
+  before="$(git -C "$TARGET" rev-parse --short HEAD 2>/dev/null || printf none)"
+fi
+
+mkdir -p "$(dirname "$TARGET")"
+if [ -d "$TARGET/.git" ]; then
+  log "Updating Lazyweb skill checkout in $TARGET..."
+  git -C "$TARGET" pull --ff-only
+else
+  log "Cloning Lazyweb skill checkout into $TARGET..."
+  rm -rf "$TARGET"
+  git clone --depth 1 "$REPO" "$TARGET"
+fi
+
+after="$(git -C "$TARGET" rev-parse --short HEAD 2>/dev/null || printf unknown)"
+
+log "Installing Lazyweb skills for host: $HOST"
+"$TARGET/setup" --host "$HOST" "${SETUP_FLAGS[@]}"
+
+version="$(tr -d '[:space:]' < "$TARGET/VERSION" 2>/dev/null || printf unknown)"
+printf 'Lazyweb update complete: %s -> %s (version %s, host %s)\n' "$before" "$after" "$version" "$HOST"

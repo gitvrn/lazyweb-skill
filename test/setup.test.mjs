@@ -64,7 +64,8 @@ test("setup installs visible skills and direct MCP config into detected local cl
         "lazyweb-design-improve",
         "lazyweb-design-brainstorm",
         "lazyweb-paywall-optimization",
-        "lazyweb-ab-test-research"
+        "lazyweb-ab-test-research",
+        "lazyweb-update"
       ]) {
         const skillPath = path.join(skillsRoot, skillName, "SKILL.md");
         assert.ok(existsSync(skillPath), `missing installed skill ${skillPath}`);
@@ -78,6 +79,7 @@ test("setup installs visible skills and direct MCP config into detected local cl
 
     assert.equal(readFileSync(path.join(home, ".lazyweb", "lazyweb_mcp_token"), "utf8").trim(), "11111111-1111-4111-8111-111111111111");
     assert.ok(existsSync(path.join(home, ".lazyweb", "bin", "lazyweb-context-detect")));
+    assert.ok(existsSync(path.join(home, ".lazyweb", "bin", "lazyweb-update")));
 
     const codexConfig = readFileSync(path.join(home, ".codex", "config.toml"), "utf8");
     assert.match(codexConfig, /\[mcp_servers\.lazyweb\]/);

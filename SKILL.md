@@ -5,7 +5,8 @@ description: |
   designing, critiquing, or changing product UI when the agent needs real app
   screenshots, competitor references, best practices, quick examples, creative
   cross-category ideas, paywall optimization guidance, or mobile growth and
-  monetization A/B test context.
+  monetization A/B test context. It can also route explicit requests to update
+  the local Lazyweb skill pack.
   It routes to the right Lazyweb mode and tells the agent to use Lazyweb MCP
   tools instead of guessing from generic training data.
 allowed-tools:
@@ -72,14 +73,16 @@ Choose exactly one mode:
 | Rewrite, evaluate, or stress-test ONE paywall CTA (button copy, not layout) | `skills/lazyweb-paywall-cta/SKILL.md` |
 | Sign-up / registration screen redesign, critique, or signup-conversion optimization | `skills/lazyweb-signup-optimization/SKILL.md` |
 | A/B tests, experiment examples, pricing, trials, lifecycle, or monetization strategy | `skills/lazyweb-ab-test-research/SKILL.md` |
+| Update local Lazyweb skills, reinstall Lazyweb, or sync Lazyweb into agentic IDEs | `skills/lazyweb-update/SKILL.md` |
 
-For a bare `/lazyweb` request, briefly explain the eight modes above and ask
-which one the user wants. Recommend `lazyweb-design-research` when they want
-deep guidance, `lazyweb-quick-references` when they want speed, and
+For a bare `/lazyweb` request, briefly explain the modes above and ask which
+one the user wants. Recommend `lazyweb-design-research` when they want deep
+guidance, `lazyweb-quick-references` when they want speed, and
 `lazyweb-design-improve` when they already have a non-paywall screen to critique.
 Route CTA copy questions to `lazyweb-paywall-cta` only when the ask is about
 the button text itself; a broader paywall redesign goes to
-`lazyweb-paywall-optimization` even if the CTA is part of it.
+`lazyweb-paywall-optimization` even if the CTA is part of it. Route explicit
+install, update, refresh, or stale slash-command requests to `lazyweb-update`.
 
 ## Mode Handoff
 

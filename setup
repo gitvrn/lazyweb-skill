@@ -143,7 +143,7 @@ install_version_marker() {
 
 install_lazyweb_bins() {
   mkdir -p "$HOME/.lazyweb/bin"
-  for bin_name in lazyweb-context-detect lazyweb-log lazyweb-telemetry-flush lazyweb-update-check; do
+  for bin_name in lazyweb-context-detect lazyweb-log lazyweb-telemetry-flush lazyweb-update lazyweb-update-check; do
     [ -f "$ROOT/bin/$bin_name" ] || continue
     link_or_copy "$ROOT/bin/$bin_name" "$HOME/.lazyweb/bin/$bin_name"
     chmod +x "$HOME/.lazyweb/bin/$bin_name" 2>/dev/null || true
