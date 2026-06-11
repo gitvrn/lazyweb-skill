@@ -277,7 +277,7 @@ mkdir -p "$REPORT_DIR/references"
 
 Do not download Lazyweb database images. Use the `imageUrl`/`image_url` returned by Lazyweb
 directly in the HTML report. Supabase storage-backed image URLs are signed for
-90 days and intended for report embedding; if a selected Lazyweb result has no returned image URL, omit the
+365 days and intended for report embedding; if a selected Lazyweb result has no returned image URL, omit the
 image and rely on `visionDescription` plus text.
 
 For web-captured examples:
