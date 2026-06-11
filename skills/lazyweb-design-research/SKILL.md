@@ -34,10 +34,12 @@ or not, ALWAYS:
 2. Embed Lazyweb references directly with their returned `imageUrl`/`image_url`; save only current-state and web-captured screenshots under `.lazyweb/design-research/{topic}-{date}/references/`
 3. Do NOT create `report.md` or any other Markdown report artifact
 4. Do NOT write research content into a plan file
-5. After saving, show the user a concise summary, the recommendation, and the exact report path
-6. Ask the user if the research looks good
-7. If in plan mode, exit plan mode after the user confirms - the research is done
-8. Suggest next steps: "You can now use this research to inform your implementation,
+5. Publish a shareable link (see "Publish a Shareable Link" below) - automatic, non-blocking
+6. After saving, show the user a concise summary, the recommendation, the exact
+   report path, and the shareable link if publishing succeeded
+7. Ask the user if the research looks good
+8. If in plan mode, exit plan mode after the user confirms - the research is done
+9. Suggest next steps: "You can now use this research to inform your implementation,
    ask `/lazyweb` to improve your current design, or start building."
 
 The visible report must be simple: **Goal**, **Recommendation**, optional
@@ -55,6 +57,59 @@ when the user asks for implementation-ready code. Pick a default recommendation,
 but do not pretend one visual direction is obvious when the evidence supports
 multiple plausible directions. Generate prototype images in parallel at medium
 effort by default, or low effort when the user asks for speed/exploration.
+
+## Publish a Shareable Link (always, right after writing report.html)
+
+Every report is auto-published to lazyweb.com so the user can share it with
+teammates. Run this with `$REPORT_DIR` set to `.lazyweb/design-research/{topic}-{date}`:
+
+```bash
+LAZYWEB_TOKEN=$(cat "$HOME/.lazyweb/lazyweb_mcp_token" 2>/dev/null || true)
+if [ -n "$LAZYWEB_TOKEN" ]; then
+  python3 - "$REPORT_DIR" "$LAZYWEB_TOKEN" "design-research" <<'PUBLISH_EOF'
+import base64, json, pathlib, sys, urllib.error, urllib.request
+report_dir, token, skill = pathlib.Path(sys.argv[1]), sys.argv[2], sys.argv[3]
+version_file = pathlib.Path.home() / ".lazyweb" / "VERSION"
+version = version_file.read_text().strip() if version_file.exists() else "0.0.0"
+html = (report_dir / "report.html").read_text(encoding="utf-8")
+refs = report_dir / "references"
+assets = [
+    {"name": p.name, "b64": base64.b64encode(p.read_bytes()).decode()}
+    for p in (sorted(refs.iterdir()) if refs.is_dir() else [])
+    if p.is_file()
+]
+body = json.dumps({"skill": skill, "version": version, "html": html, "assets": assets}).encode()
+req = urllib.request.Request(
+    "https://www.lazyweb.com/api/reports",
+    data=body,
+    headers={"Content-Type": "application/json", "Authorization": f"Bearer {token}"},
+)
+try:
+    resp = json.loads(urllib.request.urlopen(req, timeout=90).read())
+    print(f"SHAREABLE_URL: {resp['url']}")
+except urllib.error.HTTPError as exc:
+    print(f"PUBLISH_FAILED: {exc.code} {exc.read().decode()[:500]}")
+except Exception as exc:
+    print(f"PUBLISH_SKIPPED: {exc}")
+PUBLISH_EOF
+fi
+```
+
+- On `SHAREABLE_URL:`, include the link in the final summary next to the local
+  path: "Shareable link: {url} (unlisted - anyone with the link can view)".
+- On `PUBLISH_FAILED: 400 ...` the body names exactly what is unhostable
+  (e.g. `missing_assets` lists files, `unhostable_local_reference` quotes the
+  bad src). Fix the report and re-run the publish ONCE.
+- On `PUBLISH_SKIPPED:` or a missing token, say nothing about publishing and
+  continue - publish failure NEVER fails the skill; the local report stands.
+
+### Hosting-safe HTML (the template already complies - keep it that way)
+
+The hosted copy is served byte-for-byte, so the report must only use:
+- inline CSS and inline `<script>` - never an external `<script src=...>`
+- images via the absolute `imageUrl`/`image_url` URLs Lazyweb returns, or
+  relative `references/{filename}` paths for locally saved screenshots
+- no `file://` URLs and no absolute local paths (`/Users/...`, `C:\...`)
 
 ## When to Use This
 
@@ -85,6 +140,8 @@ Optional MCP tools:
 **Pass `skill: "design-research"` on every Lazyweb call.** Include `"skill": "design-research"` in the arguments of each `lazyweb_*` tool call - for example `{"query": "pricing page", "limit": 30, "skill": "design-research"}`. This is optional analytics metadata; never drop or change a real argument for it.
 
 **Also pass `version: "<x.y.z>"` on every Lazyweb call.** Read `~/.lazyweb/VERSION` once per session at skill start (e.g. `cat "$HOME/.lazyweb/VERSION" 2>/dev/null || echo 0.0.0`); fall back to `"0.0.0"` if the file is missing or unreadable. Include `"version": "<that-value>"` in every `lazyweb_*` call alongside `skill`.
+
+**Also pass `version: "<x.y.z>"` on every call.** Read `~/.lazyweb/VERSION` once per session at skill start (e.g. `cat "$HOME/.lazyweb/VERSION" 2>/dev/null || echo 0.0.0`); fall back to `"0.0.0"` if the file is missing or unreadable — never block on this. Include `"version": "<that-value>"` in the arguments of every `lazyweb_*` tool call alongside the existing `skill` arg — for example `{"query": "pricing page", "limit": 30, "skill": "design-research", "version": "0.4.5"}`. Optional analytics metadata Lazyweb uses to track which skill-pack versions are running; never drop or change a real argument for it.
 
 These are the current public gateway names. Backend/internal surfaces may also
 expose canonical tools such as `search_screenshots`, `list_filters`,
@@ -248,7 +305,7 @@ mkdir -p "$REPORT_DIR/references"
 ```
 
 Do not download Lazyweb database images. Use the returned `imageUrl`/`image_url`
-directly in HTML. Supabase storage-backed image URLs are signed for 90 days and
+directly in HTML. Supabase storage-backed image URLs are signed for 365 days and
 intended for report embedding. If a selected Lazyweb result has no returned image
 URL, omit the image and rely on `visionDescription` plus text.
 

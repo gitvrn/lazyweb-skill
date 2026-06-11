@@ -233,6 +233,60 @@ write a durable HTML report to `.lazyweb/ab-test-research/{topic}-{date}/report.
 **The report must center the actual experiments** — control vs variant, what changed,
 and the learning — not just a synthesized opinion.
 
+## Publish a Shareable Link (whenever an HTML report was written)
+
+Every report is auto-published to lazyweb.com so the user can share it with
+teammates. Right after writing `report.html`, run this with `$REPORT_DIR` set
+to `.lazyweb/ab-test-research/{topic}-{date}`:
+
+```bash
+LAZYWEB_TOKEN=$(cat "$HOME/.lazyweb/lazyweb_mcp_token" 2>/dev/null || true)
+if [ -n "$LAZYWEB_TOKEN" ]; then
+  python3 - "$REPORT_DIR" "$LAZYWEB_TOKEN" "ab-test-research" <<'PUBLISH_EOF'
+import base64, json, pathlib, sys, urllib.error, urllib.request
+report_dir, token, skill = pathlib.Path(sys.argv[1]), sys.argv[2], sys.argv[3]
+version_file = pathlib.Path.home() / ".lazyweb" / "VERSION"
+version = version_file.read_text().strip() if version_file.exists() else "0.0.0"
+html = (report_dir / "report.html").read_text(encoding="utf-8")
+refs = report_dir / "references"
+assets = [
+    {"name": p.name, "b64": base64.b64encode(p.read_bytes()).decode()}
+    for p in (sorted(refs.iterdir()) if refs.is_dir() else [])
+    if p.is_file()
+]
+body = json.dumps({"skill": skill, "version": version, "html": html, "assets": assets}).encode()
+req = urllib.request.Request(
+    "https://www.lazyweb.com/api/reports",
+    data=body,
+    headers={"Content-Type": "application/json", "Authorization": f"Bearer {token}"},
+)
+try:
+    resp = json.loads(urllib.request.urlopen(req, timeout=90).read())
+    print(f"SHAREABLE_URL: {resp['url']}")
+except urllib.error.HTTPError as exc:
+    print(f"PUBLISH_FAILED: {exc.code} {exc.read().decode()[:500]}")
+except Exception as exc:
+    print(f"PUBLISH_SKIPPED: {exc}")
+PUBLISH_EOF
+fi
+```
+
+- On `SHAREABLE_URL:`, include the link in the final summary next to the local
+  path: "Shareable link: {url} (unlisted — anyone with the link can view)".
+- On `PUBLISH_FAILED: 400 ...` the body names exactly what is unhostable
+  (e.g. `missing_assets` lists files, `unhostable_local_reference` quotes the
+  bad src). Fix the report and re-run the publish ONCE.
+- On `PUBLISH_SKIPPED:` or a missing token, say nothing about publishing and
+  continue — publish failure NEVER fails the skill; the local report stands.
+
+### Hosting-safe HTML (the template already complies — keep it that way)
+
+The hosted copy is served byte-for-byte, so the report must only use:
+- inline CSS and inline `<script>` — never an external `<script src=...>`
+- images via the absolute `imageUrl`/`image_url` URLs Lazyweb returns, or
+  relative `references/{filename}` paths for locally saved screenshots
+- no `file://` URLs and no absolute local paths (`/Users/...`, `C:\...`)
+
 ### Fields `lazyweb_ab_test_research` (operation `research`) returns by default
 
 Per experiment in `evidence.experiments[]` (no flags needed):
@@ -246,7 +300,7 @@ Experiment images are returned as full URLs. Use `control.imageUrl` or
 `control.image_url`, and `variant.imageUrl` or `variant.image_url`, directly.
 Some adjacent experiment objects may expose aliases such as `control_image_url`,
 `controlImageUrl`, `variant_image_url`, or `variantImageUrl`; use those directly
-when present. Supabase storage-backed URLs are signed for 90 days. Do not use
+when present. Supabase storage-backed URLs are signed for 365 days. Do not use
 screenshot IDs, and do not construct storage URLs from raw `path` values. If an
 image URL is missing, drop that `<img>` and keep the `vision_description`.
 `company_name` is a crawl seed — you may clean an obvious slug but never invent
