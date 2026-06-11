@@ -8,3 +8,5 @@ browse/dist/.version
 browse/node_modules/
 bun.lock
 .gstack/
+.lazyweb/
+
