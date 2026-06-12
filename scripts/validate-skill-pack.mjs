@@ -106,10 +106,59 @@ const setupPath = path.join(root, "setup");
 assert.ok(existsSync(setupPath), "missing root setup script");
 assert.ok(statSync(setupPath).mode & 0o111, "root setup must be executable");
 
-for (const binName of ["lazyweb-context-detect", "lazyweb-log", "lazyweb-telemetry-flush", "lazyweb-update", "lazyweb-update-check"]) {
+for (const binName of ["lazyweb-context-detect", "lazyweb-log", "lazyweb-router", "lazyweb-telemetry-flush", "lazyweb-update", "lazyweb-update-check"]) {
   const binPath = path.join(root, "bin", binName);
   assert.ok(existsSync(binPath), `missing bin/${binName}`);
   assert.ok(statSync(binPath).mode & 0o111, `bin/${binName} must be executable`);
+}
+assert.ok(existsSync(path.join(root, "bin", "lazyweb-hosts.sh")), "missing bin/lazyweb-hosts.sh (shared host table, sourced by setup and lazyweb-router)");
+
+// --- Autorouter contract (specs/autorouter.md §11.3, §12 Step 2b) ----------
+// 1. Every mode skill must carry a NON-EMPTY `route:` frontmatter value — the
+//    renderer builds the injected routing table from it, so an empty value
+//    would emit a blank intent cell that routes nothing.
+function frontmatterOf(text) {
+  const m = text.match(/^---\n([\s\S]*?)\n---\n/);
+  return m ? m[1] : "";
+}
+for (const dir of visibleModeSkillDirs) {
+  const fm = frontmatterOf(read(`${dir}/SKILL.md`));
+  const m = fm.match(/^route:\s*(.+)$/m);
+  assert.ok(m, `${dir}/SKILL.md missing route: frontmatter (used by lazyweb-router to render the autorouter table)`);
+  const value = m[1].trim().replace(/^["']|["']$/g, "").trim();
+  assert.ok(value.length > 0, `${dir}/SKILL.md has an empty route: value`);
+}
+
+// 2. Structural sync invariant: set-equality of skill identifiers between
+//    skills/*/ and the root SKILL.md routing table. (Direction "every dir is
+//    in the table" is asserted above; this is the inverse — the table must
+//    not reference a mode that does not exist on disk.) Deliberately NOT a
+//    prose diff: router rows are trigger-shaped, the root table is
+//    category-shaped (spec B3).
+const skillDirNames = new Set(visibleModeSkillDirs.map((dir) => path.basename(dir)));
+for (const match of router.matchAll(/skills\/([a-z0-9-]+)\/SKILL\.md/g)) {
+  assert.ok(skillDirNames.has(match[1]), `root SKILL.md routes to skills/${match[1]}/SKILL.md which does not exist on disk`);
+}
+
+// 3. Router template: required placeholders, markers, and the table rows left
+//    to the renderer ({{ROWS}}), never hardcoded mode rows that could strand a
+//    new mode.
+const routerTemplate = read("router/ROUTER.template.md");
+assert.match(routerTemplate, /<!-- LAZYWEB:ROUTER:BEGIN v\{\{VERSION\}\}/, "router template missing versioned BEGIN marker");
+assert.match(routerTemplate, /<!-- LAZYWEB:ROUTER:END -->/, "router template missing END marker");
+for (const placeholder of ["{{ACT_PREAMBLE}}", "{{ROWS}}"]) {
+  const count = routerTemplate.split(placeholder).length - 1;
+  assert.equal(count, 1, `router template must contain ${placeholder} exactly once (found ${count})`);
+}
+assert.doesNotMatch(routerTemplate, /lazyweb-(design|quick|paywall|signup|ab|update)[a-z-]*/, "router template must not hardcode mode rows — rows are rendered from skills/*/ frontmatter");
+
+// 4. Host portability guard (Step 2b): no skill BODY prose may name a
+//    Claude-only tool — the router delivers users into these files on hosts
+//    that do not have that tool. `allowed-tools:` frontmatter is exempt
+//    (non-Claude hosts ignore unknown allowed-tools).
+for (const relativePath of ["SKILL.md", ...visibleModeSkillDirs.map((dir) => `${dir}/SKILL.md`)]) {
+  const body = read(relativePath).replace(/^---\n[\s\S]*?\n---\n/, "");
+  assert.doesNotMatch(body, /AskUserQuestion/, `${relativePath} body prose names Claude-only tool AskUserQuestion — use host-neutral phrasing ("ask the user one short clarifying question")`);
 }
 
 // Every discovered mode skill must be documented in the README "Visible

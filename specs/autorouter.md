@@ -1,9 +1,9 @@
 # Lazyweb Autorouter — Implementation Spec
 
-**Status:** Draft — revised after codebase review
+**Status:** Shipped at v0.7.0 — eval gate PASSED, host coverage resolved (§12 Steps 6 + 6b done). Only the server-side MCP-session offer (§7.2, lazyweb.com infra, not this repo) remains external.
 **Owner:** Ali
-**Target version:** 0.5.0
-**Last updated:** 2026-06-10
+**Target version:** 0.5.0 spec → shipped as **0.7.0** (built on 0.6.1)
+**Last updated:** 2026-06-11
 
 > **Revision note (codebase review).** This draft was pressure-tested against
 > the actual `setup`, `SKILL.md`, `scripts/validate-skill-pack.mjs`, and the
@@ -53,6 +53,55 @@
 > The eval also **refuted** three earlier worries (the `--yes` "consent bypass,"
 > a supposed server-side/repo-edit confusion, and the opencode-XDG
 > "contradiction") — left as-is deliberately.
+>
+> **Implementation note (2026-06-11, lands Steps 1–5).** Where shipped code
+> diverges from the letter of this spec:
+> - **The pack grew to 10 skills** before implementation; a naive render blew
+>   the 1,800 B budget (worst host: 2,094 B). Per §4.1/§10 the budget held and
+>   the content gave way: `route:` trigger texts were tightened, the catch-all
+>   row shortened, skills-root paths render in `~` form (byte count no longer
+>   varies with the username), and **`lazyweb-update` opts out of the routed
+>   table via new `router-exclude: true` frontmatter** — it is a maintenance
+>   command, not a design intent. Worst host now renders 1,790 B. The render
+>   test enforces ≤1,800 B per routable host, so the 11th mode will fail CI
+>   rather than silently overflow.
+> - **`--project` shipped inside `lazyweb-router`** (consent-gated; AGENTS.md +
+>   CLAUDE.md with symlink/`@`-import collapse and the identical-copies
+>   notice), with a host-neutral `project` ACT_PREAMBLE.
+> - **Telemetry shipped** (M5): `lazyweb-log` gained a generic `event` kind and
+>   a per-machine random UUID (`~/.lazyweb/machine_id`, 0600) stamped on every
+>   event; `lazyweb-router` emits `router_install/refresh/remove/decline`.
+> - **`refresh` is manifest-driven** (covers project entries), not a host-table
+>   walk; `setup` runs it on every re-run after skills are reinstalled.
+> - **Step 2b widened:** beyond the four "ask ONE AskUserQuestion" lines, two
+>   "when AskUserQuestion is unavailable" fallback mentions in design-research
+>   were also scrubbed; the validator now rejects the tool name in any skill
+>   body prose.
+> - Open: §7.2's server-side MCP session offer (lazyweb.com, not this repo),
+>   the §11.4 blocking routing evals (the committed transcript predates this
+>   implementation), §12 Step 6b host verification, and the version bump.
+>
+> **Ship note (2026-06-11, v0.7.0 — gate cleared, shipping).**
+> - **§11.4 routing-eval gate: PASS.** Ran a fresh 48-prompt controlled eval
+>   (≥3 in-scope per routable mode + 12 out-of-scope incl. adversarial
+>   near-misses), each decided by a fresh agent given only the rendered block.
+>   Result **34/36 (94.4%) exact in-scope, 0/12 out-of-scope false positives** —
+>   both bars cleared. Transcript committed at
+>   [test/routing-evals/claude-0.7.0.md](../test/routing-evals/claude-0.7.0.md).
+>   Two defensible borderline misroutes (di4, bp4) fall through to
+>   `design-research`; documented, not over-fitted away. (First batch run was
+>   inconclusive purely from transient server rate-limiting, not routing
+>   errors; re-run in rate-limit-safe sequential waves + a direct re-run of the
+>   2 throttled paywall cases.)
+> - **§12 Step 6b host coverage: RESOLVED.** Only `claude` + `codex` have
+>   driveable CLIs on this machine; `kiro`/`factory`/`slate`/`hermes` ship as
+>   config dirs with no public global-instruction-file contract and cannot be
+>   empirically driven here. They therefore **stay capability-flag OFF →
+>   project-fallback** (`host_capability_on()` in `bin/lazyweb-hosts.sh`), and
+>   `claude`/`codex`/`opencode` remain the user-level set. This is the
+>   spec-compliant "don't write where we haven't confirmed the host reads"
+>   outcome, now final rather than TBD.
+> - **VERSION → 0.7.0**; spec status set to Shipped.
 
 ---
 

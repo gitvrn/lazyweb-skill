@@ -9,10 +9,11 @@ AUTO_UPDATE_MARKER="${LAZYWEB_AUTO_UPDATE_MARKER:-$HOME/.lazyweb/auto_update}"
 HOST="auto"
 QUIET=0
 AUTO_UPDATE_CHOICE=""
+ROUTER_CHOICE=""
 
 usage() {
   cat <<'USAGE'
-Usage: ./setup [--host auto|all|codex|claude|cursor|opencode|kiro|factory|slate|hermes|antigravity] [--quiet] [--auto-update|--no-auto-update]
+Usage: ./setup [--host auto|all|codex|claude|cursor|opencode|kiro|factory|slate|hermes|antigravity] [--quiet] [--auto-update|--no-auto-update] [--router|--no-router]
 
 Installs the standalone Lazyweb skill pack and configures direct Lazyweb MCP
 access for supported local coding clients.
@@ -21,6 +22,9 @@ Flags:
   --auto-update     Opt in to silent automatic updates (creates
                     ~/.lazyweb/auto_update). Skips the interactive prompt.
   --no-auto-update  Opt out and skip the prompt; updates remain advisory.
+  --router          Install the Lazyweb autorouter (a marked routing block in
+                    each agent's global instruction file) without the prompt.
+  --no-router       Skip the autorouter and persist the decline.
 USAGE
 }
 
@@ -45,6 +49,14 @@ while [ "$#" -gt 0 ]; do
       ;;
     --no-auto-update)
       AUTO_UPDATE_CHOICE="off"
+      shift
+      ;;
+    --router)
+      ROUTER_CHOICE="on"
+      shift
+      ;;
+    --no-router)
+      ROUTER_CHOICE="off"
       shift
       ;;
     -h|--help)
@@ -143,7 +155,8 @@ install_version_marker() {
 
 install_lazyweb_bins() {
   mkdir -p "$HOME/.lazyweb/bin"
-  for bin_name in lazyweb-context-detect lazyweb-log lazyweb-telemetry-flush lazyweb-update lazyweb-update-check; do
+  # lazyweb-hosts.sh is sourced by lazyweb-router and must sit beside it.
+  for bin_name in lazyweb-context-detect lazyweb-hosts.sh lazyweb-log lazyweb-router lazyweb-telemetry-flush lazyweb-update lazyweb-update-check; do
     [ -f "$ROOT/bin/$bin_name" ] || continue
     link_or_copy "$ROOT/bin/$bin_name" "$HOME/.lazyweb/bin/$bin_name"
     chmod +x "$HOME/.lazyweb/bin/$bin_name" 2>/dev/null || true
@@ -322,6 +335,13 @@ else
   done
 fi
 
+# Autorouter refresh (specs/autorouter.md §7.4): every consented routing block
+# is silently re-rendered so the injected table stays in lockstep with the
+# skill list. No manifest -> no-op. Never blocks setup.
+if [ -s "$HOME/.lazyweb/router.manifest.json" ]; then
+  "$ROOT/bin/lazyweb-router" refresh >/dev/null 2>&1 || true
+fi
+
 cat <<EOF
 
 Lazyweb setup complete.
@@ -379,6 +399,61 @@ case "$AUTO_UPDATE_CHOICE" in
             ;;
         esac
       fi
+    fi
+    ;;
+esac
+
+# Autorouter opt-in (specs/autorouter.md §7.1). Resolved explicitly via
+# --router / --no-router, otherwise offered once interactively with a preview.
+# Quiet/piped installs NEVER inject: MCP configs are tooling, but instruction
+# files are user-authored prose — explicit consent only; they get a tip line.
+ROUTER_BIN="$ROOT/bin/lazyweb-router"
+ROUTER_MANIFEST="$HOME/.lazyweb/router.manifest.json"
+router_declined_flag() {
+  grep -q '^router_declined=1' "$HOME/.lazyweb/config" 2>/dev/null
+}
+case "$ROUTER_CHOICE" in
+  on)
+    "$ROUTER_BIN" install --all --yes || true
+    log "Autorouter installed. Remove later: ~/.lazyweb/bin/lazyweb-router remove --all"
+    ;;
+  off)
+    "$ROUTER_BIN" decline >/dev/null 2>&1 || true
+    log "Autorouter left off. Enable later: ~/.lazyweb/bin/lazyweb-router install"
+    ;;
+  *)
+    if [ -s "$ROUTER_MANIFEST" ] || router_declined_flag; then
+      : # already resolved (installed earlier, or declined) — never re-ask
+    elif [ "$QUIET" -eq 0 ] && [ -t 0 ]; then
+      # Preview with the first routable host so the user sees the exact block.
+      # shellcheck source=/dev/null
+      . "$ROOT/bin/lazyweb-hosts.sh"
+      ROUTER_PREVIEW_HOST=""
+      for _rh in $(host_all); do
+        if host_routable "$_rh"; then ROUTER_PREVIEW_HOST="$_rh"; break; fi
+      done
+      if [ -n "$ROUTER_PREVIEW_HOST" ]; then
+        printf '\nLazyweb can add this routing section to your agents'\'' global instruction\nfiles so design questions auto-route to the right Lazyweb mode:\n\n'
+        "$ROUTER_BIN" render --host "$ROUTER_PREVIEW_HOST" 2>/dev/null || true
+        printf '\nAdd Lazyweb routing to your agents'\'' global instructions? [y/N] '
+        if read -r LAZYWEB_ROUTER_ANSWER; then
+          case "$LAZYWEB_ROUTER_ANSWER" in
+            y|Y|yes|Yes|YES)
+              "$ROUTER_BIN" install --all --yes || true
+              ;;
+            n|N|no|No|NO)
+              "$ROUTER_BIN" decline || true
+              ;;
+            *)
+              # No answer (M7): skip WITHOUT persisting a decline, so the
+              # once-per-session MCP offer remains the single follow-up.
+              log "Skipped for now. Add later: ~/.lazyweb/bin/lazyweb-router install"
+              ;;
+          esac
+        fi
+      fi
+    elif [ "$QUIET" -eq 0 ]; then
+      printf '\nTip: run ~/.lazyweb/bin/lazyweb-router install to auto-route design questions\nto the right Lazyweb mode (adds a marked block to your agents'\'' instructions).\n'
     fi
     ;;
 esac

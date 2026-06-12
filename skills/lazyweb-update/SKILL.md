@@ -1,6 +1,7 @@
 ---
 name: lazyweb-update
 route: 'Updating local Lazyweb skills, reinstalling Lazyweb, or syncing Lazyweb into agentic IDEs'
+router-exclude: true
 description: |
   Update the local Lazyweb skill pack from GitHub and reinstall Lazyweb skills
   into supported local coding clients and agentic IDEs. Use when the user asks
