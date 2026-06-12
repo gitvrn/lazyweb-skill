@@ -419,6 +419,10 @@ On success, `work/evidence.json` holds merged, same-company-deduped references
      (`{shareable_url}references/current-state.png`) — never inline base64
      through chat; if the skeleton publish failed, SKIP compare_image
      entirely rather than base64-ing.
+   Expect top-up results to be description-less near-dupes more often than
+   not: budget at most 2 vision-verifications from the round, and when it
+   yields nothing attachable, record it as saturation confirmation (your
+   corpus was already complete) rather than a failure.
 3. **Coverage honesty:** if `coverage_summary` shows failed or low_coverage
    queries — even when the script exits 0 — carry that into the report's
    `.corpus` banner when the selected corpus lands under 8 references or a
@@ -609,9 +613,10 @@ learnings as directional unless the tool returns measured lift. If the tool is
 unavailable or returns no on-context experiments, say so in the relevant card
 ("design-prevalence signal") — never imply measured lift.
 
-Call it with `include_images: false` and a small analysis limit (e.g.
-`analysis_experiment_limit: 8`) — full responses exceed many hosts'
-tool-result caps (88KB observed) and force a dump-to-file detour.
+Run it THROUGH `fetch-evidence.py` (add it as an entry in the top-up plan —
+the script speaks generic tools/call) so the response lands in a file instead
+of a tool-result dump; even capped calls (`include_images: false`,
+`analysis_experiment_limit: 8`) have returned 98KB, past most hosts' caps.
 
 Context traps with this tool:
 - **Discard off-context experiments** (wrong platform or screen type, e.g.
@@ -1215,7 +1220,11 @@ Rules for filling it:
 - Avoid horizontal page overflow at every scale setting and viewport width.
 - Fill with plain string replacement, not regex substitution — `re.sub`
   raises `bad escape` when replacement text contains backslashes (the `_vars`
-  block will); use `str.replace` or a lambda replacement.
+  block will); use `str.replace` or a lambda replacement. Slice between the
+  template's STABLE landmarks when replacing whole sections — section
+  boundaries like `<div class="compare">`, `<h3 class="why-h">`,
+  `<section id="inspo"`, and `<footer class="lw-foot">` are guaranteed; do
+  not assume closing-tag positions.
 - **Verification is the contract gate, nothing more.** Do not browse-load,
   screenshot, or vision-inspect the finished report — the template is
   render-tested and the publish gate catches contract violations. Run the
