@@ -1,0 +1,284 @@
+<!doctype html>
+<!--
+  Lazyweb design-research report v3 — CANONICAL TEMPLATE.
+  Copy this file to $REPORT_DIR/report.html and fill the {{PLACEHOLDERS}}.
+  Do NOT hand-write the skeleton, CSS, or JS — they are render-tested.
+
+  Conventions:
+  - {{LIKE_THIS}} = replace with content. Keep surrounding markup intact.
+  - <!~ REPEAT ... ~> comments mark blocks to duplicate per item.
+  - <!~ VARIANT ... ~> comments mark optional class swaps.
+  - ESCAPE every interpolated string: in HTML attributes/captions escape
+    " < > as &quot; &lt; &gt;. In the _vars JS literals escape ' and \.
+  - Delete the Inspo section entirely if fewer than 8 comparable references.
+  - Delete the .corpus banner unless evidence is thin (<8 refs) or mismatched.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Design Research: {{TOPIC}}</title>
+<style>
+:root{--ink:#1f2328;--mut:#57606a;--line:#d0d7de;--soft:#eef4fb;--accent:#0969da;--s:1}
+html[data-scale="s"]{--s:.78}html[data-scale="l"]{--s:1.25}
+body{margin:0;font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink);background:#fff}
+main{max-width:min(1480px,95vw);margin:0 auto;padding:32px clamp(16px,3vw,40px) 56px}
+h1,h2,h3,p{letter-spacing:0}h1{font-size:34px;line-height:1.1;margin:0 0 24px}h2{font-size:24px;margin:40px 0 14px}h3{font-size:16px;margin:14px 0 6px}
+.goal p{font-size:20px;max-width:820px;margin:0}
+.agent-instructions{background:var(--soft);border-left:4px solid var(--accent);border-radius:8px;padding:14px 16px;margin:18px 0}
+.ai-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:8px}
+.ai-badge{font-size:11px;font-weight:700;letter-spacing:.04em;color:#0a3b78}
+.ai-copy{font-weight:600;font-size:12px;line-height:1;cursor:pointer;border:1px solid var(--accent);color:var(--accent);background:#fff;border-radius:6px;padding:5px 11px}.ai-copy:hover{background:var(--accent);color:#fff}
+.ai-human{margin:0 0 10px;font-size:15px}
+.ai-block{white-space:pre-wrap;word-break:break-word;background:#fff;border:1px solid var(--line);border-radius:6px;padding:12px 13px;margin:0;font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;user-select:all}
+.corpus{display:flex;gap:8px;align-items:flex-start;font-size:13px;color:#8a5a00;background:#fff8e6;border:1px solid #f0e0b0;border-radius:8px;padding:9px 12px;margin:14px 0}.corpus b{color:var(--ink)}
+/* recommendation intro + section title */
+.rec-intro{max-width:980px;margin:0 0 16px;font-size:16px;line-height:1.55;color:var(--mut)}
+.rec-intro b{color:var(--ink)}
+.why-h{font-size:19px;margin:28px 0 4px}
+/* side-by-side compare — equal height-locked frames + variant switcher */
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start;max-width:calc(1400px*var(--s))}
+.cmp{margin:0;min-width:0}
+.cmp figcaption{margin:0 0 8px;min-height:28px;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:var(--mut);display:flex;gap:8px;align-items:center;justify-content:space-between}
+.cmp.is-recommended figcaption{color:var(--accent)}
+.vnav{display:none;gap:4px}
+.has-js .vnav{display:inline-flex}
+.vnav button{cursor:pointer;border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:6px;width:30px;height:24px;font-size:11px;line-height:1}
+.vnav button:hover{background:var(--soft);border-color:var(--accent);color:var(--accent)}
+.cmp-frame{border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fafbfc;aspect-ratio:16/10}
+.cmp-frame img{display:block;width:100%;height:100%;object-fit:cover;object-position:top;cursor:zoom-in}
+.compare.tall .cmp-frame{aspect-ratio:16/15}
+.compare.mobileset .cmp-frame{aspect-ratio:auto;height:calc(560px*var(--s));display:flex;align-items:center;justify-content:center;background:#0d1117}
+.compare.mobileset .cmp-frame img{width:auto;height:92%;object-fit:contain;border-radius:14px}
+/* options carousel */
+.deckwrap{margin:18px 0 8px}
+.option-deck{display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;padding:4px 2px 12px;scrollbar-width:thin}
+.option-deck>article{flex:0 0 calc(min(640px,84vw)*var(--s));scroll-snap-align:start;margin:0;border:1px solid var(--line);border-radius:12px;padding:14px;background:#fff;display:flex;flex-direction:column;gap:10px;min-width:0}
+.option-deck>article.is-recommended{border-color:var(--accent)}
+.option-deck h3{margin:0;font-size:17px;display:flex;align-items:center;gap:8px}
+.rec-flag{font-weight:700;font-size:10.5px;line-height:1;letter-spacing:.04em;text-transform:uppercase;color:var(--accent);background:var(--soft);border:1px solid #b6d4f7;border-radius:20px;padding:5px 10px;white-space:nowrap}
+.opt-points{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:5px;font-size:13.5px;color:var(--mut);line-height:1.5}
+.opt-points b{color:var(--ink)}
+.prototype-img{cursor:zoom-in}
+.proto-full{margin:0}.proto-full img{display:block;width:100%;height:auto;max-height:calc(560px*var(--s));object-fit:contain;object-position:top;border:1px solid var(--line);border-radius:8px;background:#fafbfc;cursor:zoom-in}
+.build-prompt{font-size:13px;color:var(--mut)}.build-prompt summary{cursor:pointer;font-weight:700;color:var(--ink)}
+/* mini evidence deck (also reused for any multi-reference proof) */
+.deck{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding:4px 2px 8px;scrollbar-width:thin}
+.deck>figure{flex:0 0 46%;max-width:320px;scroll-snap-align:center;margin:0;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff}
+.deck.mini>figure{flex-basis:44%;max-width:260px}
+.deck>figure>img{display:block;width:100%;height:auto;max-height:calc(420px*var(--s));object-fit:contain;background:#fafbfc}
+.deck>figure.shot-web>img{aspect-ratio:16/10;height:auto;max-height:none;object-fit:cover;object-position:top}
+.deck>figure.img-missing>img{display:none}
+.deck>figure.img-missing figcaption::after{content:' — image unavailable; see description';color:#cf222e}
+.deck .cap{font-size:12px;color:var(--mut);padding:7px 9px;line-height:1.4}.deck .cap b{color:var(--ink)}
+.deck .src{font-size:10.5px;font-weight:700;letter-spacing:.03em;color:var(--accent)}
+.deck-nav{display:none;gap:6px;justify-content:flex-end;margin-top:2px}
+.has-js .deck-nav{display:flex}
+.deck-nav button{cursor:pointer;border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:6px;width:34px;height:28px;font-size:13px;line-height:1}
+.deck-nav button:hover{background:var(--soft);border-color:var(--accent);color:var(--accent)}
+.prev{font-weight:600;font-size:11.5px;line-height:1;color:#0a3b78;background:var(--soft);border-radius:20px;padding:4px 10px;vertical-align:middle}
+/* clustered inspo map — set --map-h inline per population (520px for 8-10 points ... 760px for 14-16) */
+.inspo-map{position:relative;min-height:calc(var(--map-h,640px)*var(--s));border:1px solid var(--line);border-radius:10px;background:linear-gradient(var(--line),var(--line)) 50% 0/1px 100% no-repeat,linear-gradient(90deg,var(--line),var(--line)) 0 50%/100% 1px no-repeat,#fff}
+.inspo-map::before{content:var(--y-top);position:absolute;top:10px;left:50%;transform:translateX(-50%);color:var(--mut);font-size:12px;font-weight:700;z-index:10;background:rgba(255,255,255,.88);padding:2px 7px;border-radius:6px}
+.inspo-map::after{content:var(--y-bottom);position:absolute;bottom:10px;left:50%;transform:translateX(-50%);color:var(--mut);font-size:12px;font-weight:700;z-index:10;background:rgba(255,255,255,.88);padding:2px 7px;border-radius:6px}
+.inspo-axes{position:absolute;inset:0;pointer-events:none;z-index:10}
+.inspo-axes::before{content:var(--x-left);position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--mut);font-size:12px;font-weight:700;background:rgba(255,255,255,.88);padding:2px 7px;border-radius:6px}
+.inspo-axes::after{content:var(--x-right);position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--mut);font-size:12px;font-weight:700;background:rgba(255,255,255,.88);padding:2px 7px;border-radius:6px}
+.cluster-label{position:absolute;left:var(--x);top:var(--y);transform:translate(-50%,-50%);font-weight:700;font-size:11px;line-height:1;color:var(--mut);background:rgba(255,255,255,.88);border:1px dashed var(--line);border-radius:14px;padding:5px 11px;pointer-events:none;z-index:5;white-space:nowrap}
+.inspo-point{position:absolute;left:clamp(calc(100px*var(--s)),var(--x),calc(100% - 100px*var(--s)));top:clamp(calc(70px*var(--s)),var(--y),calc(100% - 70px*var(--s)));transform:translate(-50%,-50%);width:calc(200px*var(--s));padding:0;border:1px solid var(--line);border-radius:6px;background:#fff;cursor:zoom-in;overflow:hidden;transition:width .15s ease,left .15s ease;box-shadow:0 1px 4px rgba(31,35,40,.08)}
+.inspo-point:hover,.inspo-point:focus-visible{z-index:20;width:min(calc(520px*var(--s)),46vw);left:clamp(min(calc(260px*var(--s)),23vw),var(--x),calc(100% - min(260px*var(--s),23vw)));box-shadow:0 8px 30px rgba(31,35,40,.22);outline:2px solid var(--accent);outline-offset:2px}
+.inspo-img{display:block;width:100%;aspect-ratio:16/10;object-fit:cover;object-position:var(--pos,top center);background:#fafbfc}
+.inspo-point:hover .inspo-img,.inspo-point:focus-visible .inspo-img{aspect-ratio:16/11}
+.inspo-point.mob .inspo-img{aspect-ratio:9/16;object-fit:cover;object-position:top center}
+.inspo-point.mob:hover,.inspo-point.mob:focus-visible{width:min(calc(340px*var(--s)),30vw)}
+.inspo-point.mob:hover .inspo-img,.inspo-point.mob:focus-visible .inspo-img{aspect-ratio:auto;max-height:min(72vh,calc((var(--map-h,640px) - 40px)*var(--s)));object-fit:contain}
+/* annotated patterns — two-column grid of viewport-window screenshots + CSS bounding boxes */
+.patterns-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 24px;max-width:calc(1400px*var(--s))}
+@media(max-width:980px){.patterns-grid{grid-template-columns:1fr}}
+.pattern-shot{margin:10px 0 18px;min-width:0}
+.pattern-shot h3{display:flex;flex-wrap:wrap;align-items:center;gap:10px;font-size:15px}
+.annotated{position:relative;margin:0;width:100%;max-width:calc(720px*var(--s));aspect-ratio:var(--ar,16/11);border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fafbfc}
+.annotated img{display:block;width:100%;height:100%;object-fit:cover;object-position:var(--pos,center top);cursor:zoom-in}
+.annotated.mobile{width:calc(min(420px,100%)*var(--s));aspect-ratio:auto}
+.annotated.mobile img{height:auto;object-fit:fill;object-position:initial}
+.bbox{position:absolute;left:var(--x);top:var(--y);width:var(--w);height:var(--h);border:2px solid var(--accent);border-radius:4px;box-shadow:0 0 0 200vmax rgba(15,23,42,.16);pointer-events:none}
+.bbox>i{position:absolute;left:-2px;bottom:calc(100% + 6px);font:700 11px/1 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-style:normal;color:#fff;background:var(--accent);border-radius:5px;padding:5px 9px;white-space:nowrap}
+.bbox.flip-label>i{bottom:auto;top:calc(100% + 6px)}
+.annotated.multi .bbox{box-shadow:none}
+/* shared furniture: mock-frame (no-imagegen fallback) + control/variant flip (experiment evidence) */
+.mock{margin:14px 0}.mock .frame{border:1px solid var(--line);border-radius:14px;background:#fff;overflow:hidden}.mock.mobile .frame{max-width:300px;border-radius:26px;border:8px solid #1f2328}.mock.desktop .frame{max-width:760px}
+.mock .body{padding:14px;display:flex;flex-direction:column;gap:10px}.mock .box{background:var(--soft);border:1px dashed #b9c7d6;border-radius:8px;min-height:34px;display:flex;align-items:center;justify-content:center;color:#4a5a6a;font-size:12px;padding:8px}.mock .box.cta{background:var(--accent);border:0;color:#fff;font-weight:600}.mock .row{display:flex;gap:10px}.mock .row>.box{flex:1}.mock .cap{font-size:12px;color:var(--mut);margin-top:6px;text-align:center}
+.flip{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding-bottom:8px}
+@media(max-width:560px){.flip{grid-template-columns:1fr}}
+.flip>figure{margin:0}
+.flip>figure>img{width:100%;height:auto;max-height:580px;object-fit:contain;border:1px solid var(--line);border-radius:8px;background:#fafbfc}
+.flip figcaption{font-weight:600;font-size:12px;line-height:1.4;margin-top:5px}
+.flip .side{display:inline-block;font-weight:700;font-size:10px;line-height:1;letter-spacing:.04em;border-radius:5px;padding:3px 7px;margin-right:6px}
+.flip .side.c{color:#6e7781;background:#f6f8fa}
+.flip .side.v{color:#0a5d2a;background:#e6f4ea}
+.flip .vd{display:block;font-weight:400;color:var(--mut);font-size:11.5px;margin-top:3px}
+.flip figure.img-missing>img{display:none}
+.flip figure.img-missing figcaption::after{content:' — image unavailable; see description';color:#cf222e;font-weight:400}
+/* scalebar + lightbox */
+.scalebar{display:none;position:fixed;right:16px;bottom:16px;z-index:40;gap:4px;background:#fff;border:1px solid var(--line);border-radius:8px;padding:5px;box-shadow:0 4px 14px rgba(31,35,40,.14)}
+.has-js .scalebar{display:flex}
+.scalebar button{font-weight:700;font-size:11px;line-height:1;font-family:inherit;border:1px solid transparent;background:none;color:var(--mut);border-radius:5px;padding:7px 10px;cursor:pointer}
+.scalebar button[aria-pressed="true"]{color:var(--accent);border-color:var(--accent);background:var(--soft)}
+#lb{display:none;position:fixed;inset:0;z-index:50;background:rgba(13,17,23,.86);align-items:center;justify-content:center;padding:28px}
+#lb.open{display:flex}
+#lb img{max-width:96vw;max-height:92vh;border-radius:10px;box-shadow:0 12px 40px rgba(0,0,0,.55);background:#161b22}
+#lb .x{position:absolute;top:18px;right:22px;color:#fff;font-weight:700;font-size:26px;line-height:1;font-family:inherit;cursor:pointer;background:none;border:0}
+.lw-foot{margin-top:40px;padding-top:14px;border-top:1px solid var(--line);text-align:center;font-size:13px;color:var(--mut)}
+@media(max-width:880px){.compare{grid-template-columns:1fr}.compare.mobileset .cmp-frame{height:calc(480px*var(--s))}.option-deck>article{flex-basis:88vw}.inspo-map{min-height:calc(480px*var(--s))}.inspo-point{width:calc(150px*var(--s))}.inspo-point:hover,.inspo-point:focus-visible{width:min(86vw,calc(420px*var(--s)));left:clamp(min(43vw,calc(210px*var(--s))),var(--x),calc(100% - min(43vw,calc(210px*var(--s)))))}}
+</style>
+</head>
+<body>
+<main>
+<h1>Design Research: {{TOPIC}}</h1>
+
+<section id="agent-instructions" class="agent-instructions">
+  <div class="ai-head"><span class="ai-badge">FOR THE CODING AGENT</span>
+    <button class="ai-copy" type="button" onclick="
+      var sec=this.closest('.agent-instructions'); var txt=sec.querySelector('.ai-block').innerText;
+      var done=function(ok){this.textContent=ok?'Copied':'Press Cmd/Ctrl+C';setTimeout(function(){this.textContent='Copy';}.bind(this),1500);}.bind(this);
+      if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(function(){done(true);},function(){done(false);});}
+      else{var r=document.createRange();r.selectNodeContents(sec.querySelector('.ai-block'));var s=getSelection();s.removeAllRanges();s.addRange(r);try{document.execCommand('copy');done(true);}catch(e){done(false);}}">Copy</button>
+  </div>
+  <p class="ai-human">{{ONE_HUMAN_SENTENCE_RECOMMENDED_BET}}</p>
+  <pre class="ai-block">LAZYWEB REPORT — AGENT HANDOFF
+Use the report at {{REPORT_PATH}} as a starting point for {{TASK}}.
+
+TOP RECOMMENDATIONS (do first):
+1. {{RECOMMENDED_BET_IMPERATIVE}}
+2. {{RUNNER_UP_BET}}
+3. {{RUNNER_UP_BET}}
+
+INDEX ON: {{CONTROL_FRICTIONS_ATTACKED}}
+DO NOT OVER-INDEX ON: {{DIRECTIONAL_SIGNALS_AND_SKIP_CONDITIONS}}
+DIVE FURTHER: {{NEXT_SKILL_OR_TOOL}} — {{WHY}}
+
+Evidence basis: {{N_REFERENCES_AND_SOURCES}} · {{DATE}}</pre>
+</section>
+
+<!--~ OPTIONAL: only when evidence is thin (<8 selected references) or context-mismatched; otherwise DELETE ~-->
+<div class="corpus"><span>&#9888;</span><p style="margin:0"><b>Evidence basis:</b> {{CORPUS_CAVEAT}}</p></div>
+
+<section id="goal" class="goal">
+  <h2>Goal</h2>
+  <p>{{ONE_SENTENCE_TARGET_OUTCOME}}</p>
+</section>
+
+<section id="recommendation" class="recommendation">
+  <h2>Recommendation</h2>
+  <p class="rec-intro">{{WHAT_THE_RECOMMENDED_BET_CHANGES}} — <b>{{WHY_IT_WINS_ONE_SENTENCE}}</b></p>
+  <!--~ VARIANT: add class "tall" (16:15 frames) when the decisive evidence sits below a 16:10 fold;
+       add class "mobileset" for portrait/mobile screenshots; with NO control (greenfield),
+       delete the control figure and let the recommended figure span full width. ~-->
+  <div class="compare">
+    <figure class="cmp control">
+      <figcaption>Control</figcaption>
+      <div class="cmp-frame"><img src="references/current-state.png" alt="{{ACCURATE_CONTROL_DESCRIPTION}}" onclick="window.__zoom&&__zoom(this)"></div>
+    </figure>
+    <figure class="cmp is-recommended">
+      <figcaption><span id="vname">Recommended — {{BET_1_NAME}}</span>
+        <span class="vnav"><button type="button" aria-label="Previous variant" onclick="window.__vstep&&__vstep(-1)">&#9664;</button><button type="button" aria-label="Next variant" onclick="window.__vstep&&__vstep(1)">&#9654;</button></span>
+      </figcaption>
+      <div class="cmp-frame"><img id="vimg" src="references/prototype-{{BET_1_SLUG}}.png" alt="{{ACCURATE_PROTOTYPE_DESCRIPTION}}" onclick="window.__zoom&&__zoom(this)"></div>
+    </figure>
+  </div>
+
+  <h3 class="why-h">The &ldquo;why&rdquo; behind the recommendations</h3>
+  <div class="deckwrap">
+    <div class="option-deck">
+      <!--~ REPEAT one <article> per bet, recommended first.
+           Only the recommended card gets class "is-recommended" and the .rec-flag pill. ~-->
+      <article class="prototype-option is-recommended" id="bet-1">
+        <h3>{{BET_1_NAME}} <span class="rec-flag">Recommended option</span></h3>
+        <figure class="proto-full"><img class="prototype-img" src="references/prototype-{{BET_1_SLUG}}.png" alt="{{ACCURATE_DESCRIPTION}}" loading="lazy" onclick="window.__zoom&&__zoom(this)"></figure>
+        <ul class="opt-points">
+          <li><b>What:</b> {{THE_CHANGE_8_TO_14_WORDS}}</li>
+          <li><b>Why:</b> {{THE_MECHANISM_8_TO_14_WORDS}}</li>
+        </ul>
+        <div class="deck mini">
+          <!--~ REPEAT 2-3 figures; prevalence/whitespace count goes in the FIRST figcaption.
+               Tag desktop screenshots class="shot-web" (16:10 window crop); portrait figures untagged. ~-->
+          <figure class="shot-web"><img src="{{IMAGE_URL}}" alt="{{VISION_DESCRIPTION_ALT}}" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')"><figcaption class="cap"><span class="src">[{{SOURCE}}]</span> <b>{{COMPANY}}</b> — {{EXACT_UI_DETAIL}}. <b>{{PREVALENCE_OR_WHITESPACE_COUNT}}</b></figcaption></figure>
+          <figure class="shot-web"><img src="{{IMAGE_URL}}" alt="{{ALT}}" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')"><figcaption class="cap"><span class="src">[{{SOURCE}}]</span> <b>{{COMPANY}}</b> — {{EXACT_UI_DETAIL}}</figcaption></figure>
+        </div>
+        <!--~ OPTIONAL: mini deck with 3+ figures gets this nav right after the .deck:
+        <div class="deck-nav">
+          <button type="button" aria-label="Previous" onclick="var d=this.closest('.deck-nav').previousElementSibling,f=d.querySelector('figure');d.scrollBy({left:-((f?f.offsetWidth:240)+12),behavior:'smooth'})">&#9664;</button>
+          <button type="button" aria-label="Next" onclick="var d=this.closest('.deck-nav').previousElementSibling,f=d.querySelector('figure');d.scrollBy({left:(f?f.offsetWidth:240)+12,behavior:'smooth'})">&#9654;</button>
+        </div> ~-->
+        <details class="build-prompt"><summary>Agent prompt</summary><p>{{FULL_HYPOTHESIS_EVIDENCE_DETAIL_SKIP_CONDITION_AND_IMPLEMENTATION_BRIEF}}</p></details>
+      </article>
+      <!--~ END REPEAT ~-->
+    </div>
+    <div class="deck-nav">
+      <button type="button" aria-label="Previous" onclick="var d=this.closest('.deckwrap').querySelector('.option-deck'),f=d.querySelector('article');d.scrollBy({left:-((f?f.offsetWidth:560)+16),behavior:'smooth'})">&#9664;</button>
+      <button type="button" aria-label="Next" onclick="var d=this.closest('.deckwrap').querySelector('.option-deck'),f=d.querySelector('article');d.scrollBy({left:(f?f.offsetWidth:560)+16,behavior:'smooth'})">&#9654;</button>
+    </div>
+  </div>
+</section>
+
+<!--~ OPTIONAL SECTION: delete entirely if fewer than 8 comparable references.
+     Set --map-h to the population (520px for 8-10 points ... 760px for 14-16).
+     Keep point anchors inside 12%-88% on both axes. ~-->
+<section id="inspo" class="inspo">
+  <h2>Inspo</h2>
+  <div class="inspo-map" style="--map-h:{{MAP_HEIGHT}}px;--x-left:'{{X_LEFT}}';--x-right:'{{X_RIGHT}}';--y-top:'{{Y_TOP}}';--y-bottom:'{{Y_BOTTOM}}'">
+    <span class="inspo-axes" aria-hidden="true"></span>
+    <!--~ REPEAT 2-4 cluster labels positioned over their member groups ~-->
+    <span class="cluster-label" style="--x:{{X}}%;--y:{{Y}}%">{{CLUSTER_NAME}}</span>
+    <!--~ REPEAT 8-16 points; portrait references get class="inspo-point mob" ~-->
+    <button class="inspo-point" type="button" style="--x:{{X}}%;--y:{{Y}}%" data-source="{{PROVENANCE}}" onclick="window.__zoom&&__zoom(this.querySelector('img'))">
+      <img class="inspo-img" src="{{IMAGE_URL}}" alt="{{VISION_DESCRIPTION_ALT}}" loading="lazy">
+    </button>
+    <!--~ END REPEAT ~-->
+  </div>
+</section>
+
+<section id="interesting-patterns" class="patterns">
+  <h2>Interesting Patterns</h2>
+  <div class="patterns-grid">
+    <!--~ REPEAT one .pattern-shot per pattern (5-9 for a healthy corpus).
+         bbox coords are PERCENTAGES RELATIVE TO THE VISIBLE WINDOW (vision-verify them).
+         Single box: spotlight dim (default). Multiple boxes: add "multi" to .annotated.
+         Box in the top ~10% of the window: add "flip-label" so the chip drops below.
+         Mobile reference: class="annotated mobile" (whole screen, natural height). ~-->
+    <article class="pattern-shot">
+      <h3>{{PATTERN_OBSERVATION}} <span class="prev">{{SEEN_IN_N_OF_M}}</span></h3>
+      <figure class="annotated" style="--ar:16/11;--pos:center top">
+        <img src="{{IMAGE_URL}}" alt="{{ACCURATE_REFERENCE_DESCRIPTION}}" loading="lazy" data-source="{{PROVENANCE}}" onclick="window.__zoom&&__zoom(this)">
+        <span class="bbox" style="--x:{{X}}%;--y:{{Y}}%;--w:{{W}}%;--h:{{H}}%"><i>{{SHORT_LABEL_NAMING_THE_MOVE}}</i></span>
+      </figure>
+    </article>
+    <!--~ END REPEAT ~-->
+  </div>
+</section>
+
+<footer class="lw-foot">Powered by <a href="https://www.lazyweb.com">Lazyweb</a> &mdash; turn your agent into a design researcher... for free!</footer>
+</main>
+
+<div id="lb" aria-hidden="true"><button type="button" class="x" aria-label="Close">×</button><img alt="Expanded image"></div>
+<div class="scalebar" role="group" aria-label="Report scale">
+  <button type="button" data-s="s">S</button><button type="button" data-s="" aria-pressed="true">M</button><button type="button" data-s="l">L</button>
+</div>
+<script>
+document.body.classList.add('has-js');
+var _lb=document.getElementById('lb'),_i=_lb&&_lb.querySelector('img');
+window.__zoom=function(g){if(!_lb)return false;_i.src=g.currentSrc||g.src;_lb.classList.add('open');_lb.setAttribute('aria-hidden','false');return false;};
+if(_lb)_lb.addEventListener('click',function(){_lb.classList.remove('open');_lb.setAttribute('aria-hidden','true');_i.removeAttribute('src');});
+/* One entry per bet, recommended first. ESCAPE apostrophes/backslashes in n and a. */
+var _vars=[
+  {n:'Recommended — {{BET_1_NAME}}',s:'references/prototype-{{BET_1_SLUG}}.png',a:'{{ALT_1}}'},
+  {n:'{{BET_2_NAME}}',s:'references/prototype-{{BET_2_SLUG}}.png',a:'{{ALT_2}}'},
+  {n:'{{BET_3_NAME}}',s:'references/prototype-{{BET_3_SLUG}}.png',a:'{{ALT_3}}'}
+],_vi=0;
+window.__vstep=function(d){_vi=(_vi+d+_vars.length)%_vars.length;var v=_vars[_vi],img=document.getElementById('vimg');img.src=v.s;img.alt=v.a;document.getElementById('vname').textContent=v.n;};
+document.querySelectorAll('.scalebar button').forEach(function(b){b.addEventListener('click',function(){
+  if(b.dataset.s)document.documentElement.setAttribute('data-scale',b.dataset.s);else document.documentElement.removeAttribute('data-scale');
+  document.querySelectorAll('.scalebar button').forEach(function(x){x.setAttribute('aria-pressed',x===b)});});});
+</script>
+</body>
+</html>

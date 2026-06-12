@@ -145,6 +145,22 @@ for (const relativePath of ["README.md", "SKILL.md", ...visibleModeSkillDirs.map
 }
 
 const designResearchText = read("skills/lazyweb-design-research/SKILL.md");
+// The render-tested report skeleton/CSS/JS lives in the template file the
+// skill instructs agents to copy; component assertions check both.
+const designResearchTemplate = read("skills/lazyweb-design-research/report-template.html");
+const designResearchAll = designResearchText + "\n" + designResearchTemplate;
+assert.match(designResearchText, /report-template\.html/, "design-research skill must reference its report template");
+for (const templatePattern of [
+  /\{\{TOPIC\}\}/,
+  /window\.__vstep/,
+  /window\.__zoom/,
+  /id="lb"/,
+  /class="scalebar"/,
+  /REPEAT/,
+  /LAZYWEB REPORT — AGENT HANDOFF/
+]) {
+  assert.match(designResearchTemplate, templatePattern, `design-research report template missing ${templatePattern}`);
+}
 for (const pattern of [
   /## Report v3 Contract/,
   /## Goal/,
@@ -253,7 +269,7 @@ for (const pattern of [
   /Sharp recommendation/,
   /Trust in process\/evidence/
 ]) {
-  assert.match(designResearchText, pattern, `design-research v3 contract missing ${pattern}`);
+  assert.match(designResearchAll, pattern, `design-research v3 contract missing ${pattern}`);
 }
 
 for (const forbiddenHeading of [
@@ -265,7 +281,7 @@ for (const forbiddenHeading of [
   /^## Findings\b/m,
   /^## Sources\b/m
 ]) {
-  assert.doesNotMatch(designResearchText, forbiddenHeading, `design-research should not reintroduce old visible report heading ${forbiddenHeading}`);
+  assert.doesNotMatch(designResearchAll, forbiddenHeading, `design-research should not reintroduce old visible report heading ${forbiddenHeading}`);
 }
 for (const forbiddenV2Pattern of [
   /\.inspo-card/,
@@ -275,7 +291,7 @@ for (const forbiddenV2Pattern of [
   /<h3>Rec<\/h3>/,
   /<h3>Why<\/h3>/
 ]) {
-  assert.doesNotMatch(designResearchText, forbiddenV2Pattern, `design-research v3 should keep Recommendation side-by-side, option-led, and inspo image-only: ${forbiddenV2Pattern}`);
+  assert.doesNotMatch(designResearchAll, forbiddenV2Pattern, `design-research v3 should keep Recommendation side-by-side, option-led, and inspo image-only: ${forbiddenV2Pattern}`);
 }
 
 for (const guidanceFile of ["AGENTS.md", "CLAUDE.md"]) {
@@ -293,7 +309,7 @@ for (const guidanceFile of ["AGENTS.md", "CLAUDE.md"]) {
 // latter is forbidden. Scoped to design-research for now: the other skills'
 // CSS contracts still carry the legacy bug (tracked for a separate fix) —
 // broaden to allSkillText once they are cleaned.
-assert.doesNotMatch(designResearchText, /font:[^;{}`]*\binherit\s*[;}]/, "design-research CSS contract must not use `inherit` inside the font shorthand (browsers drop the declaration)");
+assert.doesNotMatch(designResearchAll, /font:[^;{}`]*\binherit\s*[;}]/, "design-research CSS contract must not use `inherit` inside the font shorthand (browsers drop the declaration)");
 
 assert.match(allSkillText, /signed for\s+365 days/i, "skill docs should state Lazyweb storage image URLs are signed for 365 days");
 assert.doesNotMatch(allSkillText, /signed for\s+90 days/i, "stale 90-day signing claim must not reappear in skill docs");

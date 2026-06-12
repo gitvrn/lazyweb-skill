@@ -654,11 +654,14 @@ persuasion mechanism, regardless of archetype.
    visual rules, references to borrow from and to avoid, and the outcome it
    optimizes
 
-In the rendered option card, items 2-5 compress into a structured
-`.opt-points` bullet list under the title — `<b>What:</b>` / `<b>Why:</b>` /
-`<b>Proof:</b>` / `<b>Skip if:</b>`, one short line each, lead-ins bolded. No
-chips, no badge clutter, no paragraph prose. The mini evidence deck and the
-collapsed `.build-prompt` carry the rest.
+In the rendered option card, only items 2-3 surface, as a two-bullet
+`.opt-points` list under the title — `<b>What:</b>` and `<b>Why:</b>`, each
+**8-14 words maximum**, lead-ins bolded. No Proof bullet, no Skip-if bullet,
+no chips, no paragraph prose. Evidence (item 4) renders as the mini deck
+itself — put the prevalence/whitespace count in the deck's first figcaption
+("0 of 17 pricing pages do this"). The skip condition (item 5) lives inside
+the collapsed `.build-prompt`, and the handoff block's DO-NOT-OVER-INDEX-ON
+line.
 
 ### Pick the winner
 
@@ -898,18 +901,19 @@ nothing else (no legend table, no ranking chips):
    carousel reads as the reasoning section, not a second gallery.
 4. **Options carousel** (`.option-deck`): every bet (recommended first) as a
    same-size `.prototype-option` card in a horizontal snap scroller with ◀ ▶
-   nav. Each card: title, the FULL prototype image uncropped (`.proto-full` —
-   natural height capped, `object-fit:contain`), then a structured
-   `.opt-points` bullet list — NOT a paragraph. Three to four short bullets,
-   each opening with a bolded lead-in: `<b>What:</b>` the change in one line;
-   `<b>Why:</b>` the mechanism ("the product demonstrates its value before
-   asking; the control asks on faith"); `<b>Proof:</b>` the evidence in plain
-   words ("pi.fyi + Morning Brew run content-first pages; 0 of 14 in-category
-   render a full issue — directional, no measured lift"); `<b>Skip if:</b>`
-   the one-line wrong-move condition. Then a mini evidence `.deck` of 2-3
-   references (add a `.deck-nav` when more than two cards are present), and
-   the collapsed `.build-prompt`. **No archetype chips, no evidence badges**
-   — the bolded bullet lead-ins are the only structure.
+   nav. The recommended card's title carries a `.rec-flag` pill reading
+   `Recommended option`. Each card: title, the FULL prototype image uncropped
+   (`.proto-full` — natural height capped, `object-fit:contain`), then exactly
+   two `.opt-points` bullets — **`<b>What:</b>` and `<b>Why:</b>`, each 8-14
+   words max**. Example: "<b>What:</b> Live uptime + compliance dashboard
+   replaces the marketing band." / "<b>Why:</b> Demonstrated reliability
+   converts platform engineers; claims don't." Then a mini evidence `.deck`
+   of 2-3 references (prevalence/whitespace count goes in the FIRST
+   figcaption, e.g. "0 of 17 pricing pages do this"; add a `.deck-nav` when
+   more than two cards are present), and the collapsed `.build-prompt`
+   (which carries the full hypothesis sentence, evidence detail, and the
+   skip condition). **No Proof or Skip-if bullets, no archetype chips, no
+   evidence badges** — two short bolded bullets are the only visible text.
 
 When image generation is unavailable and a layout must still be shown, render
 an HTML/CSS `.mock` mock-frame (mobile or desktop) inside the option card —
@@ -918,8 +922,8 @@ images, render the pair with the shared `.flip` two-up grid inside the bet's
 evidence area.
 
 Keep chrome quiet: thin borders, no heavy shadows or nested cards. Counts like
-"8 selected references" live in the `.opt-points` bullets, hidden metadata, or
-the handoff block — never as standalone metric chips.
+"8 selected references" live in deck figcaptions, hidden metadata, or the
+handoff block — never as standalone metric chips or extra bullets.
 
 ### Optional Inspo section
 
@@ -1047,232 +1051,44 @@ The `report.html` file should:
   Similarly, when AskUserQuestion is unavailable or the run is unattended,
   make the closest reasonable assumption and state it in the handoff block.
 
-Baseline markup (adapt details to the evidence):
+### Report template (REQUIRED starting point — do not hand-write the skeleton)
 
-```html
-<section id="goal" class="goal">
-  <h2>Goal</h2>
-  <p>{one-sentence target outcome}</p>
-</section>
+A canonical, render-tested template ships next to this skill:
+`report-template.html` in the same directory as this SKILL.md (resolve via the
+skill's base directory). **Copy it to `$REPORT_DIR/report.html` and fill the
+`{{PLACEHOLDERS}}` — never generate the skeleton, CSS, or JS from scratch.**
 
-<section id="recommendation" class="recommendation">
-  <h2>Recommendation</h2>
-  <p class="rec-intro">{What the recommended bet changes, in one clause} — <b>{why it should win, one sentence}</b></p>
-  <div class="compare">
-    <figure class="cmp control">
-      <figcaption>Control</figcaption>
-      <div class="cmp-frame"><img src="references/current-state.png" alt="{accurate current-state description}" onclick="window.__zoom&&__zoom(this)"></div>
-    </figure>
-    <figure class="cmp is-recommended">
-      <figcaption><span id="vname">Recommended — {Bet 1 name}</span>
-        <span class="vnav"><button type="button" aria-label="Previous variant" onclick="window.__vstep&&__vstep(-1)">&#9664;</button><button type="button" aria-label="Next variant" onclick="window.__vstep&&__vstep(1)">&#9654;</button></span>
-      </figcaption>
-      <div class="cmp-frame"><img id="vimg" src="references/prototype-{bet-1-slug}.png" alt="{accurate prototype description}" onclick="window.__zoom&&__zoom(this)"></div>
-    </figure>
-  </div>
-
-  <h3 class="why-h">The &ldquo;why&rdquo; behind the recommendations</h3>
-  <div class="deckwrap">
-    <div class="option-deck">
-      <article class="prototype-option is-recommended" id="bet-1">
-        <h3>{Bet 1 name} <span class="rec-flag">Recommended</span></h3>
-        <figure class="proto-full"><img class="prototype-img" src="references/prototype-{bet-1-slug}.png" alt="{accurate description}" loading="lazy" onclick="window.__zoom&&__zoom(this)"></figure>
-        <ul class="opt-points">
-          <li><b>What:</b> {the change, one line}</li>
-          <li><b>Why:</b> {the mechanism, one line}</li>
-          <li><b>Proof:</b> {evidence in plain words — references + count + strength, one line}</li>
-          <li><b>Skip if:</b> {the one-line wrong-move condition}</li>
-        </ul>
-        <div class="deck mini">
-          <figure class="shot-web"><img src="{imageUrl}" alt="{visionDescription-based alt}" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')"><figcaption class="cap"><span class="src">[Lazyweb]</span> <b>{Company}</b> — {exact UI detail}</figcaption></figure>
-          <figure class="shot-web"><img src="{imageUrl}" alt="{alt}" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')"><figcaption class="cap"><span class="src">[Lazyweb]</span> <b>{Company}</b> — {exact UI detail}</figcaption></figure>
-        </div>
-        <!-- mini deck with 3+ figures: append this generic nav right after the .deck (scrolls its previous sibling):
-        <div class="deck-nav">
-          <button type="button" aria-label="Previous" onclick="var d=this.closest('.deck-nav').previousElementSibling,f=d.querySelector('figure');d.scrollBy({left:-((f?f.offsetWidth:240)+12),behavior:'smooth'})">&#9664;</button>
-          <button type="button" aria-label="Next" onclick="var d=this.closest('.deck-nav').previousElementSibling,f=d.querySelector('figure');d.scrollBy({left:(f?f.offsetWidth:240)+12,behavior:'smooth'})">&#9654;</button>
-        </div> -->
-        <details class="build-prompt"><summary>Agent prompt</summary><p>{detailed implementation brief}</p></details>
-      </article>
-      <!-- repeat per bet (no .is-recommended, no .rec-flag) -->
-    </div>
-    <div class="deck-nav">
-      <button type="button" aria-label="Previous" onclick="var d=this.closest('.deckwrap').querySelector('.option-deck'),f=d.querySelector('article');d.scrollBy({left:-((f?f.offsetWidth:560)+16),behavior:'smooth'})">&#9664;</button>
-      <button type="button" aria-label="Next" onclick="var d=this.closest('.deckwrap').querySelector('.option-deck'),f=d.querySelector('article');d.scrollBy({left:(f?f.offsetWidth:560)+16,behavior:'smooth'})">&#9654;</button>
-    </div>
-  </div>
-</section>
-
-<section id="inspo" class="inspo">
-  <h2>Inspo</h2>
-  <div class="inspo-map" style="--map-h:640px;--x-left:'Restrained';--x-right:'Assertive';--y-top:'Emotion-led';--y-bottom:'Utility-led'">
-    <span class="inspo-axes" aria-hidden="true"></span>
-    <span class="cluster-label" style="--x:24%;--y:22%">Proof-wall heroes</span>
-    <button class="inspo-point" type="button" style="--x:20%;--y:30%" data-source="{provenance}" onclick="window.__zoom&&__zoom(this.querySelector('img'))">
-      <img class="inspo-img" src="{imageUrl}" alt="{accurate visionDescription-based alt}" loading="lazy">
-    </button>
-    <!-- 8-16 points (portrait refs get class="inspo-point mob") + 2-4 cluster labels -->
-  </div>
-</section>
-
-<section id="interesting-patterns" class="patterns">
-  <h2>Interesting Patterns</h2>
-  <div class="patterns-grid">
-    <article class="pattern-shot">
-      <h3>{Pattern observation} <span class="prev">seen in 4 of 14</span></h3>
-      <figure class="annotated" style="--ar:16/11;--pos:center top">
-        <img src="{imageUrl}" alt="{accurate reference description}" loading="lazy" data-source="{provenance}" onclick="window.__zoom&&__zoom(this)">
-        <span class="bbox" style="--x:6%;--y:58%;--w:42%;--h:24%"><i>{Short label naming the move}</i></span>
-      </figure>
-    </article>
-    <!-- repeat .pattern-shot per pattern; the grid is two columns on desktop -->
-  </div>
-</section>
-
-<footer class="lw-foot">Powered by <a href="https://www.lazyweb.com">Lazyweb</a> &mdash; turn your agent into a design researcher... for free!</footer>
-
-<div id="lb" aria-hidden="true"><button type="button" class="x" aria-label="Close">×</button><img alt="Expanded image"></div>
-<div class="scalebar" role="group" aria-label="Report scale">
-  <button type="button" data-s="s">S</button><button type="button" data-s="" aria-pressed="true">M</button><button type="button" data-s="l">L</button>
-</div>
-<script>
-document.body.classList.add('has-js');
-var _lb=document.getElementById('lb'),_i=_lb&&_lb.querySelector('img');
-window.__zoom=function(g){if(!_lb)return false;_i.src=g.currentSrc||g.src;_lb.classList.add('open');_lb.setAttribute('aria-hidden','false');return false;};
-if(_lb)_lb.addEventListener('click',function(){_lb.classList.remove('open');_lb.setAttribute('aria-hidden','true');_i.removeAttribute('src');});
-var _vars=[
-  {n:'Recommended — {Bet 1 name}',s:'references/prototype-{bet-1-slug}.png',a:'{alt 1}'},
-  {n:'{Bet 2 name}',s:'references/prototype-{bet-2-slug}.png',a:'{alt 2}'},
-  {n:'{Bet 3 name}',s:'references/prototype-{bet-3-slug}.png',a:'{alt 3}'}
-],_vi=0;
-window.__vstep=function(d){_vi=(_vi+d+_vars.length)%_vars.length;var v=_vars[_vi],img=document.getElementById('vimg');img.src=v.s;img.alt=v.a;document.getElementById('vname').textContent=v.n;};
-document.querySelectorAll('.scalebar button').forEach(function(b){b.addEventListener('click',function(){
-  if(b.dataset.s)document.documentElement.setAttribute('data-scale',b.dataset.s);else document.documentElement.removeAttribute('data-scale');
-  document.querySelectorAll('.scalebar button').forEach(function(x){x.setAttribute('aria-pressed',x===b)});});});
-</script>
+```bash
+cp "{skill-base-dir}/report-template.html" "$REPORT_DIR/report.html"
 ```
 
-Minimum CSS contract:
+Rules for filling it:
 
-```css
-:root{--ink:#1f2328;--mut:#57606a;--line:#d0d7de;--soft:#eef4fb;--accent:#0969da;--s:1}
-html[data-scale="s"]{--s:.78}html[data-scale="l"]{--s:1.25}
-body{margin:0;font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink);background:#fff}
-main{max-width:min(1480px,95vw);margin:0 auto;padding:32px clamp(16px,3vw,40px) 56px}
-h1,h2,h3,p{letter-spacing:0}h1{font-size:34px;line-height:1.1;margin:0 0 24px}h2{font-size:24px;margin:40px 0 14px}h3{font-size:16px;margin:14px 0 6px}
-.goal p{font-size:20px;max-width:820px;margin:0}
-.agent-instructions{background:var(--soft);border-left:4px solid var(--accent);border-radius:8px;padding:14px 16px;margin:18px 0}
-.ai-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:8px}
-.ai-badge{font-size:11px;font-weight:700;letter-spacing:.04em;color:#0a3b78}
-.ai-copy{font-weight:600;font-size:12px;line-height:1;cursor:pointer;border:1px solid var(--accent);color:var(--accent);background:#fff;border-radius:6px;padding:5px 11px}.ai-copy:hover{background:var(--accent);color:#fff}
-.ai-human{margin:0 0 10px;font-size:15px}
-.ai-block{white-space:pre-wrap;word-break:break-word;background:#fff;border:1px solid var(--line);border-radius:6px;padding:12px 13px;margin:0;font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;user-select:all}
-.corpus{display:flex;gap:8px;align-items:flex-start;font-size:13px;color:#8a5a00;background:#fff8e6;border:1px solid #f0e0b0;border-radius:8px;padding:9px 12px;margin:14px 0}.corpus b{color:var(--ink)}
-/* recommendation intro + section title */
-.rec-intro{max-width:980px;margin:0 0 16px;font-size:16px;line-height:1.55;color:var(--mut)}
-.rec-intro b{color:var(--ink)}
-.why-h{font-size:19px;margin:28px 0 4px}
-/* side-by-side compare — equal height-locked frames + variant switcher */
-.compare{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start;max-width:calc(1400px*var(--s))}
-.cmp{margin:0;min-width:0}
-.cmp figcaption{margin:0 0 8px;min-height:28px;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:var(--mut);display:flex;gap:8px;align-items:center;justify-content:space-between}
-.cmp.is-recommended figcaption{color:var(--accent)}
-.vnav{display:none;gap:4px}
-.has-js .vnav{display:inline-flex}
-.vnav button{cursor:pointer;border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:6px;width:30px;height:24px;font-size:11px;line-height:1}
-.vnav button:hover{background:var(--soft);border-color:var(--accent);color:var(--accent)}
-.cmp-frame{border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fafbfc;aspect-ratio:16/10}
-.cmp-frame img{display:block;width:100%;height:100%;object-fit:cover;object-position:top;cursor:zoom-in}
-.compare.tall .cmp-frame{aspect-ratio:16/15}
-.compare.mobileset .cmp-frame{aspect-ratio:auto;height:calc(560px*var(--s));display:flex;align-items:center;justify-content:center;background:#0d1117}
-.compare.mobileset .cmp-frame img{width:auto;height:92%;object-fit:contain;border-radius:14px}
-/* options carousel */
-.deckwrap{margin:18px 0 8px}
-.option-deck{display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;padding:4px 2px 12px;scrollbar-width:thin}
-.option-deck>article{flex:0 0 calc(min(640px,84vw)*var(--s));scroll-snap-align:start;margin:0;border:1px solid var(--line);border-radius:12px;padding:14px;background:#fff;display:flex;flex-direction:column;gap:10px;min-width:0}
-.option-deck>article.is-recommended{border-color:var(--accent)}
-.option-deck h3{margin:0;font-size:17px;display:flex;align-items:center;gap:8px}
-.rec-flag{font-weight:700;font-size:10.5px;line-height:1;letter-spacing:.04em;text-transform:uppercase;color:var(--accent)}
-.opt-points{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:5px;font-size:13.5px;color:var(--mut);line-height:1.5}
-.opt-points b{color:var(--ink)}
-.prototype-img{cursor:zoom-in}
-.proto-full{margin:0}.proto-full img{display:block;width:100%;height:auto;max-height:calc(560px*var(--s));object-fit:contain;object-position:top;border:1px solid var(--line);border-radius:8px;background:#fafbfc;cursor:zoom-in}
-.build-prompt{font-size:13px;color:var(--mut)}.build-prompt summary{cursor:pointer;font-weight:700;color:var(--ink)}
-/* mini evidence deck (also reused for any multi-reference proof) */
-.deck{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding:4px 2px 8px;scrollbar-width:thin}
-.deck>figure{flex:0 0 46%;max-width:320px;scroll-snap-align:center;margin:0;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff}
-.deck.mini>figure{flex-basis:44%;max-width:260px}
-.deck>figure>img{display:block;width:100%;height:auto;max-height:calc(420px*var(--s));object-fit:contain;background:#fafbfc}
-.deck>figure.shot-web>img{aspect-ratio:16/10;height:auto;max-height:none;object-fit:cover;object-position:top}
-.deck>figure.img-missing>img{display:none}
-.deck>figure.img-missing figcaption::after{content:' — image unavailable; see description';color:#cf222e}
-.deck .cap{font-size:12px;color:var(--mut);padding:7px 9px;line-height:1.4}.deck .cap b{color:var(--ink)}
-.deck .src{font-size:10.5px;font-weight:700;letter-spacing:.03em;color:var(--accent)}
-.deck-nav{display:none;gap:6px;justify-content:flex-end;margin-top:2px}
-.has-js .deck-nav{display:flex}
-.deck-nav button{cursor:pointer;border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:6px;width:34px;height:28px;font-size:13px;line-height:1}
-.deck-nav button:hover{background:var(--soft);border-color:var(--accent);color:var(--accent)}
-.prev{font-weight:600;font-size:11.5px;line-height:1;color:#0a3b78;background:var(--soft);border-radius:20px;padding:4px 10px;vertical-align:middle}
-/* clustered inspo map — set --map-h inline per population (520px for 8-10 points ... 760px for 14-16) */
-.inspo-map{position:relative;min-height:calc(var(--map-h,640px)*var(--s));border:1px solid var(--line);border-radius:10px;background:linear-gradient(var(--line),var(--line)) 50% 0/1px 100% no-repeat,linear-gradient(90deg,var(--line),var(--line)) 0 50%/100% 1px no-repeat,#fff}
-.inspo-map::before{content:var(--y-top);position:absolute;top:10px;left:50%;transform:translateX(-50%);color:var(--mut);font-size:12px;font-weight:700;z-index:10;background:rgba(255,255,255,.88);padding:2px 7px;border-radius:6px}
-.inspo-map::after{content:var(--y-bottom);position:absolute;bottom:10px;left:50%;transform:translateX(-50%);color:var(--mut);font-size:12px;font-weight:700;z-index:10;background:rgba(255,255,255,.88);padding:2px 7px;border-radius:6px}
-.inspo-axes{position:absolute;inset:0;pointer-events:none;z-index:10}
-.inspo-axes::before{content:var(--x-left);position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--mut);font-size:12px;font-weight:700;background:rgba(255,255,255,.88);padding:2px 7px;border-radius:6px}
-.inspo-axes::after{content:var(--x-right);position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--mut);font-size:12px;font-weight:700;background:rgba(255,255,255,.88);padding:2px 7px;border-radius:6px}
-.cluster-label{position:absolute;left:var(--x);top:var(--y);transform:translate(-50%,-50%);font-weight:700;font-size:11px;line-height:1;color:var(--mut);background:rgba(255,255,255,.88);border:1px dashed var(--line);border-radius:14px;padding:5px 11px;pointer-events:none;z-index:5;white-space:nowrap}
-.inspo-point{position:absolute;left:clamp(calc(100px*var(--s)),var(--x),calc(100% - 100px*var(--s)));top:clamp(calc(70px*var(--s)),var(--y),calc(100% - 70px*var(--s)));transform:translate(-50%,-50%);width:calc(200px*var(--s));padding:0;border:1px solid var(--line);border-radius:6px;background:#fff;cursor:zoom-in;overflow:hidden;transition:width .15s ease,left .15s ease;box-shadow:0 1px 4px rgba(31,35,40,.08)}
-.inspo-point:hover,.inspo-point:focus-visible{z-index:20;width:min(calc(520px*var(--s)),46vw);left:clamp(min(calc(260px*var(--s)),23vw),var(--x),calc(100% - min(260px*var(--s),23vw)));box-shadow:0 8px 30px rgba(31,35,40,.22);outline:2px solid var(--accent);outline-offset:2px}
-.inspo-img{display:block;width:100%;aspect-ratio:16/10;object-fit:cover;object-position:var(--pos,top center);background:#fafbfc}
-.inspo-point:hover .inspo-img,.inspo-point:focus-visible .inspo-img{aspect-ratio:16/11}
-.inspo-point.mob .inspo-img{aspect-ratio:9/16;object-fit:cover;object-position:top center}
-.inspo-point.mob:hover,.inspo-point.mob:focus-visible{width:min(calc(340px*var(--s)),30vw)}
-.inspo-point.mob:hover .inspo-img,.inspo-point.mob:focus-visible .inspo-img{aspect-ratio:auto;max-height:min(72vh,calc((var(--map-h,640px) - 40px)*var(--s)));object-fit:contain}
-/* annotated patterns — two-column grid of viewport-window screenshots + CSS bounding boxes */
-.patterns-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 24px;max-width:calc(1400px*var(--s))}
-@media(max-width:980px){.patterns-grid{grid-template-columns:1fr}}
-.pattern-shot{margin:10px 0 18px;min-width:0}
-.pattern-shot h3{display:flex;flex-wrap:wrap;align-items:center;gap:10px;font-size:15px}
-.annotated{position:relative;margin:0;width:100%;max-width:calc(720px*var(--s));aspect-ratio:var(--ar,16/11);border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fafbfc}
-.annotated img{display:block;width:100%;height:100%;object-fit:cover;object-position:var(--pos,center top);cursor:zoom-in}
-.annotated.mobile{width:calc(min(420px,100%)*var(--s));aspect-ratio:auto}
-.annotated.mobile img{height:auto;object-fit:fill;object-position:initial}
-.bbox{position:absolute;left:var(--x);top:var(--y);width:var(--w);height:var(--h);border:2px solid var(--accent);border-radius:4px;box-shadow:0 0 0 200vmax rgba(15,23,42,.16);pointer-events:none}
-.bbox>i{position:absolute;left:-2px;bottom:calc(100% + 6px);font:700 11px/1 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-style:normal;color:#fff;background:var(--accent);border-radius:5px;padding:5px 9px;white-space:nowrap}
-.bbox.flip-label>i{bottom:auto;top:calc(100% + 6px)}
-.annotated.multi .bbox{box-shadow:none}
-/* shared furniture: mock-frame (no-imagegen fallback) + control/variant flip (experiment evidence) */
-.mock{margin:14px 0}.mock .frame{border:1px solid var(--line);border-radius:14px;background:#fff;overflow:hidden}.mock.mobile .frame{max-width:300px;border-radius:26px;border:8px solid #1f2328}.mock.desktop .frame{max-width:760px}
-.mock .body{padding:14px;display:flex;flex-direction:column;gap:10px}.mock .box{background:var(--soft);border:1px dashed #b9c7d6;border-radius:8px;min-height:34px;display:flex;align-items:center;justify-content:center;color:#4a5a6a;font-size:12px;padding:8px}.mock .box.cta{background:var(--accent);border:0;color:#fff;font-weight:600}.mock .row{display:flex;gap:10px}.mock .row>.box{flex:1}.mock .cap{font-size:12px;color:var(--mut);margin-top:6px;text-align:center}
-.flip{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding-bottom:8px}
-@media(max-width:560px){.flip{grid-template-columns:1fr}}
-.flip>figure{margin:0}
-.flip>figure>img{width:100%;height:auto;max-height:580px;object-fit:contain;border:1px solid var(--line);border-radius:8px;background:#fafbfc}
-.flip figcaption{font-weight:600;font-size:12px;line-height:1.4;margin-top:5px}
-.flip .side{display:inline-block;font-weight:700;font-size:10px;line-height:1;letter-spacing:.04em;border-radius:5px;padding:3px 7px;margin-right:6px}
-.flip .side.c{color:#6e7781;background:#f6f8fa}
-.flip .side.v{color:#0a5d2a;background:#e6f4ea}
-.flip .vd{display:block;font-weight:400;color:var(--mut);font-size:11.5px;margin-top:3px}
-.flip figure.img-missing>img{display:none}
-.flip figure.img-missing figcaption::after{content:' — image unavailable; see description';color:#cf222e;font-weight:400}
-/* scalebar + lightbox */
-.scalebar{display:none;position:fixed;right:16px;bottom:16px;z-index:40;gap:4px;background:#fff;border:1px solid var(--line);border-radius:8px;padding:5px;box-shadow:0 4px 14px rgba(31,35,40,.14)}
-.has-js .scalebar{display:flex}
-.scalebar button{font-weight:700;font-size:11px;line-height:1;font-family:inherit;border:1px solid transparent;background:none;color:var(--mut);border-radius:5px;padding:7px 10px;cursor:pointer}
-.scalebar button[aria-pressed="true"]{color:var(--accent);border-color:var(--accent);background:var(--soft)}
-#lb{display:none;position:fixed;inset:0;z-index:50;background:rgba(13,17,23,.86);align-items:center;justify-content:center;padding:28px}
-#lb.open{display:flex}
-#lb img{max-width:96vw;max-height:92vh;border-radius:10px;box-shadow:0 12px 40px rgba(0,0,0,.55);background:#161b22}
-#lb .x{position:absolute;top:18px;right:22px;color:#fff;font-weight:700;font-size:26px;line-height:1;font-family:inherit;cursor:pointer;background:none;border:0}
-.lw-foot{margin-top:40px;padding-top:14px;border-top:1px solid var(--line);text-align:center;font-size:13px;color:var(--mut)}
-@media(max-width:880px){.compare{grid-template-columns:1fr}.compare.mobileset .cmp-frame{height:calc(480px*var(--s))}.option-deck>article{flex-basis:88vw}.inspo-map{min-height:calc(480px*var(--s))}.inspo-point{width:calc(150px*var(--s))}.inspo-point:hover,.inspo-point:focus-visible{width:min(86vw,calc(420px*var(--s)));left:clamp(min(43vw,calc(210px*var(--s))),var(--x),calc(100% - min(43vw,calc(210px*var(--s)))))}}
-```
+- `{{LIKE_THIS}}` placeholders take content; everything else stays byte-identical.
+  The CSS and JS are render-tested at 1500px/800px across S/M/L scales — do not
+  restyle, "improve", or trim them.
+- `<!--~ REPEAT ... ~-->` comments mark blocks to duplicate per bet / reference /
+  point / pattern; `<!--~ OPTIONAL ... ~-->` and `<!--~ VARIANT ... ~-->` blocks
+  are kept, swapped, or deleted as their comment says (corpus banner, Inspo
+  section, `tall`/`mobileset` compare variants, greenfield no-control case).
+  Remove the `~` comments themselves from the final report.
+- Update the `_vars` array to exactly the bets you shipped (one entry per bet,
+  recommended first) and **escape interpolated strings** as the template's
+  comments instruct — apostrophes/backslashes in JS literals; `"` `<` `>` as
+  entities in attributes and captions.
+- Lazyweb references use absolute `imageUrl`/`image_url` values; local assets
+  (control, prototypes, web captures) use relative `references/{filename}`
+  paths only.
+- Avoid horizontal page overflow at every scale setting and viewport width.
+- Open the HTML file in the user's browser: `open "$REPORT_DIR/report.html"` —
+  skip this in a headless/CI/no-GUI environment and just report the path.
+  Similarly, when AskUserQuestion is unavailable or the run is unattended,
+  make the closest reasonable assumption and state it in the handoff block.
 
-CSS gotcha: never write `font:700 10px/1 inherit` — `inherit` is not a valid
-font-family inside the `font` shorthand and browsers drop the whole
-declaration. Use longhands (`font-weight`/`font-size`/`line-height`);
-font-family inherits by default (declare `font-family:inherit` only on
-button/form elements).
+CSS gotcha (if you must add a style): never write `font:700 10px/1 inherit` —
+`inherit` is not a valid font-family inside the `font` shorthand and browsers
+drop the whole declaration. Use longhands; font-family inherits by default
+(declare `font-family:inherit` only on button/form elements).
 
 ## Operating principles & evidence components (REQUIRED - overrides convenience)
 
@@ -1311,9 +1127,10 @@ creative bet may legitimately be the whitespace count, not a prevalence count.
 Low in-category prevalence is not weak evidence for a Bold bet; it is the point.
 
 **4. Be truth-seeking — never overclaim.**
-Carry evidence strength in plain words inside each description sentence —
-**measured** (real lift number) vs **directional** (visual prevalence, no
-lift) vs **single source / outside this category** — not as badge chips.
+Carry evidence strength in plain words inside deck figcaptions and the
+collapsed `.build-prompt` — **measured** (real lift number) vs **directional**
+(visual prevalence, no lift) vs **single source / outside this category** —
+never as badge chips or extra card bullets.
 Forbid comparative-performance verbs ("outperforms", "converts better") unless
 a measurement backs them. Put a one-line `.corpus` banner right after Agent
 Instructions when evidence is single-source, thin (<8 selected references), or
