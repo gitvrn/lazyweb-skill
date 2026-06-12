@@ -67,44 +67,11 @@ when the user asks for implementation-ready code. Generate prototype images in
 parallel at medium effort by default, or low effort when the user asks for
 speed/exploration.
 
-## Skeleton publish (the churn hedge — publish EARLY, enrich in place)
-
-The publish ladder's `IDEMPOTENCY_KEY` means re-publishing updates the SAME
-URL. Use that to put a live link in the user's hands ~1 minute into the run:
-
-1. **Right after the control is captured and the goal is written** (~2 min
-   in; browse cold-start makes "1 minute" unrealistic), build the skeleton
-   report from the template's SKELETON block (see the template's comments).
-   Extract the template's `<head>`+`<style>` verbatim — e.g.
-   `python3 -c "t=open('{skill-base-dir}/report-template.html').read(); print(t[t.index('<style>'):t.index('</style>')+8])"` —
-   never retype the CSS. Structure: `<meta name="lazyweb-report-state" content="skeleton">` +
-   `<meta http-equiv="refresh" content="60">` in `<head>`; body = `<h1>` →
-   `.genbar` → Goal → the compare grid with the Control image on the left and
-   the `.pending-ref` tile in the right `.cmp-frame` → one `.pending-strip` →
-   footer. NO Agent Instructions block, NO option deck, NO Inspo in the
-   skeleton — it leads with the human moment, not empty plumbing.
-2. The `.genbar` copy is an honest promise: **"This report is generating.
-   Control captured · analyzing references · 3 redesign bets in progress.
-   Usually ready in 5-12 minutes · started {HH:MM} {TZ}."** Always a range
-   plus the start timestamp — never a precise ETA (a stale skeleton must
-   self-identify), and the page auto-refreshes via the meta tag (the enriched
-   publish simply lacks the tag, so reloading stops naturally).
-3. Run the contract gate (it detects skeleton mode from the state meta tag),
-   then publish with the SAME `$IDEMPOTENCY_KEY` the final publish will use.
-   **Tell the user the URL immediately** — "your report is generating at
-   {url}; it fills in as the run completes."
-4. The final enriched publish at the end of the run replaces the skeleton at
-   the same URL. The enriched report must contain NO `.genbar`, no
-   `.pending-*` elements, and no refresh/state meta tags — the gate enforces
-   this.
-
-Skeleton publish failures are non-blocking (same rules as the final publish):
-never let an early-publish error stop the run.
-
 ## Publish a Shareable Link (always, right after writing report.html)
 
 Every report is auto-published to lazyweb.com so the user can share it with
-teammates. Before publishing, run this contract gate with `$REPORT_DIR` set to
+teammates — ONCE, when it is complete. Never publish partial, skeleton, or
+in-progress states; the user sees a report only when it is done. Before publishing, run this contract gate with `$REPORT_DIR` set to
 `.lazyweb/design-research/{topic}-{date}`:
 
 ```bash
@@ -117,23 +84,7 @@ html = path.read_text(encoding="utf-8")
 # Forbidden-content checks run on RENDERED content only — HTML comments
 # (including the template's own instruction comments) don't render.
 rendered = re.sub(r"<!--[\s\S]*?-->", "", html)
-skeleton = bool(re.search(r'name=["\']lazyweb-report-state["\'] content=["\']skeleton["\']', html, re.I))
-
-if skeleton:
-    required_groups = {
-        "Generating banner": [
-            r'class=["\'][^"\']*\bgenbar\b',
-            r'report is generating',
-            r'started',
-        ],
-        "Control compare": [
-            r'class=["\'][^"\']*\bcmp\b[^"\']*\bcontrol\b|class=["\'][^"\']*\bcontrol\b',
-            r'class=["\'][^"\']*\bpending-ref\b',
-        ],
-        "Auto-refresh": [r'http-equiv=["\']refresh["\']'],
-    }
-else:
-    required_groups = {
+required_groups = {
     "Agent Instructions copy block": [
         r'class=["\'][^"\']*\bagent-instructions\b',
         r'FOR THE CODING AGENT',
@@ -143,7 +94,7 @@ else:
         r'class=["\'][^"\']*\bprototype-option\b',
         r'Recommended',
     ],
-    }
+}
 missing = []
 for label, patterns in required_groups.items():
     for pattern in patterns:
@@ -159,9 +110,6 @@ for label, pattern in {
     "old prototype wrapper": r'class=["\'][^"\']*\bprototype-image\b',
     "old evidence sections": r'Reference Evidence|Source Notes|Key Examples|<h2[^>]*>\s*Findings\s*</h2>|<h2[^>]*>\s*Sources\s*</h2>',
     "removed patterns section": r'class=["\'][^"\']*\bpattern-shot\b|class=["\'][^"\']*\bpatterns-grid\b|<h2[^>]*>\s*Interesting Patterns\s*</h2>',
-    **({} if skeleton else {
-        "skeleton leftovers in final report": r'class=["\'][^"\']*\bgenbar\b|class=["\'][^"\']*\bpending-ref\b|class=["\'][^"\']*\bpending-strip\b|http-equiv=["\']refresh["\']|lazyweb-report-state',
-    }),
     "unfilled template example content": r'EXAMPLE-|picsum\.photos|placehold\.co|\bdata-ex=|\{\{[A-Z0-9_]+\}\}',
 }.items():
     if re.search(pattern, rendered, re.I):
@@ -414,11 +362,10 @@ On success, `work/evidence.json` holds merged, same-company-deduped references
    `work/evidence-topup.json`:
    - `lazyweb_find_similar` on the 2-3 strongest results, passing each
      reference's `imageUrl` string as `image_url`, `"limit": 5`;
-   - `lazyweb_compare_image` on the control via `image_url` pointing at the
-     HOSTED control from the skeleton publish
-     (`{shareable_url}references/current-state.png`) — never inline base64
-     through chat; if the skeleton publish failed, SKIP compare_image
-     entirely rather than base64-ing.
+   - `lazyweb_compare_image` is OMITTED from the fast path (measured: low
+     yield and payload-hostile — inline base64 through chat costs more than
+     it returns). Only the agent-fallback path may use it, with the
+     downscaled ≤500px viewport-crop JPEG.
    Expect top-up results to be description-less near-dupes more often than
    not: budget at most 2 vision-verifications from the round, and when it
    yields nothing attachable, record it as saturation confirmation (your

@@ -205,9 +205,10 @@ for (const scriptName of ["fetch-evidence.py", "generate-prototypes.py"]) {
   assert.ok(statSync(sp).mode & 0o111, `${scriptName} must be executable`);
   assert.match(designResearchText, new RegExp(scriptName.replace(".", "\\.")), `design-research skill must reference ${scriptName}`);
 }
-for (const skeletonPattern of [/\.genbar/, /\.pending-ref/, /\.pending-strip/, /lazyweb-report-state/, /usually ready in 5-12 min/]) {
-  assert.match(designResearchAll, skeletonPattern, `skeleton-publish machinery missing: ${skeletonPattern}`);
+for (const removedSkeletonToken of [/\.genbar/, /\.pending-ref/, /\.pending-strip/, /lazyweb-report-state/, /Skeleton publish/i]) {
+  assert.doesNotMatch(designResearchAll, removedSkeletonToken, `removed skeleton-publish machinery must not reappear: ${removedSkeletonToken}`);
 }
+assert.match(designResearchText, /ONCE, when it is complete/, "publish section must state reports publish only when complete");
 assert.match(designResearchText, /unfilled template example content/, "publish gate must block unfilled template example content");
 assert.match(designResearchText, /picsum\\\.photos|picsum\.photos/, "publish gate must name picsum.photos as forbidden in final reports");
 for (const templatePattern of [
