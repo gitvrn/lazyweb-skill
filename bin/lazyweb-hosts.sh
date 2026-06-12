@@ -81,16 +81,25 @@ host_routable() {
   return 0
 }
 
+# Tilde-form path for rendered text: stable byte count across usernames, and
+# every host expands ~ in its own instruction files.
+_lw_tilde() { case "$1" in "$HOME"/*) printf '~%s' "${1#"$HOME"}" ;; *) printf '%s' "$1" ;; esac; }
+
 host_act_preamble() {
   case "$1" in
     claude)
       printf '%s' 'To act on a row, invoke that skill (e.g. /lazyweb-design-research).'
       ;;
     codex)
-      printf 'To act on a row, invoke that skill by name, or read %s/<skill>/SKILL.md and follow it.' "$(host_skills_root codex)"
+      printf 'To act on a row, invoke that skill by name, or read %s/<skill>/SKILL.md and follow it.' "$(_lw_tilde "$(host_skills_root codex)")"
+      ;;
+    project)
+      # Project-level block (spec §7.3): read by whichever host opens the repo,
+      # so the phrasing must be host-neutral and name no single skills root.
+      printf '%s' "To act on a row, invoke that skill by name if your client supports skills; otherwise read <skill>/SKILL.md under your client's installed Lazyweb skills directory (e.g. ~/.claude/skills, ~/.codex/skills, ~/.cursor/skills) and follow it."
       ;;
     *)
-      printf 'To act on a row, read %s/<skill>/SKILL.md and follow it.' "$(host_skills_root "$1")"
+      printf 'To act on a row, read %s/<skill>/SKILL.md and follow it.' "$(_lw_tilde "$(host_skills_root "$1")")"
       ;;
   esac
 }

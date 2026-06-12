@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 'use strict';
 /*
- * lazyweb-log <query|tool|stop>
+ * lazyweb-log <query|tool|stop|event [name]>
  *
  * Deterministic telemetry capture, invoked by Claude Code hooks (and Codex hooks where
  * supported). Reads the hook's JSON payload on stdin and appends a redacted event to
@@ -76,11 +76,39 @@ function append(event) {
   } catch (_) {}
 }
 
+// Stable per-machine identifier (autorouter spec §9 M5): a random UUID minted
+// once per install, so cohort metrics (router-installed vs not) can tell two
+// machines apart. Never a hostname, username, or email — nothing derivable
+// from the machine; redaction rules stay intact because the value is random.
+function machineId() {
+  const f = path.join(HOME, '.lazyweb', 'machine_id');
+  try {
+    const v = fs.readFileSync(f, 'utf8').trim();
+    if (/^[0-9a-f-]{36}$/.test(v)) return v;
+  } catch (_) {}
+  try {
+    const v = require('crypto').randomUUID();
+    fs.mkdirSync(path.dirname(f), { recursive: true });
+    fs.writeFileSync(f, v + '\n', { mode: 0o600 });
+    return v;
+  } catch (_) { return 'unknown'; }
+}
+
 function main() {
   let payload = {};
   try { payload = JSON.parse(readStdin() || '{}'); } catch (_) { payload = {}; }
   const session = payload.session_id || 'unknown';
-  const base = { v: 1, ts: new Date().toISOString(), session_id: session };
+  const base = { v: 1, ts: new Date().toISOString(), session_id: session, machine: machineId() };
+
+  if (KIND === 'event') {
+    // Generic lifecycle event (e.g. lazyweb-router's router_install /
+    // router_refresh / router_remove / router_decline). Name comes from
+    // argv[3]; optional JSON data on stdin. Fire-and-forget like every other
+    // kind — never blocks, never fails the caller.
+    const name = String(process.argv[3] || '').replace(/[^a-z0-9_]/gi, '').slice(0, 64);
+    if (name) append({ ...base, event: name, data: redact(payload) });
+    return;
+  }
 
   if (KIND === 'query') {
     const turn = turnFor(session, true);

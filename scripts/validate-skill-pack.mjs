@@ -106,10 +106,59 @@ const setupPath = path.join(root, "setup");
 assert.ok(existsSync(setupPath), "missing root setup script");
 assert.ok(statSync(setupPath).mode & 0o111, "root setup must be executable");
 
-for (const binName of ["lazyweb-context-detect", "lazyweb-log", "lazyweb-telemetry-flush", "lazyweb-update", "lazyweb-update-check"]) {
+for (const binName of ["lazyweb-context-detect", "lazyweb-log", "lazyweb-router", "lazyweb-telemetry-flush", "lazyweb-update", "lazyweb-update-check"]) {
   const binPath = path.join(root, "bin", binName);
   assert.ok(existsSync(binPath), `missing bin/${binName}`);
   assert.ok(statSync(binPath).mode & 0o111, `bin/${binName} must be executable`);
+}
+assert.ok(existsSync(path.join(root, "bin", "lazyweb-hosts.sh")), "missing bin/lazyweb-hosts.sh (shared host table, sourced by setup and lazyweb-router)");
+
+// --- Autorouter contract (specs/autorouter.md §11.3, §12 Step 2b) ----------
+// 1. Every mode skill must carry a NON-EMPTY `route:` frontmatter value — the
+//    renderer builds the injected routing table from it, so an empty value
+//    would emit a blank intent cell that routes nothing.
+function frontmatterOf(text) {
+  const m = text.match(/^---\n([\s\S]*?)\n---\n/);
+  return m ? m[1] : "";
+}
+for (const dir of visibleModeSkillDirs) {
+  const fm = frontmatterOf(read(`${dir}/SKILL.md`));
+  const m = fm.match(/^route:\s*(.+)$/m);
+  assert.ok(m, `${dir}/SKILL.md missing route: frontmatter (used by lazyweb-router to render the autorouter table)`);
+  const value = m[1].trim().replace(/^["']|["']$/g, "").trim();
+  assert.ok(value.length > 0, `${dir}/SKILL.md has an empty route: value`);
+}
+
+// 2. Structural sync invariant: set-equality of skill identifiers between
+//    skills/*/ and the root SKILL.md routing table. (Direction "every dir is
+//    in the table" is asserted above; this is the inverse — the table must
+//    not reference a mode that does not exist on disk.) Deliberately NOT a
+//    prose diff: router rows are trigger-shaped, the root table is
+//    category-shaped (spec B3).
+const skillDirNames = new Set(visibleModeSkillDirs.map((dir) => path.basename(dir)));
+for (const match of router.matchAll(/skills\/([a-z0-9-]+)\/SKILL\.md/g)) {
+  assert.ok(skillDirNames.has(match[1]), `root SKILL.md routes to skills/${match[1]}/SKILL.md which does not exist on disk`);
+}
+
+// 3. Router template: required placeholders, markers, and the table rows left
+//    to the renderer ({{ROWS}}), never hardcoded mode rows that could strand a
+//    new mode.
+const routerTemplate = read("router/ROUTER.template.md");
+assert.match(routerTemplate, /<!-- LAZYWEB:ROUTER:BEGIN v\{\{VERSION\}\}/, "router template missing versioned BEGIN marker");
+assert.match(routerTemplate, /<!-- LAZYWEB:ROUTER:END -->/, "router template missing END marker");
+for (const placeholder of ["{{ACT_PREAMBLE}}", "{{ROWS}}"]) {
+  const count = routerTemplate.split(placeholder).length - 1;
+  assert.equal(count, 1, `router template must contain ${placeholder} exactly once (found ${count})`);
+}
+assert.doesNotMatch(routerTemplate, /lazyweb-(design|quick|paywall|signup|ab|update)[a-z-]*/, "router template must not hardcode mode rows — rows are rendered from skills/*/ frontmatter");
+
+// 4. Host portability guard (Step 2b): no skill BODY prose may name a
+//    Claude-only tool — the router delivers users into these files on hosts
+//    that do not have that tool. `allowed-tools:` frontmatter is exempt
+//    (non-Claude hosts ignore unknown allowed-tools).
+for (const relativePath of ["SKILL.md", ...visibleModeSkillDirs.map((dir) => `${dir}/SKILL.md`)]) {
+  const body = read(relativePath).replace(/^---\n[\s\S]*?\n---\n/, "");
+  assert.doesNotMatch(body, /AskUserQuestion/, `${relativePath} body prose names Claude-only tool AskUserQuestion — use host-neutral phrasing ("ask the user one short clarifying question")`);
 }
 
 // Every discovered mode skill must be documented in the README "Visible
@@ -145,12 +194,30 @@ for (const relativePath of ["README.md", "SKILL.md", ...visibleModeSkillDirs.map
 }
 
 const designResearchText = read("skills/lazyweb-design-research/SKILL.md");
+// The render-tested report skeleton/CSS/JS lives in the template file the
+// skill instructs agents to copy; component assertions check both.
+const designResearchTemplate = read("skills/lazyweb-design-research/report-template.html");
+const designResearchAll = designResearchText + "\n" + designResearchTemplate;
+assert.match(designResearchText, /report-template\.html/, "design-research skill must reference its report template");
+assert.match(designResearchText, /unfilled template example content/, "publish gate must block unfilled template example content");
+assert.match(designResearchText, /picsum\\\.photos|picsum\.photos/, "publish gate must name picsum.photos as forbidden in final reports");
+for (const templatePattern of [
+  /data-ex=/,
+  /picsum\.photos/,
+  /window\.__vstep/,
+  /window\.__zoom/,
+  /id="lb"/,
+  /class="scalebar"/,
+  /REPEAT/,
+  /LAZYWEB REPORT — AGENT HANDOFF/
+]) {
+  assert.match(designResearchTemplate, templatePattern, `design-research report template missing ${templatePattern}`);
+}
 for (const pattern of [
   /## Report v3 Contract/,
   /## Goal/,
   /## Recommendation/,
   /## Inspo/,
-  /## Interesting Patterns/,
   /Prototype fidelity rules/,
   /High fidelity/,
   /Medium fidelity/,
@@ -161,9 +228,6 @@ for (const pattern of [
   /\.inspo-map/,
   /\.inspo-point/,
   /\.inspo-img/,
-  /\.pattern-shot/,
-  /\.annotated/,
-  /\.bbox/,
   /\.prototype-option/,
   /\.prototype-img/,
   /\.proto-full/,
@@ -181,7 +245,6 @@ for (const pattern of [
   /\.scalebar/,
   /\.vnav/,
   /\.cluster-label/,
-  /\.patterns-grid/,
   /\.rec-intro/,
   /\.why-h/,
   /Report rescale \+ lightbox/,
@@ -217,9 +280,11 @@ for (const pattern of [
   /Reference Evidence/,
   /Source Notes/,
   /Never publish a `lazyweb-design-research` report that fails this gate/,
-  /Provider fallback order/,
+  /Provider priority order/,
+  /Capability probe/,
+  /imagegen-capability\.json/,
+  /Codex CLI image generation/,
   /native host image generation tool/i,
-  /Do not use Codex CLI for image generation/i,
   /Nano Banana/,
   /Gemini/,
   /CONTROL/,
@@ -237,10 +302,6 @@ for (const pattern of [
   /Long-scroll pages/i,
   /decisive region/i,
   /8-16 points/i,
-  /5-9 patterns/i,
-  /viewport-window reference screenshots/i,
-  /CSS bounding-box callouts/i,
-  /not the user's\s+control screenshot/i,
   /image-only/i,
   /## Comparison Eval Contract/,
   /metrics\.json/,
@@ -253,7 +314,7 @@ for (const pattern of [
   /Sharp recommendation/,
   /Trust in process\/evidence/
 ]) {
-  assert.match(designResearchText, pattern, `design-research v3 contract missing ${pattern}`);
+  assert.match(designResearchAll, pattern, `design-research v3 contract missing ${pattern}`);
 }
 
 for (const forbiddenHeading of [
@@ -265,8 +326,18 @@ for (const forbiddenHeading of [
   /^## Findings\b/m,
   /^## Sources\b/m
 ]) {
-  assert.doesNotMatch(designResearchText, forbiddenHeading, `design-research should not reintroduce old visible report heading ${forbiddenHeading}`);
+  assert.doesNotMatch(designResearchAll, forbiddenHeading, `design-research should not reintroduce old visible report heading ${forbiddenHeading}`);
 }
+for (const removedPatternsToken of [
+  /\.pattern-shot/,
+  /\.patterns-grid/,
+  /\.bbox/,
+  /\.annotated\b/,
+  /## Interesting Patterns/
+]) {
+  assert.doesNotMatch(designResearchAll, removedPatternsToken, `removed Interesting Patterns machinery must not reappear: ${removedPatternsToken}`);
+}
+
 for (const forbiddenV2Pattern of [
   /\.inspo-card/,
   /\.rec-copy/,
@@ -275,16 +346,16 @@ for (const forbiddenV2Pattern of [
   /<h3>Rec<\/h3>/,
   /<h3>Why<\/h3>/
 ]) {
-  assert.doesNotMatch(designResearchText, forbiddenV2Pattern, `design-research v3 should keep Recommendation side-by-side, option-led, and inspo image-only: ${forbiddenV2Pattern}`);
+  assert.doesNotMatch(designResearchAll, forbiddenV2Pattern, `design-research v3 should keep Recommendation side-by-side, option-led, and inspo image-only: ${forbiddenV2Pattern}`);
 }
 
 for (const guidanceFile of ["AGENTS.md", "CLAUDE.md"]) {
   const guidance = read(guidanceFile);
   assert.match(guidance, /report v3/, `${guidanceFile} should document the design-research v3 exception`);
-  assert.match(guidance, /\.compare.*\.option-deck.*\.pattern-shot.*\.annotated.*\.bbox/s, `${guidanceFile} should name the design-research v3 components`);
+  assert.match(guidance, /\.compare.*\.option-deck/s, `${guidanceFile} should name the design-research v3 components`);
   assert.match(guidance, /side-by-side `\.compare`.*Control × Recommended.*height-locked frames.*variant switcher/s, `${guidanceFile} should require side-by-side control/recommendation comparison for design-research v3`);
   assert.match(guidance, /ranking is carried by order \+ a `Recommended` flag/, `${guidanceFile} should require order plus Recommended flag for design-research ranking`);
-  assert.match(guidance, /\.pattern-shot`\/`\.annotated` viewport-window figures with `\.bbox` overlays/, `${guidanceFile} should require annotated viewport-window patterns`);
+  assert.match(guidance, /renders no patterns/, `${guidanceFile} should state design-research v3 has no patterns section`);
   assert.match(guidance, /CSS gotcha/, `${guidanceFile} should carry the font-shorthand CSS gotcha`);
 }
 
@@ -293,7 +364,7 @@ for (const guidanceFile of ["AGENTS.md", "CLAUDE.md"]) {
 // latter is forbidden. Scoped to design-research for now: the other skills'
 // CSS contracts still carry the legacy bug (tracked for a separate fix) —
 // broaden to allSkillText once they are cleaned.
-assert.doesNotMatch(designResearchText, /font:[^;{}`]*\binherit\s*[;}]/, "design-research CSS contract must not use `inherit` inside the font shorthand (browsers drop the declaration)");
+assert.doesNotMatch(designResearchAll, /font:[^;{}`]*\binherit\s*[;}]/, "design-research CSS contract must not use `inherit` inside the font shorthand (browsers drop the declaration)");
 
 assert.match(allSkillText, /signed for\s+365 days/i, "skill docs should state Lazyweb storage image URLs are signed for 365 days");
 assert.doesNotMatch(allSkillText, /signed for\s+90 days/i, "stale 90-day signing claim must not reappear in skill docs");

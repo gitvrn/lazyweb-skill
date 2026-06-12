@@ -1,6 +1,6 @@
 ---
 name: lazyweb-quick-references
-route: 'Quick examples / screenshots / UI references, no full report'
+route: "Quick UI examples / screenshots / references, no report"
 description: |
   Find app screenshots and UI references quickly. Embeds Lazyweb results by
   storage-backed URL and groups them by pattern. Use when the user wants to see examples of a specific
@@ -108,7 +108,7 @@ The hosted copy is served byte-for-byte, so the report must only use:
 Before searching, ground the work in what the user is building, and avoid guessing when a wrong guess wastes a search:
 
 1. **Detect context.** Run `lazyweb-context-detect` (on `PATH` when installed by setup; otherwise `~/.lazyweb/repos/lazyweb-skill/bin/lazyweb-context-detect`). It prints the project, platform (mobile/desktop), and stack. Use it to bias the `platform` filter and to caption references accurately.
-2. **Clarify only what's missing.** If it reports `platform=unknown`, or you can't tell the product/screen from the request, ask ONE AskUserQuestion to pin down product/screen, mobile vs desktop, and the specific outcome. Skip anything the context already answered; don't interrogate when the request is already clear.
+2. **Clarify only what's missing.** If it reports `platform=unknown`, or you can't tell the product/screen from the request, ask the user ONE short clarifying question to pin down product/screen, mobile vs desktop, and the specific outcome. Skip anything the context already answered; don't interrogate when the request is already clear.
 3. **Search from multiple angles.** Cast 3-5 `lazyweb_search` queries with different wordings and filters (by screen, by competitor `company`, by `category`, by `platform`) instead of one, and read each result's `visionDescription` before using it.
 4. **Obey the response metadata.** Never repeat an identical query — results are deterministic; page deeper with `offset` and follow `pagination.next_offset`. On `no_matches`/`low_coverage` warnings, use the closest result, strip the query to its core 2-6 word UI pattern, or tell the user the pattern is not covered — don't rephrase the same concept in a loop (style adjectives like "dark"/"minimal" are not searchable facets; judge style from the images). On `company_not_in_library`, use a suggested company or drop the filter. Building a whole app or page? Run one search per screen/section, not one broad query.
 

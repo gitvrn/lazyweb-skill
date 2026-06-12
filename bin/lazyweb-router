@@ -17,6 +17,13 @@ ROOT="$(cd "$SCRIPT_DIR/.." && pwd -P)"
 # shellcheck source=/dev/null
 . "$SCRIPT_DIR/lazyweb-hosts.sh"
 
+# If this script was COPIED (not symlinked) into ~/.lazyweb/bin, ROOT resolves
+# to ~/.lazyweb, which has no pack files. Fall back to the lazyweb-update
+# checkout, which is the persistent pack location.
+if [ ! -f "$ROOT/router/ROUTER.template.md" ] && [ -f "${LAZYWEB_SKILL_DIR:-$HOME/.lazyweb/repos/lazyweb-skill}/router/ROUTER.template.md" ]; then
+  ROOT="${LAZYWEB_SKILL_DIR:-$HOME/.lazyweb/repos/lazyweb-skill}"
+fi
+
 VERSION="$(cat "$ROOT/VERSION" 2>/dev/null || echo 0.0.0)"
 TEMPLATE="$ROOT/router/ROUTER.template.md"
 SKILLS_DIR="$ROOT/skills"
@@ -30,13 +37,24 @@ BUDGET=1800
 usage() {
   cat <<'USAGE'
 Usage:
-  lazyweb-router install [--host <h>|--all] [--yes]
-  lazyweb-router remove  [--host <h>|--all]
+  lazyweb-router install [--host <h>|--all] [--yes] [--project [<dir>]]
+  lazyweb-router remove  [--host <h>|--all] [--project [<dir>]]
   lazyweb-router status
   lazyweb-router render  --host <h>
   lazyweb-router refresh
   lazyweb-router decline
 USAGE
+}
+
+# Fire-and-forget telemetry (spec §9): router lifecycle events through the
+# existing lazyweb-log buffer. Never blocks, never fails the command.
+emit_event() {
+  local logbin data
+  logbin="$SCRIPT_DIR/lazyweb-log"; data="${2:-}"
+  [ -x "$logbin" ] || logbin="$HOME/.lazyweb/bin/lazyweb-log"
+  [ -x "$logbin" ] || return 0
+  [ -n "$data" ] || data='{}'
+  printf '%s' "$data" | "$logbin" event "$1" >/dev/null 2>&1 || true
 }
 
 # --- manifest lock (spec §10 M6): serialize manifest mutations -------------
@@ -114,6 +132,9 @@ function skillMeta(dir) {
   const f = path.join(SKILLS, dir, 'SKILL.md');
   if (!fs.existsSync(f)) return null;
   const fm = frontmatter(fs.readFileSync(f, 'utf8'));
+  // Utility skills (e.g. lazyweb-update) opt out of the routed table: the
+  // autorouter routes design intents, and every row spends the byte budget.
+  if (/^router-exclude:\s*true\s*$/m.test(fm)) return null;
   const name = fmValue(fm, 'name') || dir;
   const route = fmValue(fm, 'route') || firstSentence(fm) || name;
   return { dir, name, route };
@@ -138,7 +159,7 @@ function orderedSkills() {
 }
 function renderRows() {
   const rows = orderedSkills().map((s) => `| ${s.route} | \`${s.name}\` |`);
-  rows.push('| Anything UI-related that fits none of the above | `lazyweb` (the router skill picks the mode) |');
+  rows.push('| Anything else UI-related | `lazyweb` (picks the right mode) |');
   return rows.join('\n');
 }
 function renderBlock() {
@@ -253,16 +274,51 @@ NODE
 
 # --- argument parsing ------------------------------------------------------
 CMD="${1:-}"; shift || true
-SEL_HOST=""; ALL=0; YES=0
+SEL_HOST=""; ALL=0; YES=0; PROJECT=0; PROJECT_DIR=""
 while [ "$#" -gt 0 ]; do
   case "$1" in
     --host) SEL_HOST="${2:-}"; shift 2 ;;
     --host=*) SEL_HOST="${1#--host=}"; shift ;;
     --all) ALL=1; shift ;;
     --yes|-y) YES=1; shift ;;
+    --project)
+      PROJECT=1
+      # optional value: a following arg that is not a flag is the project dir
+      if [ "$#" -gt 1 ] && [ "${2#-}" = "${2:-}" ] && [ -n "${2:-}" ]; then
+        PROJECT_DIR="$2"; shift
+      fi
+      shift ;;
+    --project=*) PROJECT=1; PROJECT_DIR="${1#--project=}"; shift ;;
     *) echo "Unknown option: $1" >&2; usage >&2; exit 1 ;;
   esac
 done
+[ "$PROJECT" -eq 1 ] && [ -z "$PROJECT_DIR" ] && PROJECT_DIR="$PWD"
+
+# Project targets (spec §7.3): AGENTS.md AND CLAUDE.md (Claude Code does not
+# read AGENTS.md natively). Collapse to AGENTS.md alone when CLAUDE.md is a
+# symlink resolving to the same real file, or when it @-imports AGENTS.md.
+project_targets() {
+  local dir agents claude ra rc
+  dir="$1"; agents="$dir/AGENTS.md"; claude="$dir/CLAUDE.md"
+  if [ -e "$agents" ] && [ -e "$claude" ]; then
+    ra="$(node -e 'try{process.stdout.write(require("fs").realpathSync(process.argv[1]))}catch(e){process.stdout.write(process.argv[1])}' "$agents")"
+    rc="$(node -e 'try{process.stdout.write(require("fs").realpathSync(process.argv[1]))}catch(e){process.stdout.write(process.argv[1])}' "$claude")"
+    if [ "$ra" = "$rc" ]; then printf '%s\n' "$agents"; return; fi
+  fi
+  if [ -f "$claude" ] && grep -Eq '^@\.?/?AGENTS\.md\s*$' "$claude" 2>/dev/null; then
+    printf '%s\n' "$agents"; return
+  fi
+  printf '%s\n%s\n' "$agents" "$claude"
+}
+
+# Identical hand-synced copies get a one-line nudge (spec §7.3 S4); we still
+# write both — they are read by different hosts.
+project_copies_notice() {
+  local dir="$1"
+  if [ -f "$dir/AGENTS.md" ] && [ -f "$dir/CLAUDE.md" ] && cmp -s "$dir/AGENTS.md" "$dir/CLAUDE.md"; then
+    echo "note: AGENTS.md and CLAUDE.md are identical copies — consider symlinking one to the other so you maintain a single file."
+  fi
+}
 
 selected_targets() {
   if [ -n "$SEL_HOST" ]; then printf '%s\n' "$SEL_HOST"; return; fi
@@ -273,6 +329,11 @@ selected_targets() {
 case "$CMD" in
   render)
     [ -n "$SEL_HOST" ] || { echo "render needs --host <h>" >&2; exit 1; }
+    if [ "$SEL_HOST" != "project" ] && [ -z "$(host_skills_root "$SEL_HOST")" ]; then
+      # Rule 0 (§4.3): no skills on disk for this host -> nothing to point at.
+      echo "lazyweb-router: $SEL_HOST is not a routable host (setup installs no skill files for it)" >&2
+      exit 1
+    fi
     run_node render "$SEL_HOST" "" "$(host_act_preamble "$SEL_HOST")"
     ;;
 
@@ -281,14 +342,36 @@ case "$CMD" in
       echo "lazyweb-router: routing previously declined (rm $CONFIG to re-enable, or pass --yes)" >&2
       exit 0
     fi
+    # Resolve targets up front so the consent preview and the writes agree.
+    TARGET_LIST=""
+    if [ "$PROJECT" -eq 1 ]; then
+      [ -d "$PROJECT_DIR" ] || { echo "lazyweb-router: project dir not found: $PROJECT_DIR" >&2; exit 1; }
+      TARGET_LIST="$(project_targets "$PROJECT_DIR")"
+    else
+      for h in $(selected_targets); do
+        host_routable "$h" || continue
+        TARGET_LIST="${TARGET_LIST}${TARGET_LIST:+$'\n'}$h"
+      done
+    fi
+    [ -n "$TARGET_LIST" ] || {
+      if [ -n "$SEL_HOST" ]; then
+        echo "$SEL_HOST: not routable (no skills installed and/or capability flag off) — skipped" >&2
+        exit 1
+      fi
+      echo "lazyweb-router: no routable targets found (run setup first?)" >&2
+      exit 0
+    }
     # Consent gate: need --yes, or an interactive TTY confirmation.
     if [ "$YES" -ne 1 ]; then
       if [ -t 0 ]; then
         echo "Will add the Lazyweb routing block to:"
-        for h in $(selected_targets); do
-          host_routable "$h" || continue
-          echo "  - $h: $(host_instruction_file "$h")"
-        done
+        if [ "$PROJECT" -eq 1 ]; then
+          printf '%s\n' "$TARGET_LIST" | sed 's/^/  - /'
+        else
+          for h in $TARGET_LIST; do
+            echo "  - $h: $(host_instruction_file "$h")"
+          done
+        fi
         printf 'Proceed? [y/N] '
         read -r ans || ans=""
         case "$ans" in y|Y|yes|Yes|YES) ;; *) echo "Aborted."; exit 0 ;; esac
@@ -299,34 +382,54 @@ case "$CMD" in
     fi
     acquire_lock || exit 1
     trap release_lock EXIT
-    rc=0; wrote=0
-    for h in $(selected_targets); do
-      if ! host_routable "$h"; then
-        if [ -n "$SEL_HOST" ]; then
-          echo "$h: not routable (no skills installed and/or capability flag off) — skipped" >&2
-          rc=1
+    rc=0; wrote=0; written_hosts=""
+    if [ "$PROJECT" -eq 1 ]; then
+      while IFS= read -r f; do
+        [ -n "$f" ] || continue
+        if run_node install project "$f" "$(host_act_preamble project)"; then
+          wrote=1
+        else
+          st=$?; [ "$st" -gt "$rc" ] && rc=$st
         fi
-        continue
-      fi
-      run_node install "$h" "$(host_instruction_file "$h")" "$(host_act_preamble "$h")" || rc=1
-      wrote=1
-    done
+      done <<EOF_TARGETS
+$TARGET_LIST
+EOF_TARGETS
+      project_copies_notice "$PROJECT_DIR"
+      written_hosts="project"
+    else
+      for h in $TARGET_LIST; do
+        if run_node install "$h" "$(host_instruction_file "$h")" "$(host_act_preamble "$h")"; then
+          wrote=1
+          written_hosts="${written_hosts}${written_hosts:+,}$h"
+        else
+          st=$?; [ "$st" -gt "$rc" ] && rc=$st
+        fi
+      done
+    fi
     # Manual install clears a prior decline on success.
     if [ "$wrote" -eq 1 ] && declined; then
       grep -v '^router_declined=1' "$CONFIG" > "$CONFIG.tmp" 2>/dev/null || true
       mv "$CONFIG.tmp" "$CONFIG" 2>/dev/null || true
     fi
+    [ "$wrote" -eq 1 ] && emit_event router_install "{\"hosts\":\"$written_hosts\",\"version\":\"$VERSION\"}"
     exit "$rc"
     ;;
 
   remove)
     acquire_lock || exit 1
     trap release_lock EXIT
-    for h in $(selected_targets); do
-      f="$(host_instruction_file "$h")"
-      [ -n "$f" ] || continue
-      run_node remove "$h" "$f" || true
-    done
+    if [ "$PROJECT" -eq 1 ]; then
+      for f in "$PROJECT_DIR/AGENTS.md" "$PROJECT_DIR/CLAUDE.md"; do
+        run_node remove project "$f" || true
+      done
+    else
+      for h in $(selected_targets); do
+        f="$(host_instruction_file "$h")"
+        [ -n "$f" ] || continue
+        run_node remove "$h" "$f" || true
+      done
+    fi
+    emit_event router_remove "{\"version\":\"$VERSION\"}"
     ;;
 
   status)
@@ -335,26 +438,49 @@ case "$CMD" in
       [ -n "$f" ] || { echo "$h: no user-level target (project-fallback host)"; continue; }
       run_node status "$h" "$f" || true
     done
+    # Project-level entries recorded in the manifest.
+    if [ -f "$MANIFEST" ]; then
+      node -e '
+        try {
+          const m = JSON.parse(require("fs").readFileSync(process.argv[1], "utf8"));
+          for (const t of (m.targets || [])) if (t.host === "project") console.log(`project: v${t.version} -> ${t.file}`);
+        } catch (e) {}
+      ' "$MANIFEST" 2>/dev/null || true
+    fi
     ;;
 
   refresh)
     [ -f "$MANIFEST" ] || { echo "no manifest; nothing to refresh"; exit 0; }
     acquire_lock || exit 1
     trap release_lock EXIT
-    for h in $(host_all); do
-      f="$(host_instruction_file "$h")"
-      [ -n "$f" ] || continue
-      if grep -q "\"file\": \"$f\"" "$MANIFEST" 2>/dev/null; then
+    # Manifest-driven: every consented target (user-level AND project) is
+    # re-rendered in place. Hosts that lost their skills since are skipped.
+    REFRESH_LIST="$(node -e '
+      try {
+        const m = JSON.parse(require("fs").readFileSync(process.argv[1], "utf8"));
+        for (const t of (m.targets || [])) console.log(`${t.host}\t${t.file}`);
+      } catch (e) {}
+    ' "$MANIFEST" 2>/dev/null || true)"
+    refreshed=0
+    while IFS="$(printf '\t')" read -r h f; do
+      [ -n "$h" ] && [ -n "$f" ] || continue
+      if [ "$h" != "project" ]; then
         host_routable "$h" || continue
-        run_node install "$h" "$f" "$(host_act_preamble "$h")" || true
       fi
-    done
+      run_node install "$h" "$f" "$(host_act_preamble "$h")" || true
+      refreshed=1
+    done <<EOF_REFRESH
+$REFRESH_LIST
+EOF_REFRESH
+    [ "$refreshed" -eq 1 ] && emit_event router_refresh "{\"version\":\"$VERSION\"}"
+    exit 0
     ;;
 
   decline)
     mkdir -p "$LW_HOME"
     grep -q '^router_declined=1' "$CONFIG" 2>/dev/null || echo 'router_declined=1' >> "$CONFIG"
     echo "Recorded decline (router_declined=1 in $CONFIG)."
+    emit_event router_decline "{\"version\":\"$VERSION\"}"
     ;;
 
   ''|-h|--help|help) usage ;;

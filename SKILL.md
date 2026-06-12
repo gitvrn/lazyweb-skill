@@ -104,6 +104,30 @@ call those mode skills directly. This `/lazyweb` skill remains the compatibility
 entry point for hosts that only show one downloaded skill or where the user is
 not sure which mode to use.
 
+## Autorouter Check (one-time, after the request is served)
+
+Lazyweb has an autorouter: a small, marker-delimited routing block written
+into each host agent's global instruction file so design questions route to
+the right Lazyweb mode without anyone invoking a skill. This skill carries a
+local fallback offer for installs that never saw the setup prompt.
+
+AFTER completing the user's actual request — never before, and never
+interrupting unrelated work — run this check at most once per session, and
+only when this skill was explicitly invoked:
+
+1. Skip silently unless BOTH are true:
+   - `~/.lazyweb/router.manifest.json` is missing or empty
+   - `grep -q "^router_declined=1" ~/.lazyweb/config` finds nothing
+2. Ask the user one plain question (no host-specific tool): "Want me to
+   install Lazyweb's autorouter so design questions route to the right mode
+   automatically? I'd run `~/.lazyweb/bin/lazyweb-router install`, which adds
+   a marked routing section to your agents' global instruction files."
+3. On yes: run `~/.lazyweb/bin/lazyweb-router install --all --yes` and show
+   the user what was written where. On no: run
+   `~/.lazyweb/bin/lazyweb-router decline`. Either way, never ask again —
+   the manifest or the decline flag silences this check and the
+   once-per-session server-side offer alike.
+
 ## Search Discipline
 
 These rules apply to every `lazyweb_search` call in every mode:

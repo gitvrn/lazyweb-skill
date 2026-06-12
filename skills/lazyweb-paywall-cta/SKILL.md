@@ -1,6 +1,6 @@
 ---
 name: lazyweb-paywall-cta
-route: 'Rewriting or stress-testing one paywall CTA (button copy only)'
+route: "Rewrite one paywall CTA (button copy only)"
 description: |
   Critique and rewrite a paywall primary CTA (and adjacent microcopy) by
   reading the target screen, diagnosing CTA-level conversion friction, and
