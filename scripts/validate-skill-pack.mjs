@@ -150,8 +150,11 @@ const designResearchText = read("skills/lazyweb-design-research/SKILL.md");
 const designResearchTemplate = read("skills/lazyweb-design-research/report-template.html");
 const designResearchAll = designResearchText + "\n" + designResearchTemplate;
 assert.match(designResearchText, /report-template\.html/, "design-research skill must reference its report template");
+assert.match(designResearchText, /unfilled template example content/, "publish gate must block unfilled template example content");
+assert.match(designResearchText, /picsum\\\.photos|picsum\.photos/, "publish gate must name picsum.photos as forbidden in final reports");
 for (const templatePattern of [
-  /\{\{TOPIC\}\}/,
+  /data-ex=/,
+  /picsum\.photos/,
   /window\.__vstep/,
   /window\.__zoom/,
   /id="lb"/,
@@ -166,7 +169,6 @@ for (const pattern of [
   /## Goal/,
   /## Recommendation/,
   /## Inspo/,
-  /## Interesting Patterns/,
   /Prototype fidelity rules/,
   /High fidelity/,
   /Medium fidelity/,
@@ -177,9 +179,6 @@ for (const pattern of [
   /\.inspo-map/,
   /\.inspo-point/,
   /\.inspo-img/,
-  /\.pattern-shot/,
-  /\.annotated/,
-  /\.bbox/,
   /\.prototype-option/,
   /\.prototype-img/,
   /\.proto-full/,
@@ -197,7 +196,6 @@ for (const pattern of [
   /\.scalebar/,
   /\.vnav/,
   /\.cluster-label/,
-  /\.patterns-grid/,
   /\.rec-intro/,
   /\.why-h/,
   /Report rescale \+ lightbox/,
@@ -233,9 +231,11 @@ for (const pattern of [
   /Reference Evidence/,
   /Source Notes/,
   /Never publish a `lazyweb-design-research` report that fails this gate/,
-  /Provider fallback order/,
+  /Provider priority order/,
+  /Capability probe/,
+  /imagegen-capability\.json/,
+  /Codex CLI image generation/,
   /native host image generation tool/i,
-  /Do not use Codex CLI for image generation/i,
   /Nano Banana/,
   /Gemini/,
   /CONTROL/,
@@ -253,10 +253,6 @@ for (const pattern of [
   /Long-scroll pages/i,
   /decisive region/i,
   /8-16 points/i,
-  /5-9 patterns/i,
-  /viewport-window reference screenshots/i,
-  /CSS bounding-box callouts/i,
-  /not the user's\s+control screenshot/i,
   /image-only/i,
   /## Comparison Eval Contract/,
   /metrics\.json/,
@@ -283,6 +279,16 @@ for (const forbiddenHeading of [
 ]) {
   assert.doesNotMatch(designResearchAll, forbiddenHeading, `design-research should not reintroduce old visible report heading ${forbiddenHeading}`);
 }
+for (const removedPatternsToken of [
+  /\.pattern-shot/,
+  /\.patterns-grid/,
+  /\.bbox/,
+  /\.annotated\b/,
+  /## Interesting Patterns/
+]) {
+  assert.doesNotMatch(designResearchAll, removedPatternsToken, `removed Interesting Patterns machinery must not reappear: ${removedPatternsToken}`);
+}
+
 for (const forbiddenV2Pattern of [
   /\.inspo-card/,
   /\.rec-copy/,
@@ -297,10 +303,10 @@ for (const forbiddenV2Pattern of [
 for (const guidanceFile of ["AGENTS.md", "CLAUDE.md"]) {
   const guidance = read(guidanceFile);
   assert.match(guidance, /report v3/, `${guidanceFile} should document the design-research v3 exception`);
-  assert.match(guidance, /\.compare.*\.option-deck.*\.pattern-shot.*\.annotated.*\.bbox/s, `${guidanceFile} should name the design-research v3 components`);
+  assert.match(guidance, /\.compare.*\.option-deck/s, `${guidanceFile} should name the design-research v3 components`);
   assert.match(guidance, /side-by-side `\.compare`.*Control × Recommended.*height-locked frames.*variant switcher/s, `${guidanceFile} should require side-by-side control/recommendation comparison for design-research v3`);
   assert.match(guidance, /ranking is carried by order \+ a `Recommended` flag/, `${guidanceFile} should require order plus Recommended flag for design-research ranking`);
-  assert.match(guidance, /\.pattern-shot`\/`\.annotated` viewport-window figures with `\.bbox` overlays/, `${guidanceFile} should require annotated viewport-window patterns`);
+  assert.match(guidance, /renders no patterns/, `${guidanceFile} should state design-research v3 has no patterns section`);
   assert.match(guidance, /CSS gotcha/, `${guidanceFile} should carry the font-shorthand CSS gotcha`);
 }
 

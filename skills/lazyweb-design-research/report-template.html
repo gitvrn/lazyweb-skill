@@ -1,23 +1,30 @@
 <!doctype html>
 <!--
-  Lazyweb design-research report v3 — CANONICAL TEMPLATE.
-  Copy this file to $REPORT_DIR/report.html and fill the {{PLACEHOLDERS}}.
+  Lazyweb design-research report v3 — CANONICAL TEMPLATE (living demo).
+  Copy this file to $REPORT_DIR/report.html and REPLACE the example content.
   Do NOT hand-write the skeleton, CSS, or JS — they are render-tested.
+  Open this file in a browser to see the full shape and interactivity.
 
   Conventions:
-  - {{LIKE_THIS}} = replace with content. Keep surrounding markup intact.
+  - Example content marks itself two ways: a data-ex attribute on the element
+    and/or picsum.photos image URLs. REPLACE every example value with real run
+    data and DELETE every data-ex attribute as you go. The publish gate BLOCKS
+    any report still containing data-ex, picsum.photos, placehold.co, EXAMPLE-,
+    or a {{PLACEHOLDER}}.
   - <!~ REPEAT ... ~> comments mark blocks to duplicate per item.
-  - <!~ VARIANT ... ~> comments mark optional class swaps.
+  - <!~ OPTIONAL ... ~> / <!~ VARIANT ... ~> blocks are kept, swapped, or
+    deleted as their comment says. Remove the ~ comments from the final report.
   - ESCAPE every interpolated string: in HTML attributes/captions escape
     " < > as &quot; &lt; &gt;. In the _vars JS literals escape ' and \.
   - Delete the Inspo section entirely if fewer than 8 comparable references.
-  - Delete the .corpus banner unless evidence is thin (<8 refs) or mismatched.
+  - The .corpus banner ships commented out — enable only for thin/mismatched
+    corpora (<8 selected references).
 -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Design Research: {{TOPIC}}</title>
+<title>Design Research: Acme Analytics Pricing Page</title> <!--~ data-ex: replace with real topic ~-->
 <style>
 :root{--ink:#1f2328;--mut:#57606a;--line:#d0d7de;--soft:#eef4fb;--accent:#0969da;--s:1}
 html[data-scale="s"]{--s:.78}html[data-scale="l"]{--s:1.25}
@@ -76,7 +83,6 @@ h1,h2,h3,p{letter-spacing:0}h1{font-size:34px;line-height:1.1;margin:0 0 24px}h2
 .has-js .deck-nav{display:flex}
 .deck-nav button{cursor:pointer;border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:6px;width:34px;height:28px;font-size:13px;line-height:1}
 .deck-nav button:hover{background:var(--soft);border-color:var(--accent);color:var(--accent)}
-.prev{font-weight:600;font-size:11.5px;line-height:1;color:#0a3b78;background:var(--soft);border-radius:20px;padding:4px 10px;vertical-align:middle}
 /* clustered inspo map — set --map-h inline per population (520px for 8-10 points ... 760px for 14-16) */
 .inspo-map{position:relative;min-height:calc(var(--map-h,640px)*var(--s));border:1px solid var(--line);border-radius:10px;background:linear-gradient(var(--line),var(--line)) 50% 0/1px 100% no-repeat,linear-gradient(90deg,var(--line),var(--line)) 0 50%/100% 1px no-repeat,#fff}
 .inspo-map::before{content:var(--y-top);position:absolute;top:10px;left:50%;transform:translateX(-50%);color:var(--mut);font-size:12px;font-weight:700;z-index:10;background:rgba(255,255,255,.88);padding:2px 7px;border-radius:6px}
@@ -92,19 +98,6 @@ h1,h2,h3,p{letter-spacing:0}h1{font-size:34px;line-height:1.1;margin:0 0 24px}h2
 .inspo-point.mob .inspo-img{aspect-ratio:9/16;object-fit:cover;object-position:top center}
 .inspo-point.mob:hover,.inspo-point.mob:focus-visible{width:min(calc(340px*var(--s)),30vw)}
 .inspo-point.mob:hover .inspo-img,.inspo-point.mob:focus-visible .inspo-img{aspect-ratio:auto;max-height:min(72vh,calc((var(--map-h,640px) - 40px)*var(--s)));object-fit:contain}
-/* annotated patterns — two-column grid of viewport-window screenshots + CSS bounding boxes */
-.patterns-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 24px;max-width:calc(1400px*var(--s))}
-@media(max-width:980px){.patterns-grid{grid-template-columns:1fr}}
-.pattern-shot{margin:10px 0 18px;min-width:0}
-.pattern-shot h3{display:flex;flex-wrap:wrap;align-items:center;gap:10px;font-size:15px}
-.annotated{position:relative;margin:0;width:100%;max-width:calc(720px*var(--s));aspect-ratio:var(--ar,16/11);border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fafbfc}
-.annotated img{display:block;width:100%;height:100%;object-fit:cover;object-position:var(--pos,center top);cursor:zoom-in}
-.annotated.mobile{width:calc(min(420px,100%)*var(--s));aspect-ratio:auto}
-.annotated.mobile img{height:auto;object-fit:fill;object-position:initial}
-.bbox{position:absolute;left:var(--x);top:var(--y);width:var(--w);height:var(--h);border:2px solid var(--accent);border-radius:4px;box-shadow:0 0 0 200vmax rgba(15,23,42,.16);pointer-events:none}
-.bbox>i{position:absolute;left:-2px;bottom:calc(100% + 6px);font:700 11px/1 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-style:normal;color:#fff;background:var(--accent);border-radius:5px;padding:5px 9px;white-space:nowrap}
-.bbox.flip-label>i{bottom:auto;top:calc(100% + 6px)}
-.annotated.multi .bbox{box-shadow:none}
 /* shared furniture: mock-frame (no-imagegen fallback) + control/variant flip (experiment evidence) */
 .mock{margin:14px 0}.mock .frame{border:1px solid var(--line);border-radius:14px;background:#fff;overflow:hidden}.mock.mobile .frame{max-width:300px;border-radius:26px;border:8px solid #1f2328}.mock.desktop .frame{max-width:760px}
 .mock .body{padding:14px;display:flex;flex-direction:column;gap:10px}.mock .box{background:var(--soft);border:1px dashed #b9c7d6;border-radius:8px;min-height:34px;display:flex;align-items:center;justify-content:center;color:#4a5a6a;font-size:12px;padding:8px}.mock .box.cta{background:var(--accent);border:0;color:#fff;font-weight:600}.mock .row{display:flex;gap:10px}.mock .row>.box{flex:1}.mock .cap{font-size:12px;color:var(--mut);margin-top:6px;text-align:center}
@@ -134,7 +127,7 @@ h1,h2,h3,p{letter-spacing:0}h1{font-size:34px;line-height:1.1;margin:0 0 24px}h2
 </head>
 <body>
 <main>
-<h1>Design Research: {{TOPIC}}</h1>
+<h1 data-ex="topic">Design Research: Acme Analytics — Pricing Page</h1>
 
 <section id="agent-instructions" class="agent-instructions">
   <div class="ai-head"><span class="ai-badge">FOR THE CODING AGENT</span>
@@ -144,46 +137,47 @@ h1,h2,h3,p{letter-spacing:0}h1{font-size:34px;line-height:1.1;margin:0 0 24px}h2
       if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(function(){done(true);},function(){done(false);});}
       else{var r=document.createRange();r.selectNodeContents(sec.querySelector('.ai-block'));var s=getSelection();s.removeAllRanges();s.addRange(r);try{document.execCommand('copy');done(true);}catch(e){done(false);}}">Copy</button>
   </div>
-  <p class="ai-human">{{ONE_HUMAN_SENTENCE_RECOMMENDED_BET}}</p>
-  <pre class="ai-block">LAZYWEB REPORT — AGENT HANDOFF
-Use the report at {{REPORT_PATH}} as a starting point for {{TASK}}.
+  <p class="ai-human" data-ex="human-sentence">Build the Live Trust Dashboard first: replace the marketing band on /pricing with live uptime, compliance artifacts, and an engineer-led demo CTA.</p>
+  <pre class="ai-block" data-ex="handoff">LAZYWEB REPORT — AGENT HANDOFF
+Use the report at /abs/path/to/report.html as a starting point for redesigning the Acme pricing page to lift enterprise demo requests.
 
 TOP RECOMMENDATIONS (do first):
-1. {{RECOMMENDED_BET_IMPERATIVE}}
-2. {{RUNNER_UP_BET}}
-3. {{RUNNER_UP_BET}}
+1. Replace the hero marketing band with a live trust dashboard (uptime, SOC 2, incident history).
+2. Print the SLA number and a price anchor inside the Enterprise plan column.
+3. Offer a self-serve procurement data room behind one email field.
 
-INDEX ON: {{CONTROL_FRICTIONS_ATTACKED}}
-DO NOT OVER-INDEX ON: {{DIRECTIONAL_SIGNALS_AND_SKIP_CONDITIONS}}
-DIVE FURTHER: {{NEXT_SKILL_OR_TOOL}} — {{WHY}}
+INDEX ON: zero verifiable evidence on the control; compliance buried below the fold
+DO NOT OVER-INDEX ON: single-source off-category live-ticker reference; no measured lift in corpus
+DIVE FURTHER: /lazyweb-ab-test-research — validate the trust-dashboard bet against pricing experiments
 
-Evidence basis: {{N_REFERENCES_AND_SOURCES}} · {{DATE}}</pre>
+Evidence basis: 14 Lazyweb references + 2 web captures · 2026-06-11</pre>
 </section>
 
-<!--~ OPTIONAL: only when evidence is thin (<8 selected references) or context-mismatched; otherwise DELETE ~-->
-<div class="corpus"><span>&#9888;</span><p style="margin:0"><b>Evidence basis:</b> {{CORPUS_CAVEAT}}</p></div>
+<!--~ OPTIONAL: enable only when evidence is thin (<8 selected references) or context-mismatched.
+<div class="corpus"><span>&#9888;</span><p style="margin:0"><b>Evidence basis:</b> only 6 on-category references survived screening — treat prevalence claims as directional.</p></div>
+~-->
 
 <section id="goal" class="goal">
   <h2>Goal</h2>
-  <p>{{ONE_SENTENCE_TARGET_OUTCOME}}</p>
+  <p data-ex="goal">Get more enterprise buyers to book a demo from the pricing page.</p>
 </section>
 
 <section id="recommendation" class="recommendation">
   <h2>Recommendation</h2>
-  <p class="rec-intro">{{WHAT_THE_RECOMMENDED_BET_CHANGES}} — <b>{{WHY_IT_WINS_ONE_SENTENCE}}</b></p>
+  <p class="rec-intro" data-ex="intro">Swap the hero marketing band for a live trust dashboard with an engineer-led demo CTA — <b>because enterprise buyers convert on demonstrated reliability, and the control offers zero verifiable evidence above the fold.</b></p>
   <!--~ VARIANT: add class "tall" (16:15 frames) when the decisive evidence sits below a 16:10 fold;
        add class "mobileset" for portrait/mobile screenshots; with NO control (greenfield),
        delete the control figure and let the recommended figure span full width. ~-->
   <div class="compare">
     <figure class="cmp control">
       <figcaption>Control</figcaption>
-      <div class="cmp-frame"><img src="references/current-state.png" alt="{{ACCURATE_CONTROL_DESCRIPTION}}" onclick="window.__zoom&&__zoom(this)"></div>
+      <div class="cmp-frame"><img data-ex="control" src="https://picsum.photos/seed/lw-control/1280/800" alt="Acme pricing page today: four plan cards, no trust signals above the fold" onclick="window.__zoom&&__zoom(this)"></div>
     </figure>
     <figure class="cmp is-recommended">
-      <figcaption><span id="vname">Recommended — {{BET_1_NAME}}</span>
+      <figcaption><span id="vname">Recommended — Live Trust Dashboard</span>
         <span class="vnav"><button type="button" aria-label="Previous variant" onclick="window.__vstep&&__vstep(-1)">&#9664;</button><button type="button" aria-label="Next variant" onclick="window.__vstep&&__vstep(1)">&#9654;</button></span>
       </figcaption>
-      <div class="cmp-frame"><img id="vimg" src="references/prototype-{{BET_1_SLUG}}.png" alt="{{ACCURATE_PROTOTYPE_DESCRIPTION}}" onclick="window.__zoom&&__zoom(this)"></div>
+      <div class="cmp-frame"><img id="vimg" data-ex="proto-1" src="https://picsum.photos/seed/lw-proto1/1280/800" alt="Prototype: slim plan rail over a full-width live uptime and compliance band" onclick="window.__zoom&&__zoom(this)"></div>
     </figure>
   </div>
 
@@ -191,26 +185,52 @@ Evidence basis: {{N_REFERENCES_AND_SOURCES}} · {{DATE}}</pre>
   <div class="deckwrap">
     <div class="option-deck">
       <!--~ REPEAT one <article> per bet, recommended first.
-           Only the recommended card gets class "is-recommended" and the .rec-flag pill. ~-->
+           Only the recommended card gets class "is-recommended" and the .rec-flag pill.
+           What/Why bullets: 8-14 words each, no Proof or Skip-if bullets.
+           Prevalence/whitespace count goes in the FIRST deck figcaption. ~-->
       <article class="prototype-option is-recommended" id="bet-1">
-        <h3>{{BET_1_NAME}} <span class="rec-flag">Recommended option</span></h3>
-        <figure class="proto-full"><img class="prototype-img" src="references/prototype-{{BET_1_SLUG}}.png" alt="{{ACCURATE_DESCRIPTION}}" loading="lazy" onclick="window.__zoom&&__zoom(this)"></figure>
-        <ul class="opt-points">
-          <li><b>What:</b> {{THE_CHANGE_8_TO_14_WORDS}}</li>
-          <li><b>Why:</b> {{THE_MECHANISM_8_TO_14_WORDS}}</li>
+        <h3 data-ex="bet-1">Live Trust Dashboard <span class="rec-flag">Recommended option</span></h3>
+        <figure class="proto-full"><img class="prototype-img" data-ex="proto-1-full" src="https://picsum.photos/seed/lw-proto1/1280/960" alt="Full prototype: live uptime band, compliance downloads, engineer demo CTA" loading="lazy" onclick="window.__zoom&&__zoom(this)"></figure>
+        <ul class="opt-points" data-ex="bet-1-points">
+          <li><b>What:</b> Live uptime + compliance dashboard replaces the marketing band.</li>
+          <li><b>Why:</b> Demonstrated reliability converts platform engineers; claims don't.</li>
         </ul>
         <div class="deck mini">
-          <!--~ REPEAT 2-3 figures; prevalence/whitespace count goes in the FIRST figcaption.
-               Tag desktop screenshots class="shot-web" (16:10 window crop); portrait figures untagged. ~-->
-          <figure class="shot-web"><img src="{{IMAGE_URL}}" alt="{{VISION_DESCRIPTION_ALT}}" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')"><figcaption class="cap"><span class="src">[{{SOURCE}}]</span> <b>{{COMPANY}}</b> — {{EXACT_UI_DETAIL}}. <b>{{PREVALENCE_OR_WHITESPACE_COUNT}}</b></figcaption></figure>
-          <figure class="shot-web"><img src="{{IMAGE_URL}}" alt="{{ALT}}" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')"><figcaption class="cap"><span class="src">[{{SOURCE}}]</span> <b>{{COMPANY}}</b> — {{EXACT_UI_DETAIL}}</figcaption></figure>
+          <figure class="shot-web"><img data-ex="ref-1" src="https://picsum.photos/seed/lw-ref1/960/600" alt="Userpilot case-study grid with quantified outcomes" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')"><figcaption class="cap"><span class="src">[Lazyweb]</span> <b>Userpilot</b> — quantified-outcomes grid beside pricing. <b>0 of 14 pricing pages show live metrics — whitespace.</b></figcaption></figure>
+          <figure class="shot-web"><img data-ex="ref-2" src="https://picsum.photos/seed/lw-ref2/960/600" alt="Sequoia trust page with compliance badge row" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')"><figcaption class="cap"><span class="src">[Lazyweb]</span> <b>Sequoia</b> — badge-led trust band above plan grid.</figcaption></figure>
+        </div>
+        <details class="build-prompt"><summary>Agent prompt</summary><p data-ex="bet-1-prompt">Hypothesis: replacing the hero marketing band with a live trust dashboard should lift enterprise demo requests because demonstrated reliability converts buyers that claims cannot. Evidence: whitespace — 0 of 14 in-category references render live metrics on pricing (directional, no measured lift); mechanism proof from quantified-outcome case-study pages. Skip if: status-page numbers are unflattering or too young to be credible. Build: slim plan rail at top; full-width dark band with 90-day uptime sparkline, incident strip, downloadable SOC 2/ISO artifacts, customer logos with workload stats; primary CTA "Book a demo with an infrastructure engineer".</p></details>
+      </article>
+      <article class="prototype-option" id="bet-2">
+        <h3 data-ex="bet-2">Procurement-Ready Plan Column</h3>
+        <figure class="proto-full"><img class="prototype-img" data-ex="proto-2-full" src="https://picsum.photos/seed/lw-proto2/1280/960" alt="Full prototype: enterprise column with SLA, price anchor, compliance badges" loading="lazy" onclick="window.__zoom&&__zoom(this)"></figure>
+        <ul class="opt-points" data-ex="bet-2-points">
+          <li><b>What:</b> SLA, price anchor, and badges printed inside the Enterprise column.</li>
+          <li><b>Why:</b> Removes every procurement blocker without leaving the plan grid.</li>
+        </ul>
+        <div class="deck mini">
+          <figure class="shot-web"><img data-ex="ref-3" src="https://picsum.photos/seed/lw-ref3/960/600" alt="Vercel enterprise column with printed SLA" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')"><figcaption class="cap"><span class="src">[Lazyweb]</span> <b>Vercel</b> — 99.99% SLA printed in-column. <b>2 of 2 direct competitors do this; control doesn't.</b></figcaption></figure>
+          <figure class="shot-web"><img data-ex="ref-4" src="https://picsum.photos/seed/lw-ref4/960/600" alt="Netlify enterprise card leading with the SLA promise" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')"><figcaption class="cap"><span class="src">[Lazyweb]</span> <b>Netlify</b> — Enterprise card led by support + SLA.</figcaption></figure>
+        </div>
+        <details class="build-prompt"><summary>Agent prompt</summary><p data-ex="bet-2-prompt">Hypothesis: printing the SLA number, a "$2k/mo starting" anchor, and compliance badges inside the Enterprise column should lift inquiries because procurement blockers are answered in place. Evidence: 2 of 2 captured direct competitors print the SLA in-column; 9 of 14 references run the column convention. Skip if: legal will not commit to a public SLA number. Build: keep the grid; rework the Enterprise column with SLA row, anchor price, badge strip, embedded scheduler under "Book a demo".</p></details>
+      </article>
+      <article class="prototype-option" id="bet-3">
+        <h3 data-ex="bet-3">Self-Serve Procurement Room</h3>
+        <figure class="proto-full"><img class="prototype-img" data-ex="proto-3-full" src="https://picsum.photos/seed/lw-proto3/1280/960" alt="Full prototype: one email field unlocking a procurement data room" loading="lazy" onclick="window.__zoom&&__zoom(this)"></figure>
+        <ul class="opt-points" data-ex="bet-3-points">
+          <li><b>What:</b> One email field unlocks a data room with SOC 2, DPA, sample invoice.</li>
+          <li><b>Why:</b> Procurement needs artifacts, not adjectives or sales calls.</li>
+        </ul>
+        <div class="deck mini">
+          <figure class="shot-web"><img data-ex="ref-5" src="https://picsum.photos/seed/lw-ref5/960/600" alt="Intercom instant demo environment" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')"><figcaption class="cap"><span class="src">[Web]</span> <b>Intercom</b> — instant demo behind one field. <b>Single source, outside this category.</b></figcaption></figure>
+          <figure class="shot-web"><img data-ex="ref-6" src="https://picsum.photos/seed/lw-ref6/960/600" alt="Ramp three-path demo page" loading="lazy" onerror="this.closest('figure').classList.add('img-missing')"><figcaption class="cap"><span class="src">[Lazyweb]</span> <b>Ramp</b> — three demo paths by buyer readiness.</figcaption></figure>
         </div>
         <!--~ OPTIONAL: mini deck with 3+ figures gets this nav right after the .deck:
         <div class="deck-nav">
           <button type="button" aria-label="Previous" onclick="var d=this.closest('.deck-nav').previousElementSibling,f=d.querySelector('figure');d.scrollBy({left:-((f?f.offsetWidth:240)+12),behavior:'smooth'})">&#9664;</button>
           <button type="button" aria-label="Next" onclick="var d=this.closest('.deck-nav').previousElementSibling,f=d.querySelector('figure');d.scrollBy({left:(f?f.offsetWidth:240)+12,behavior:'smooth'})">&#9654;</button>
         </div> ~-->
-        <details class="build-prompt"><summary>Agent prompt</summary><p>{{FULL_HYPOTHESIS_EVIDENCE_DETAIL_SKIP_CONDITION_AND_IMPLEMENTATION_BRIEF}}</p></details>
+        <details class="build-prompt"><summary>Agent prompt</summary><p data-ex="bet-3-prompt">Hypothesis: replacing "Contact sales" with a self-serve data room (order form with price anchor, SOC 2 report, DPA, sample invoice, migration guide) behind one email field should produce more qualified leads because procurement evaluates artifacts. Evidence: mechanism-only — single source, outside this category; 0 of 14 publish procurement artifacts on pricing. Skip if: sales insists on qualifying every enterprise lead by phone first. Build: replace the Enterprise CTA with "Open the procurement room"; room lists downloadable artifacts plus an instant read-only sandbox link.</p></details>
       </article>
       <!--~ END REPEAT ~-->
     </div>
@@ -223,37 +243,27 @@ Evidence basis: {{N_REFERENCES_AND_SOURCES}} · {{DATE}}</pre>
 
 <!--~ OPTIONAL SECTION: delete entirely if fewer than 8 comparable references.
      Set --map-h to the population (520px for 8-10 points ... 760px for 14-16).
-     Keep point anchors inside 12%-88% on both axes. ~-->
+     Keep point anchors inside 12%-88% on both axes; portrait refs get class="inspo-point mob".
+     Aim for 10-16 points in 2-4 named clusters. ~-->
 <section id="inspo" class="inspo">
   <h2>Inspo</h2>
-  <div class="inspo-map" style="--map-h:{{MAP_HEIGHT}}px;--x-left:'{{X_LEFT}}';--x-right:'{{X_RIGHT}}';--y-top:'{{Y_TOP}}';--y-bottom:'{{Y_BOTTOM}}'">
+  <div class="inspo-map" data-ex="map" style="--map-h:640px;--x-left:'Form-first';--x-right:'Content-first';--y-top:'Numbers-led';--y-bottom:'Story-led'">
     <span class="inspo-axes" aria-hidden="true"></span>
-    <!--~ REPEAT 2-4 cluster labels positioned over their member groups ~-->
-    <span class="cluster-label" style="--x:{{X}}%;--y:{{Y}}%">{{CLUSTER_NAME}}</span>
-    <!--~ REPEAT 8-16 points; portrait references get class="inspo-point mob" ~-->
-    <button class="inspo-point" type="button" style="--x:{{X}}%;--y:{{Y}}%" data-source="{{PROVENANCE}}" onclick="window.__zoom&&__zoom(this.querySelector('img'))">
-      <img class="inspo-img" src="{{IMAGE_URL}}" alt="{{VISION_DESCRIPTION_ALT}}" loading="lazy">
-    </button>
-    <!--~ END REPEAT ~-->
-  </div>
-</section>
-
-<section id="interesting-patterns" class="patterns">
-  <h2>Interesting Patterns</h2>
-  <div class="patterns-grid">
-    <!--~ REPEAT one .pattern-shot per pattern (5-9 for a healthy corpus).
-         bbox coords are PERCENTAGES RELATIVE TO THE VISIBLE WINDOW (vision-verify them).
-         Single box: spotlight dim (default). Multiple boxes: add "multi" to .annotated.
-         Box in the top ~10% of the window: add "flip-label" so the chip drops below.
-         Mobile reference: class="annotated mobile" (whole screen, natural height). ~-->
-    <article class="pattern-shot">
-      <h3>{{PATTERN_OBSERVATION}} <span class="prev">{{SEEN_IN_N_OF_M}}</span></h3>
-      <figure class="annotated" style="--ar:16/11;--pos:center top">
-        <img src="{{IMAGE_URL}}" alt="{{ACCURATE_REFERENCE_DESCRIPTION}}" loading="lazy" data-source="{{PROVENANCE}}" onclick="window.__zoom&&__zoom(this)">
-        <span class="bbox" style="--x:{{X}}%;--y:{{Y}}%;--w:{{W}}%;--h:{{H}}%"><i>{{SHORT_LABEL_NAMING_THE_MOVE}}</i></span>
-      </figure>
-    </article>
-    <!--~ END REPEAT ~-->
+    <span class="cluster-label" style="--x:24%;--y:24%">Minimal ask</span>
+    <span class="cluster-label" style="--x:70%;--y:28%">Numbers-first proof</span>
+    <span class="cluster-label" style="--x:62%;--y:74%">Preview the product</span>
+    <button class="inspo-point" type="button" style="--x:18%;--y:30%" data-source="example" onclick="window.__zoom&&__zoom(this.querySelector('img'))"><img class="inspo-img" src="https://picsum.photos/seed/lw-m1/640/400" alt="Minimal pricing page, single plan card" loading="lazy"></button>
+    <button class="inspo-point" type="button" style="--x:30%;--y:20%" data-source="example" onclick="window.__zoom&&__zoom(this.querySelector('img'))"><img class="inspo-img" src="https://picsum.photos/seed/lw-m2/640/400" alt="Two-plan grid with one CTA" loading="lazy"></button>
+    <button class="inspo-point" type="button" style="--x:26%;--y:44%" data-source="example" onclick="window.__zoom&&__zoom(this.querySelector('img'))"><img class="inspo-img" src="https://picsum.photos/seed/lw-m3/640/400" alt="Single-column pricing with FAQ" loading="lazy"></button>
+    <button class="inspo-point" type="button" style="--x:62%;--y:18%" data-source="example" onclick="window.__zoom&&__zoom(this.querySelector('img'))"><img class="inspo-img" src="https://picsum.photos/seed/lw-m4/640/400" alt="Metric-tile case study band" loading="lazy"></button>
+    <button class="inspo-point" type="button" style="--x:76%;--y:24%" data-source="example" onclick="window.__zoom&&__zoom(this.querySelector('img'))"><img class="inspo-img" src="https://picsum.photos/seed/lw-m5/640/400" alt="ROI calculator beside plans" loading="lazy"></button>
+    <button class="inspo-point" type="button" style="--x:68%;--y:38%" data-source="example" onclick="window.__zoom&&__zoom(this.querySelector('img'))"><img class="inspo-img" src="https://picsum.photos/seed/lw-m6/640/400" alt="Usage-based pricing slider" loading="lazy"></button>
+    <button class="inspo-point" type="button" style="--x:84%;--y:32%" data-source="example" onclick="window.__zoom&&__zoom(this.querySelector('img'))"><img class="inspo-img" src="https://picsum.photos/seed/lw-m7/640/400" alt="Live KPI dashboard hero" loading="lazy"></button>
+    <button class="inspo-point" type="button" style="--x:42%;--y:62%" data-source="example" onclick="window.__zoom&&__zoom(this.querySelector('img'))"><img class="inspo-img" src="https://picsum.photos/seed/lw-m8/640/400" alt="Customer-story pricing narrative" loading="lazy"></button>
+    <button class="inspo-point" type="button" style="--x:58%;--y:68%" data-source="example" onclick="window.__zoom&&__zoom(this.querySelector('img'))"><img class="inspo-img" src="https://picsum.photos/seed/lw-m9/640/400" alt="Interactive product demo embedded" loading="lazy"></button>
+    <button class="inspo-point" type="button" style="--x:72%;--y:78%" data-source="example" onclick="window.__zoom&&__zoom(this.querySelector('img'))"><img class="inspo-img" src="https://picsum.photos/seed/lw-m10/640/400" alt="Full sample issue as the page" loading="lazy"></button>
+    <button class="inspo-point" type="button" style="--x:34%;--y:78%" data-source="example" onclick="window.__zoom&&__zoom(this.querySelector('img'))"><img class="inspo-img" src="https://picsum.photos/seed/lw-m11/640/400" alt="Founder-letter pricing rationale" loading="lazy"></button>
+    <button class="inspo-point mob" type="button" style="--x:14%;--y:64%" data-source="example" onclick="window.__zoom&&__zoom(this.querySelector('img'))"><img class="inspo-img" src="https://picsum.photos/seed/lw-m12/390/780" alt="Mobile paywall with single plan" loading="lazy"></button>
   </div>
 </section>
 
@@ -269,11 +279,11 @@ document.body.classList.add('has-js');
 var _lb=document.getElementById('lb'),_i=_lb&&_lb.querySelector('img');
 window.__zoom=function(g){if(!_lb)return false;_i.src=g.currentSrc||g.src;_lb.classList.add('open');_lb.setAttribute('aria-hidden','false');return false;};
 if(_lb)_lb.addEventListener('click',function(){_lb.classList.remove('open');_lb.setAttribute('aria-hidden','true');_i.removeAttribute('src');});
-/* One entry per bet, recommended first. ESCAPE apostrophes/backslashes in n and a. */
+/* One entry per bet, recommended first. ESCAPE apostrophes/backslashes in n and a. Example values below — replace all three. */
 var _vars=[
-  {n:'Recommended — {{BET_1_NAME}}',s:'references/prototype-{{BET_1_SLUG}}.png',a:'{{ALT_1}}'},
-  {n:'{{BET_2_NAME}}',s:'references/prototype-{{BET_2_SLUG}}.png',a:'{{ALT_2}}'},
-  {n:'{{BET_3_NAME}}',s:'references/prototype-{{BET_3_SLUG}}.png',a:'{{ALT_3}}'}
+  {n:'Recommended — Live Trust Dashboard',s:'https://picsum.photos/seed/lw-proto1/1280/800',a:'Prototype: live uptime and compliance band'},
+  {n:'Procurement-Ready Plan Column',s:'https://picsum.photos/seed/lw-proto2/1280/800',a:'Prototype: enterprise column with SLA and anchor'},
+  {n:'Self-Serve Procurement Room',s:'https://picsum.photos/seed/lw-proto3/1280/800',a:'Prototype: data room behind one email field'}
 ],_vi=0;
 window.__vstep=function(d){_vi=(_vi+d+_vars.length)%_vars.length;var v=_vars[_vi],img=document.getElementById('vimg');img.src=v.s;img.alt=v.a;document.getElementById('vname').textContent=v.n;};
 document.querySelectorAll('.scalebar button').forEach(function(b){b.addEventListener('click',function(){

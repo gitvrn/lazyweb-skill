@@ -3,7 +3,7 @@ name: lazyweb-design-research
 route: 'Design research, best practices, competitive analysis, "what do top apps do"'
 description: |
   Deep design research combining Lazyweb's screenshot database with web research.
-  Produces a prototype-first HTML report with visual references and annotated patterns.
+  Produces a prototype-first HTML report with side-by-side prototypes and a clustered inspo map.
   Use when the user needs competitive analysis, best practices research, or wants
   to understand how the best apps handle a specific design problem.
   Trigger on: "best practices for", "how should I design", "what do top apps do",
@@ -48,7 +48,7 @@ or not, ALWAYS:
    ask `/lazyweb` to improve your current design, or start building."
 
 The visible report is: **Agent Instructions**, **Goal**, **Recommendation**,
-optional **Inspo**, and **Interesting Patterns** — in that order. Do not produce
+and optional **Inspo** — in that order. Do not produce
 the older busy structure with key examples, findings, sources, broad
 recommendation lists, or long prose analysis sections.
 
@@ -80,6 +80,9 @@ import pathlib, re, sys
 
 path = pathlib.Path(sys.argv[1])
 html = path.read_text(encoding="utf-8")
+# Forbidden-content checks run on RENDERED content only — HTML comments
+# (including the template's own instruction comments) don't render.
+rendered = re.sub(r"<!--[\s\S]*?-->", "", html)
 
 required_groups = {
     "Agent Instructions copy block": [
@@ -90,11 +93,6 @@ required_groups = {
         r'class=["\'][^"\']*\boption-deck\b',
         r'class=["\'][^"\']*\bprototype-option\b',
         r'Recommended',
-    ],
-    "Annotated pattern proof": [
-        r'class=["\'][^"\']*\bpattern-shot\b',
-        r'class=["\'][^"\']*\bannotated\b',
-        r'class=["\'][^"\']*\bbbox\b',
     ],
 }
 missing = []
@@ -111,8 +109,10 @@ for label, pattern in {
     "old axis/bubble inspo UI": r'class=["\'][^"\']*\baxis\b|class=["\'][^"\']*\bbubble\b',
     "old prototype wrapper": r'class=["\'][^"\']*\bprototype-image\b',
     "old evidence sections": r'Reference Evidence|Source Notes|Key Examples|<h2[^>]*>\s*Findings\s*</h2>|<h2[^>]*>\s*Sources\s*</h2>',
+    "removed patterns section": r'class=["\'][^"\']*\bpattern-shot\b|class=["\'][^"\']*\bpatterns-grid\b|<h2[^>]*>\s*Interesting Patterns\s*</h2>',
+    "unfilled template example content": r'EXAMPLE-|picsum\.photos|placehold\.co|\bdata-ex=|\{\{[A-Z0-9_]+\}\}',
 }.items():
-    if re.search(pattern, html, re.I):
+    if re.search(pattern, rendered, re.I):
         missing.append(f"Forbidden {label}: {pattern}")
 
 if missing:
@@ -320,6 +320,30 @@ Think about two groups:
 
 ### 5. Search Lazyweb (go deep — the corpus is the product)
 
+**Run evidence gathering in PARALLEL.** When the host has a subagent/Agent
+tool, dispatch THREE gatherers concurrently in a single message:
+
+- **G1 — median mapper:** runs Pass A below; returns the in-category baseline.
+- **G2 — edge hunter:** runs Pass B below plus the `lazyweb_find_similar`
+  expansion; returns outliers with mechanism notes.
+- **G3 — web + control:** runs the step-7 web research (capture URLs +
+  screenshots into `work/`) and, when a control exists, `lazyweb_compare_image`
+  on the downscaled control.
+
+Each gatherer writes structured JSON to `$REPORT_DIR/work/gatherer-{n}.json`
+(references with `visionDescription`, image URLs, coverage notes, queries run)
+and returns a compact summary. The main agent merges, dedupes, and clusters.
+Hosts WITHOUT a subagent tool follow the same three roles as sequential
+phases, batching independent tool calls into single messages wherever the host
+allows.
+
+**Text before image (hard rule, applies to every gatherer):** select and rank
+references from TEXT — `visionDescription`, captions, `coverage`, `warnings`,
+similarity scores — before fetching or viewing ANY image. An image may be
+viewed only after its text fields qualify it for the report (or when
+vision-verifying an agent-described result). Viewing images first is the
+single biggest avoidable token-and-time cost in this phase.
+
 **Search discipline:** never repeat an identical query; results are deterministic.
 Page deeper with `offset` and follow the response's `pagination.next_offset`.
 Read `coverage` and `warnings` on every response. On `no_matches`/`low_coverage`,
@@ -328,9 +352,10 @@ the coverage gap in the report. On `company_not_in_library`, use a suggested
 company or drop the filter.
 
 Keep a running search log at `$REPORT_DIR/work/search-log.json` — append every
-query with its filters/offset as you run it. This is what makes a crashed run
-resumable (results files alone don't record what was searched) and is the
-ground truth for "never repeat an identical query".
+query with its filters/offset as you run it (gatherers append to their own
+`work/gatherer-{n}.json`; the merge step consolidates). This is what makes a
+crashed run resumable and is the ground truth for "never repeat an identical
+query".
 
 Run **6-10 searches minimum**, split into two mandatory passes:
 
@@ -339,10 +364,10 @@ everyone in the user's space does. This is what the Safe bet completes and
 what the Bold bet must NOT resemble.
 
 ```json
-{"query":"<specific screen/component>","limit":12}
-{"query":"<screen type>","company":"<competitor>","limit":12}
-{"query":"<screen type>","category":"<category>","limit":12}
-{"query":"<different description of same thing>","limit":12}
+{"query":"<specific screen/component>","limit":15}
+{"query":"<screen type>","company":"<competitor>","limit":15}
+{"query":"<screen type>","category":"<category>","limit":15}
+{"query":"<different description of same thing>","limit":15}
 ```
 
 **Pass B — hunt the edges (4-6 searches, REQUIRED — never skip).** Deliberately
@@ -351,10 +376,10 @@ exists to feed the Bold and Wild-card bets; a corpus that only contains the
 median can only produce median recommendations.
 
 ```json
-{"query":"<the underlying FUNCTION, not the screen name — 'data visualization with gamification' not 'dashboard'>","limit":12}
-{"query":"<same screen type>","category":"<deliberately unrelated category: Gaming, Entertainment, Music, Editorial...>","limit":12}
-{"query":"<the persuasion mechanism itself, e.g. 'live activity feed', 'interactive product demo'>","limit":12}
-{"query":"<a second unrelated category doing the same job>","limit":12}
+{"query":"<the underlying FUNCTION, not the screen name — 'data visualization with gamification' not 'dashboard'>","limit":15}
+{"query":"<same screen type>","category":"<deliberately unrelated category: Gaming, Entertainment, Music, Editorial...>","limit":15}
+{"query":"<the persuasion mechanism itself, e.g. 'live activity feed', 'interactive product demo'>","limit":15}
+{"query":"<a second unrelated category doing the same job>","limit":15}
 ```
 
 Cross-pollination routing: finance → look at Gaming/Entertainment/Music;
@@ -389,7 +414,7 @@ Handle them explicitly:
 - Dedupe same-company near-duplicates: keep at most one screen per company per
   cluster unless the duplicates demonstrate different patterns.
 
-Keep `limit` at ~12: larger results overflow many hosts' tool-result cap,
+Keep `limit` at 15 (10-20 band): larger results overflow many hosts' tool-result cap,
 forcing a dump-to-file + re-read round trip that costs more time than a second
 page. Page with `offset` when you genuinely need more. When sending the control
 to `lazyweb_compare_image`, downscale it first (≤500px-wide JPEG) before
@@ -712,24 +737,45 @@ report in front of the user quickly:
 - Normal skill execution must not run full `npm test`, full browser QA, or eval
   comparisons. Those are development/eval checks, not user-facing report steps.
 
-Provider fallback order:
+Provider priority order — **image generation first, HTML last**:
 
-1. Use the native host image generation tool when available.
-2. If native imagegen is unavailable, use a configured external image API such
-   as Nano Banana or Gemini when local credentials/tooling are available
-   (probe env vars/CLIs; prefer the provider with credentials and file output).
-3. **Rasterized HTML prototype:** hand-build each bet as a standalone HTML/CSS
-   page (using the bet's `.build-prompt` as the spec), load it with the browse
-   binary, and screenshot it to `references/prototype-{bet-slug}.png`. This
-   yields a real, legible prototype image and is the standard fallback when no
-   bitmap generator exists — it fills the side-by-side compare slot exactly
-   like a generated image. (Do not use Codex CLI for image generation; it
-   cannot emit bitmaps.)
-4. If neither an image provider nor browse exists, render the recommended
+1. Native host image generation tool.
+2. **Codex CLI image generation** — `codex exec` asked to generate and save a
+   bitmap prototype to a file path.
+3. External image API (Nano Banana / Gemini) when local credentials exist.
+4. **Rasterized HTML prototype (last resort):** hand-build each bet as a
+   standalone HTML/CSS page (using the bet's `.build-prompt` as the spec),
+   load it with the browse binary, and screenshot it to
+   `references/prototype-{bet-slug}.png`. Still a real, legible prototype —
+   and the HTML is implementation-ready, which is its compensating advantage.
+5. If neither an image provider nor browse exists, render the recommended
    bet's layout as a live `.mock` mock-frame in the compare's right slot, and
    ship the option deck as prompt-ready `.prototype-option` cards with images
    marked `not generated` and the structured `.build-prompt` visible/copyable.
    The compare's right slot must never be empty when a control exists.
+
+**Capability probe — run ONCE, cache the result.** Probing dead routes on
+every run burns minutes. Before generating, read
+`~/.lazyweb/imagegen-capability.json`; if it exists and `checked_at` is under
+7 days old, use the best route marked `ok` and skip all probing. Otherwise
+probe each route quickly (~30s total) and write the cache:
+
+- native: is a host image-generation tool callable?
+- codex: does `codex exec "reply OK"` succeed (a broken config fails here —
+  e.g. an invalid `service_tier` in `~/.codex/config.toml`), and can it
+  actually emit a bitmap file when asked? Codex's bitmap ability is
+  machine-dependent — settle it empirically, never assume either way.
+- api: are Gemini/Nano Banana credentials present (env vars/CLIs)?
+
+```json
+{"checked_at":"<ISO date>","native":"ok|dead","codex":"ok|dead","api":"ok|dead"}
+```
+
+Tell the user which route was used. To force a re-probe (e.g. after fixing
+Codex), delete the cache file. All prototype generations for the 2-4 bets run
+IN PARALLEL on whichever route wins — parallel subagents/background jobs, or
+concurrent `codex exec`/API calls; sequential only when the host genuinely
+cannot run concurrent jobs.
 
 Image prompt template:
 
@@ -802,15 +848,15 @@ explanation paragraphs to reach it.
 
 Long-scroll pages are never rendered at full height anywhere in the report.
 Every desktop/web screenshot — compare frames, option-card prototypes, deck
-figures, inspo thumbnails AND their hover expansions, pattern figures — shows a
+figures, inspo thumbnails AND their hover expansions — shows a
 **viewport window**: a crop from one to one-and-a-half viewport heights
 (aspect ratio between 16:10 and 16:15), cropped from the top unless the
 evidence sits lower, in which case shift the window (`object-position` /
 `--pos`) to contain it. The lightbox (explicit click) is the only place a full
 page may appear. Mobile/portrait screenshots are exempt from the windowing —
-they show the whole screen in compare frames, option cards, decks, and
-pattern figures (resting inspo thumbnails may show a top-anchored portrait
-window; hover/expansion reveals the whole screen). This rule exists because a
+they show the whole screen in compare frames, option cards, and decks
+(resting inspo thumbnails may show a top-anchored portrait window;
+hover/expansion reveals the whole screen). This rule exists because a
 6000px-tall figure makes everything around it unreadable.
 
 ### Visible section order
@@ -830,8 +876,6 @@ window; hover/expansion reveals the whole screen). This rule exists because a
 ## Inspo
 {Optional clustered 2x2 reference map, 8-16 points. Omit below 8 comparable references.}
 
-## Interesting Patterns
-{Viewport-window reference screenshots with CSS bounding-box callouts on the interesting area.}
 ```
 
 Do not render visible standalone sections named `Recommendations / Next Steps`,
@@ -935,7 +979,7 @@ handoff block — never as standalone metric chips or extra bullets.
 
 Include `Inspo` only when at least **8 comparable references** can be
 positioned meaningfully. It is a clustered 2x2 map for browsing real designs —
-a place to *look*, not a diagram. Aim for 8-16 points; plotting the whole
+a place to *look*, not a diagram. Aim for 10-16 points; plotting the whole
 selected corpus is encouraged when the axes hold.
 
 Rules:
@@ -964,44 +1008,6 @@ Rules:
 - If there are fewer than 8 meaningful comparable references, omit `Inspo`
   and do not mention the omission in the report body.
 
-### Interesting Patterns section
-
-Patterns are viewport-window screenshots with the interesting area called out
-by a CSS bounding box — context preserved around the evidence, but never a
-full long-scroll page (desktop window rule) and never a box baked into the
-image file.
-
-For a healthy corpus target **5-9 patterns**; use fewer only when the corpus is
-genuinely thin, and never pad with weak ones. Only include patterns that
-influenced a bet or expose a surprising transferable move.
-
-Patterns render in a **two-column grid** (`.patterns-grid`, stacking to one
-column below ~980px) so the section stays compact — each pattern fills its
-column rather than spanning the page. Each pattern uses `.pattern-shot` with
-an `.annotated` figure:
-
-- The figure is a **fixed-window frame**: `aspect-ratio` via `--ar` (default
-  16:11, allowed range 16:10 to 16:15), image `object-fit:cover` with the
-  window positioned via `--pos` so the evidence plus surrounding context is
-  visible. Desktop figures fill the grid column; mobile figures
-  (`.annotated.mobile`, `min(420px,100%)`) show the whole screen at natural
-  height. Add `flip-label` to a `.bbox` whose top edge sits in the upper ~10%
-  of the window so its label chip drops below the box instead of clipping.
-- Overlay one or more `.bbox` elements at **percentage coordinates**
-  (`--x/--y/--w/--h`) **relative to the visible window**, so the callout
-  scales with the report. Each box carries a short label chip naming the move;
-  with a single box, the box spotlights its area by dimming the rest. With
-  multiple boxes, add `multi` to the `.annotated` figure — boxes render as
-  plain outlines (stacked dims would darken each other).
-- **Derive coordinates by actually looking at the image** (read it with vision
-  before writing the box) and verify against the rendered window — if you
-  cannot place the box confidently, ship the window with a caption and no box.
-  A wrong box is worse than no box.
-- Use reference screenshots from Lazyweb or web research, not the user's
-  control screenshot — the control belongs in `Recommendation`.
-- Title states the observation; add a `.prev` prevalence chip when the pattern
-  backs a bet. Provenance in `alt`/`data-source`, not visible prose paragraphs.
-
 ### Report rescale + lightbox (required interactions)
 
 - Fixed `.scalebar` (bottom-right): three buttons `S / M / L` setting
@@ -1019,7 +1025,7 @@ an `.annotated` figure:
 ### Evidence and confidence
 
 - Every claim in the visible body must have nearby evidence: a prototype
-  decision, an image-only map point, an annotated pattern, or a deck card.
+  decision, an image-only map point, or a deck card.
 - Quantify prevalence ("7 of 14 selected references") instead of asserting it
   ("near-universal"). Counts always refer to the selected corpus.
 - For growth/monetization screens, use `lazyweb_ab_test_research` when available.
@@ -1061,8 +1067,11 @@ The `report.html` file should:
 
 A canonical, render-tested template ships next to this skill:
 `report-template.html` in the same directory as this SKILL.md (resolve via the
-skill's base directory). **Copy it to `$REPORT_DIR/report.html` and fill the
-`{{PLACEHOLDERS}}` — never generate the skeleton, CSS, or JS from scratch.**
+skill's base directory). It is a **living demo** — filled with realistic
+example content so its full shape and interactivity render when opened
+directly in a browser. **Copy it to `$REPORT_DIR/report.html` and replace the
+example content with real run data — never generate the skeleton, CSS, or JS
+from scratch.**
 
 ```bash
 cp "{skill-base-dir}/report-template.html" "$REPORT_DIR/report.html"
@@ -1070,14 +1079,19 @@ cp "{skill-base-dir}/report-template.html" "$REPORT_DIR/report.html"
 
 Rules for filling it:
 
-- `{{LIKE_THIS}}` placeholders take content; everything else stays byte-identical.
-  The CSS and JS are render-tested at 1500px/800px across S/M/L scales — do not
-  restyle, "improve", or trim them.
-- `<!--~ REPEAT ... ~-->` comments mark blocks to duplicate per bet / reference /
-  point / pattern; `<!--~ OPTIONAL ... ~-->` and `<!--~ VARIANT ... ~-->` blocks
-  are kept, swapped, or deleted as their comment says (corpus banner, Inspo
-  section, `tall`/`mobileset` compare variants, greenfield no-control case).
-  Remove the `~` comments themselves from the final report.
+- Example content is marked with `data-ex` attributes and `picsum.photos`
+  image URLs. **Replace every example value and delete every `data-ex`
+  attribute as you go.** The publish contract gate BLOCKS any report still
+  containing `data-ex`, `picsum.photos`, `placehold.co`, `EXAMPLE-`, or a
+  leftover `{{PLACEHOLDER}}`.
+- Everything that is not example content stays byte-identical. The CSS and JS
+  are render-tested at 1500px/800px across S/M/L scales — do not restyle,
+  "improve", or trim them.
+- `<!--~ REPEAT ... ~-->` comments mark blocks to duplicate per bet /
+  reference / point; `<!--~ OPTIONAL ... ~-->` and `<!--~ VARIANT ... ~-->`
+  blocks are kept, swapped, or deleted as their comment says (corpus banner,
+  Inspo section, `tall`/`mobileset` compare variants, greenfield no-control
+  case). Remove the `~` comments themselves from the final report.
 - Update the `_vars` array to exactly the bets you shipped (one entry per bet,
   recommended first) and **escape interpolated strings** as the template's
   comments instruct — apostrophes/backslashes in JS literals; `"` `<` `>` as
@@ -1086,6 +1100,10 @@ Rules for filling it:
   (control, prototypes, web captures) use relative `references/{filename}`
   paths only.
 - Avoid horizontal page overflow at every scale setting and viewport width.
+- **Verification is the contract gate, nothing more.** Do not browse-load,
+  screenshot, or vision-inspect the finished report — the template is
+  render-tested and the publish gate catches contract violations. Run the
+  gate, fix what it names, publish.
 - Open the HTML file in the user's browser: `open "$REPORT_DIR/report.html"` —
   skip this in a headless/CI/no-GUI environment and just report the path.
   Similarly, when AskUserQuestion is unavailable or the run is unattended,
@@ -1175,7 +1193,7 @@ Instrument both runs as well as the host allows:
 - Tool-call count by tool name, including Lazyweb MCP, web search,
   browser/capture, shell, and agent calls
 - Design-reference count: total references found, references selected,
-  references shown per bet, references placed in the map, and patterns annotated
+  references shown per bet, and references placed in the map
 
 For quality, ask another agent in a fresh context to review only the original
 prompt and anonymized report files labeled `Report A` and `Report B`. The judge
@@ -1199,8 +1217,7 @@ old/new only after scoring and include the winner plus reasoning in `compare.htm
 - When the corpus is weak, add the `.corpus` banner and avoid padding.
 - 14 relevant references beat 20 loose ones; 8 relevant references beat 14
   loose ones. Relevance is the bar, then volume.
-- A wrong bounding box is worse than no bounding box; a mislabeled cluster is
-  worse than no map.
+- A mislabeled cluster is worse than no map.
 - Three reasonable bets is a failed run. The Safe bet earns trust; the Bold
   and Wild bets earn the report its existence. Novelty must always carry a
   mechanism ("why this converts HERE") — weird-for-weird's-sake is as much a
