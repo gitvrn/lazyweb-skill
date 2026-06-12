@@ -339,10 +339,10 @@ everyone in the user's space does. This is what the Safe bet completes and
 what the Bold bet must NOT resemble.
 
 ```json
-{"query":"<specific screen/component>","limit":30}
-{"query":"<screen type>","company":"<competitor>","limit":30}
-{"query":"<screen type>","category":"<category>","limit":30}
-{"query":"<different description of same thing>","limit":30}
+{"query":"<specific screen/component>","limit":12}
+{"query":"<screen type>","company":"<competitor>","limit":12}
+{"query":"<screen type>","category":"<category>","limit":12}
+{"query":"<different description of same thing>","limit":12}
 ```
 
 **Pass B — hunt the edges (4-6 searches, REQUIRED — never skip).** Deliberately
@@ -351,10 +351,10 @@ exists to feed the Bold and Wild-card bets; a corpus that only contains the
 median can only produce median recommendations.
 
 ```json
-{"query":"<the underlying FUNCTION, not the screen name — 'data visualization with gamification' not 'dashboard'>","limit":30}
-{"query":"<same screen type>","category":"<deliberately unrelated category: Gaming, Entertainment, Music, Editorial...>","limit":30}
-{"query":"<the persuasion mechanism itself, e.g. 'live activity feed', 'interactive product demo'>","limit":30}
-{"query":"<a second unrelated category doing the same job>","limit":30}
+{"query":"<the underlying FUNCTION, not the screen name — 'data visualization with gamification' not 'dashboard'>","limit":12}
+{"query":"<same screen type>","category":"<deliberately unrelated category: Gaming, Entertainment, Music, Editorial...>","limit":12}
+{"query":"<the persuasion mechanism itself, e.g. 'live activity feed', 'interactive product demo'>","limit":12}
+{"query":"<a second unrelated category doing the same job>","limit":12}
 ```
 
 Cross-pollination routing: finance → look at Gaming/Entertainment/Music;
@@ -388,6 +388,12 @@ Handle them explicitly:
 - Skip entries with null `siteId`/`pageUrl` AND no description.
 - Dedupe same-company near-duplicates: keep at most one screen per company per
   cluster unless the duplicates demonstrate different patterns.
+
+Keep `limit` at ~12: larger results overflow many hosts' tool-result cap,
+forcing a dump-to-file + re-read round trip that costs more time than a second
+page. Page with `offset` when you genuinely need more. When sending the control
+to `lazyweb_compare_image`, downscale it first (≤500px-wide JPEG) before
+base64 — a full 1500px PNG exceeds tool-call limits.
 
 Platform routing:
 - SaaS, web, desktop app, admin surface, or marketing page -> use `platform: "desktop"`
