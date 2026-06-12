@@ -1,6 +1,6 @@
 ---
 name: lazyweb-design-research
-route: 'Design research, best practices, competitive analysis, "what do top apps do"'
+route: "Design research, best practices, competitive analysis"
 description: |
   Deep design research combining Lazyweb's screenshot database with web research.
   Produces a prototype-first HTML report with side-by-side prototypes and a clustered inspo map.
@@ -251,6 +251,16 @@ fi
 [ -x "$LB" ] && echo "BROWSE_READY: $LB" || echo "NO_BROWSE"
 ```
 
+Immediately after `BROWSE_READY`, set a real viewport — the daemon's default
+window can be arbitrarily small and silently produces unusable captures:
+
+```bash
+$LB viewport 1440x900
+```
+
+Use `$LB screenshot --viewport <path>` for viewport-window shots; the default
+`screenshot` is full-page.
+
 If `NO_BROWSE`: Web screenshot capture is unavailable. Lazyweb results still work -
 just describe web examples in text without screenshots. To enable web captures,
 run: `cd ~/.lazyweb/repos/lazyweb-skill/browse && ./setup`
@@ -262,7 +272,7 @@ run: `cd ~/.lazyweb/repos/lazyweb-skill/browse && ./setup`
 Before searching, ground the work in what the user is building:
 
 1. Run `lazyweb-context-detect` (on `PATH` when installed by setup; otherwise `~/.lazyweb/repos/lazyweb-skill/bin/lazyweb-context-detect`). Use its project/platform/stack output to bias the `platform` filter and captions.
-2. Clarify only what cannot be inferred. If platform is unknown, or the product/screen/outcome is unclear, ask ONE AskUserQuestion to pin down product/screen, mobile vs desktop, and the specific outcome.
+2. Clarify only what cannot be inferred. If platform is unknown, or the product/screen/outcome is unclear, ask the user ONE short clarifying question to pin down product/screen, mobile vs desktop, and the specific outcome.
 
 ### 1. Understand the research question
 
@@ -333,6 +343,12 @@ tool, dispatch THREE gatherers concurrently in a single message:
 Each gatherer writes structured JSON to `$REPORT_DIR/work/gatherer-{n}.json`
 (references with `visionDescription`, image URLs, coverage notes, queries run)
 and returns a compact summary. The main agent merges, dedupes, and clusters.
+Gatherer prompts MUST state: (a) the output directory already exists — use the
+Write tool only, never Bash/mkdir (denied permissions stall the run); (b) copy
+each returned `imageUrl` string VERBATIM into the JSON — a reference without
+its imageUrl cannot be embedded; (c) expansion results lacking a
+`visionDescription` are not dropped wholesale — keep the top ≤5 as
+`pending_vision` entries for the main agent to vision-verify after the merge.
 Hosts WITHOUT a subagent tool follow the same three roles as sequential
 phases, batching independent tool calls into single messages wherever the host
 allows.
@@ -417,7 +433,9 @@ Handle them explicitly:
 Keep `limit` at 15 (10-20 band): larger results overflow many hosts' tool-result cap,
 forcing a dump-to-file + re-read round trip that costs more time than a second
 page. Page with `offset` when you genuinely need more. When sending the control
-to `lazyweb_compare_image`, downscale it first (≤500px-wide JPEG) before
+to `lazyweb_compare_image`, **crop it to its top viewport window FIRST** (a
+full-page capture downscaled whole becomes an unembeddable sliver and the
+server rejects it), then downscale that window to a ≤500px-wide JPEG before
 base64 — a full 1500px PNG exceeds tool-call limits.
 
 Platform routing:
@@ -775,7 +793,10 @@ Tell the user which route was used. To force a re-probe (e.g. after fixing
 Codex), delete the cache file. All prototype generations for the 2-4 bets run
 IN PARALLEL on whichever route wins — parallel subagents/background jobs, or
 concurrent `codex exec`/API calls; sequential only when the host genuinely
-cannot run concurrent jobs.
+cannot run concurrent jobs. **Route-4 split:** builder subagents WRITE the
+HTML files only; the MAIN agent rasterizes them with the browse binary
+sequentially afterwards (~5s each) — the browse daemon is one shared tab,
+never driven by multiple agents concurrently.
 
 Image prompt template:
 
@@ -1060,8 +1081,9 @@ The `report.html` file should:
 - Avoid horizontal page overflow at every scale setting and viewport width.
 - Open the HTML file in the user's browser: `open "$REPORT_DIR/report.html"` —
   skip this in a headless/CI/no-GUI environment and just report the path.
-  Similarly, when AskUserQuestion is unavailable or the run is unattended,
-  make the closest reasonable assumption and state it in the handoff block.
+  Similarly, when you cannot ask the user (an unattended or non-interactive
+  run), make the closest reasonable assumption and state it in the handoff
+  block.
 
 ### Report template (REQUIRED starting point — do not hand-write the skeleton)
 
@@ -1100,14 +1122,18 @@ Rules for filling it:
   (control, prototypes, web captures) use relative `references/{filename}`
   paths only.
 - Avoid horizontal page overflow at every scale setting and viewport width.
+- Fill with plain string replacement, not regex substitution — `re.sub`
+  raises `bad escape` when replacement text contains backslashes (the `_vars`
+  block will); use `str.replace` or a lambda replacement.
 - **Verification is the contract gate, nothing more.** Do not browse-load,
   screenshot, or vision-inspect the finished report — the template is
   render-tested and the publish gate catches contract violations. Run the
   gate, fix what it names, publish.
 - Open the HTML file in the user's browser: `open "$REPORT_DIR/report.html"` —
   skip this in a headless/CI/no-GUI environment and just report the path.
-  Similarly, when AskUserQuestion is unavailable or the run is unattended,
-  make the closest reasonable assumption and state it in the handoff block.
+  Similarly, when you cannot ask the user (an unattended or non-interactive
+  run), make the closest reasonable assumption and state it in the handoff
+  block.
 
 CSS gotcha (if you must add a style): never write `font:700 10px/1 inherit` —
 `inherit` is not a valid font-family inside the `font` shorthand and browsers
